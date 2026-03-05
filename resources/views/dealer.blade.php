@@ -42,149 +42,138 @@
 @endsection
 @section('content')
 <section class="welcome">
-     <!-- Customer Info Section -->
-     <div class="row">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Dealer Information</h5>
-                </div>
-                <div class="card-body">
-                    <div class='text-center'>
-                    <img src="{{$dealer->avatar ? asset($dealer->avatar) : asset('design/assets/images/profile/user-1.png')}}" alt="Avatar Image" class="img-fluid rounded-circle" style="width: 100px; height: 100px;">
-                    </div>  
-                    <br>
-                   <div class='text-center'>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"  data-bs-target="#uploadAvatarModal" title="Upload Avatar">
-                        <i class="fas fa-camera"></i>
-                        <span class="sr-only">Upload Avatar</span>
-                        </button>
-                    </div>
-                    <!-- Customer Personal Details -->
-                    <p><strong>Name:</strong> {{$dealer->name}}</p>
-                    <p><strong>Contact:</strong> {{$dealer->number}}</p>
-                    <p><strong>Address:</strong> {{$dealer->address}}</p>
-                    <p><strong>Store Name:</strong> {{$dealer->store_name}}</p>
-                    <p><strong>Store Type:</strong> {{$dealer->store_type}}</p>
-                    <p><strong>facebook:</strong> {{$dealer->facebook}}</p>
-                    <p><strong>Email:</strong> {{$dealer->user->email}}</p>
-
-                    <!-- QR Code Generation -->
-                    <div id="qrcode" class="mt-4 text-center">
-                      
-                    </div>
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Dealer Information</h5>
         </div>
-        <div class="col-8">
-            <div class='row'>
-                <div class="col-6">
-                     <div class="card shadow-sm stretch">
-                        @if($dealer->valid_id)
-                            <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="bi bi-person-vcard-fill me-2"></i> Valid ID Information  &nbsp;
-                                <button type="button" data-bs-toggle="modal"  data-bs-target="#viewValidId" class="btn btn-primary btn-sm btn-radius">
-                                    <i class="bi bi-file-earmark"></i>
-                                </button>
-                            </h5>
-                            <hr>
-                            <p class="mb-2">
-                                <strong><i class="bi bi-card-text me-2"></i>ID Type:</strong> {{$dealer->valid_id}}
-                            </p>
-                            <p class="mb-0">
-                                <strong><i class="bi bi-hash me-2"></i>ID Number:</strong> {{$dealer->valid_id_number}}
-                            </p>
-                            </div>
-                        @else
-                        <div class="card-body text-center">
-                        <h5 class="card-title"><i class="bi bi-person-vcard"></i> Upload Valid ID</h5>
-                        <p class="card-text">Submit a valid government-issued ID.</p>
-                        <button class="btn btn-danger" type='button' data-bs-toggle="modal"  data-bs-target="#uploadIdModal">
-                            <i class="bi bi-upload"></i> Upload ID
-                        </button>
-                        </div>
-                        @endif
-                    </div>
-                        </div>
-                        <div class="col-6">
-                            @if($dealer->signature)
-                        <div class="card shadow-sm stretch" >
-                            <div class="card-body text-center">
-                            <h6 class="card-title"><i class="mdi mdi-file-document-check-outline"></i> Signed Contract</h6>
-
-                            @if($dealer->signature)
-                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#contractView">
-                            <i class="bi bi-file-text"></i> View Signed Contract
-                            </button>
-                            @else
-                            <p class="text-muted"><i class="mdi mdi-close-circle-outline"></i> No contract uploaded.</p>
-                            @endif
-                        </div>
-                    @else
-
-                        <div class="card shadow-sm">
-                            <div class="card-body text-center">
-                            <h5 class="card-title"><i class="bi bi-file-earmark-text"></i> Contract Signing</h5>
-                            <p class="card-text">Review and sign the contract.</p>
-                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#contractModal">
-                                <i class="bi bi-pencil-square"></i> Sign Contract
-                            </button>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            
-          <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Transactions</h5>
-                </div>
-                <div class="card-body">
-                    <!-- Purchase History Table -->
-                    <table class="table table-bordered" style='font-size:12px;'>
-                        <thead>
-                            <tr>
-                                <th>Transaction No.</th>
-                                <th>Product</th>
-                                <th>Quantity</th>
-                                <th>Points Earned</th>
-                                <th>Amount</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($transactions as $transaction)
-                            <tr>
-                                <td>{{$transaction->id}}</td>
-                                <td>{{$transaction->item}}</td>
-                                <td>{{$transaction->qty}}</td>
-                                <td><span class='text-success'>{{$transaction->points_client}}</span></td>
-                                <td>{{number_format($transaction->qty*$transaction->price,2)}}</td>
-                                <td>{{date('M d, Y',strtotime($transaction->created_at))}}</td>
-                            </tr>
-                            @endforeach
-                            <!-- Sample Purchase 1 -->
-                            {{-- <tr>
-                                <td>123</td>
-                                <td>330g LPG Cylinder</td>
-                                <td>5</td>
-                                <td>PHP XXX.00</td>
-                                <td>March 1, 2025</td>
-                            </tr> --}}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="card-body">
+          <div class='text-center'>
+            <img src="{{$dealer->avatar ? asset($dealer->avatar) : asset('design/assets/images/profile/user-1.png')}}" alt="Avatar Image" class="img-fluid rounded-circle" style="width: 100px; height: 100px;">
+          </div>  
+          <br>
+          <div class='text-center'>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal"  data-bs-target="#uploadAvatarModal" title="Upload Avatar">
+              <i class="fas fa-camera"></i>
+              <span class="sr-only">Upload Avatar</span>
+            </button>
+          </div>
+          <!-- Customer Personal Details -->
+          <p><strong>Name:</strong> {{$dealer->name}}</p>
+          <p><strong>Contact:</strong> {{$dealer->number}}</p>
+          <p><strong>Address:</strong> {{$dealer->address}}</p>
+          <p><strong>Store Name:</strong> {{$dealer->store_name}}</p>
+          <p><strong>Store Type:</strong> {{$dealer->store_type}}</p>
+          <p><strong>facebook:</strong> {{$dealer->facebook}}</p>
+          <p><strong>Email:</strong> {{$dealer->user->email}}</p>
+          <!-- QR Code Generation -->
+          <div id="qrcode" class="mt-4 text-center"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-8">
+      <div class='row'>
+        <div class="col-6">
+          <div class="card shadow-sm stretch">
+            @if($dealer->valid_id)
+              <div class="card-body">
+                <h5 class="card-title">
+                  <i class="bi bi-person-vcard-fill me-2"></i> Valid ID Information  &nbsp;
+                  <button type="button" data-bs-toggle="modal"  data-bs-target="#viewValidId" class="btn btn-primary btn-sm btn-radius">
+                    <i class="bi bi-file-earmark"></i>
+                  </button>
+                </h5>
+                <hr>
+                <p class="mb-2">
+                  <strong><i class="bi bi-card-text me-2"></i>ID Type:</strong> {{$dealer->valid_id}}
+                </p>
+                <p class="mb-0">
+                  <strong><i class="bi bi-hash me-2"></i>ID Number:</strong> {{$dealer->valid_id_number}}
+                </p>
+              </div>
+            @else
+              <div class="card-body text-center">
+                <h5 class="card-title"><i class="bi bi-person-vcard"></i> Upload Valid ID</h5>
+                <p class="card-text">Submit a valid government-issued ID.</p>
+                <button class="btn btn-danger" type='button' data-bs-toggle="modal"  data-bs-target="#uploadIdModal">
+                  <i class="bi bi-upload"></i> Upload ID
+                </button>
+              </div>
+            @endif
           </div>
         </div>
-           
+        <div class="col-6">
+          @if($dealer->signature)
+            <div class="card shadow-sm stretch" >
+              <div class="card-body text-center">
+              <h6 class="card-title"><i class="mdi mdi-file-document-check-outline"></i> Signed Contract</h6>
+              @if($dealer->signature)
+                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#contractView">
+                  <i class="bi bi-file-text"></i> View Signed Contract
+                </button>
+              @else
+                <p class="text-muted"><i class="mdi mdi-close-circle-outline"></i> No contract uploaded.</p>
+              @endif
+            </div>
+          @else
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <h5 class="card-title"><i class="bi bi-file-earmark-text"></i> Contract Signing</h5>
+                <p class="card-text">Review and sign the contract.</p>
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#contractModal">
+                    <i class="bi bi-pencil-square"></i> Sign Contract
+                </button>
+              </div>
+            </div>
+          @endif
         </div>
-    </div>
-    
 
+        <div class="col-md-12">
+          <div class="card">
+              <div class="card-header">
+                  <h5>Transactions</h5>
+              </div>
+              <div class="card-body">
+                  <!-- Purchase History Table -->
+                  <table class="table table-bordered" style='font-size:12px;'>
+                      <thead>
+                          <tr>
+                              <th>Transaction No.</th>
+                              <th>Product</th>
+                              <th>Quantity</th>
+                              <th>Points Earned</th>
+                              <th>Amount</th>
+                              <th>Date</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          @foreach($transactions as $transaction)
+                          <tr>
+                              <td>{{$transaction->id}}</td>
+                              <td>{{$transaction->item}}</td>
+                              <td>{{$transaction->qty}}</td>
+                              <td><span class='text-success'>{{$transaction->points_client}}</span></td>
+                              <td>{{number_format($transaction->qty*$transaction->price,2)}}</td>
+                              <td>{{date('M d, Y',strtotime($transaction->created_at))}}</td>
+                          </tr>
+                          @endforeach
+                          <!-- Sample Purchase 1 -->
+                          {{-- <tr>
+                              <td>123</td>
+                              <td>330g LPG Cylinder</td>
+                              <td>5</td>
+                              <td>PHP XXX.00</td>
+                              <td>March 1, 2025</td>
+                          </tr> --}}
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 @include('change_avatar_dealer')
 @include('upload_valid_id_dealer')

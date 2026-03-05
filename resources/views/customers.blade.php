@@ -62,74 +62,119 @@
 @endsection
 @section('content')
 <section class="welcome">
-    <div class="row">
-        <div class="col-lg-12 col-xl-12 d-flex align-items-stretch">
-            <div class="card w-100">
-                <div class="card-body">
-                    <h5>Customers <button class="btn-sm btn-success btn" data-bs-toggle="modal"  data-bs-target="#new_customer">+ Add</button></h5>
-                  <div class="table-responsive">
-                    <table id="example" class="table table-bordered table-striped " style="width:100%">
-                        <thead>
-                          <tr>
-                              <th>Customer Name</th>
-                              <th>Contact Number</th>
-                              <th>Email Address</th>
-                              <th style="display:none;">Date Start</th>
-                              <th style="display:none;">As of Now</th>
-                              <th>Serial Number</th>
-                              <th>Address</th>
-                              <th>Total Points</th>
-                              <th>Last Transaction</th>
-                              <th style="display:none;">Remarks</th>
-                              <th style="display:none;">Status</th>
-                          </tr>
-                        </thead>
-                        <tbody id="customerBody">
-                            @foreach($customers as $customer)
-                          <tr>
-                              <td><a href='view-client/{{$customer->id}}'>{{ strtoupper($customer->name) }}</a></td>
-                              <td>{{ $customer->number }}</td>
-                              <td>{{ $customer->email_address }}</td>
-                              <td style="display:none;">
-                                  @php
-                                      $firstTransaction = $customer->transactions->sortBy('date')->first();
-                                  @endphp
-
-                                  {{ $firstTransaction ? date('M d, Y', strtotime($firstTransaction->date)) : 'No Data' }}
-                              </td>
-                              <td style="display:none;">
-                                  {{ \Carbon\Carbon::now()->format('M d, Y') }}
-                              </td>
-                              <td>
-                                  @if($customer->serial)
-                                      {{ $customer->serial->serial_number }}
-                                  @endif
-                              </td>
-                              <td>{{ $customer->address }}</td>
-                              <td>{{ $customer->transactions->sum('points_client') }}</td>
-                              <td>
-                                  @php
-                                      $transaction = ($customer->transactions)->sortByDesc('date')->first();
-                                  @endphp
-                                  @if($transaction)
-                                      {{ date('M d, Y', strtotime($transaction->date)) }}
-                                  @else
-                                      No Data
-                                  @endif
-                              </td>
-                             
-                              <td style="display:none;">@if($customer->serial && !empty($customer->serial->remarks)) SN# @if($customer->serial) {{ $customer->serial->serial_number }} @endif used to be owned by @if($customer->serial && $customer->serial->remarks) @php $previousOwner = \App\Client::find($customer->serial->remarks); @endphp {{ $previousOwner ? $previousOwner->name : 'Unknown Client' }} @endif  @endif</td>
-                              <td style="display:none;">{{ $customer->status ?? '' }}</td>
-                          </tr>
-                          @endforeach
-
-                        </tbody>
-                    </table>
-                  </div>
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-sm-6 col-lg-4 col-xl-2">
+      <div class="card warning-card overflow-hidden text-bg-primary w-100">
+        <div class="card-body p-4">
+          <div class="mb-7">
+            <i class="ti ti-user-check fs-8 fw-lighter"></i> <!-- Active icon -->
+          </div>
+          <h5 class="text-white fw-bold fs-14 text-nowrap">
+            {{ $activeCustomers }}
+          </h5>
+          <p class="opacity-50 mb-0" style="font-size: 12px;">ACTIVE CUSTOMERS</p>
         </div>
+      </div>
     </div>
+    <div class="col-sm-6 col-lg-4 col-xl-2">
+      <div class="card danger-card overflow-hidden text-bg-primary w-100">
+        <div class="card-body p-4">
+          <div class="mb-7">
+              <i class="ti ti-user-x fs-8 fw-lighter"></i> <!-- Inactive icon -->
+          </div>
+          <h5 class="text-white fw-bold fs-14 text-nowrap">
+            {{ $inactiveCustomers }}
+          </h5>
+          <p class="opacity-50 mb-0" style="font-size: 12px;">INACTIVE CUSTOMERS</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+      <div class="col-lg-12 col-xl-12 d-flex align-items-stretch">
+          <div class="card w-100">
+              <div class="card-body">
+                  <h5>Customers <button class="btn-sm btn-success btn" data-bs-toggle="modal"  data-bs-target="#new_customer">+ Add</button></h5>
+                <div class="table-responsive">
+                  <table id="example" class="table table-bordered table-striped " style="width:100%">
+                      <thead>
+                        <tr>
+                            <th>Customer Reference</th>
+                            <th>Customer Name</th>
+                            <th>Contact Number</th>
+                            <th>Email Address</th>
+                            <th style="display:none;">Date Start</th>
+                            <th style="display:none;">As of Now</th>
+                            <th>Serial Number</th>
+                            <th>Address</th>
+                            <th>Total Points</th>
+                            <th>Last Transaction</th>
+                            <th style="display:none;">Remarks</th>
+                            <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody id="customerBody">
+                          @foreach($customers as $customer)
+                        <tr>
+                          <td>{{ $customer->client_reference }}</td>
+                          <td><a href='view-client/{{$customer->id}}'>{{ strtoupper($customer->name) }}</a></td>
+                          <td>{{ $customer->number }}</td>
+                          <td>{{ $customer->email_address }}</td>
+                          <td style="display:none;">
+                              @php
+                                  $firstTransaction = $customer->transactions->sortBy('date')->first();
+                              @endphp
+
+                              {{ $firstTransaction ? date('M d, Y', strtotime($firstTransaction->date)) : 'No Data' }}
+                          </td>
+                          <td style="display:none;">
+                              {{ \Carbon\Carbon::now()->format('M d, Y') }}
+                          </td>
+                          <td>
+                            @if($customer->serial)
+                              {{ $customer->serial->serial_number }}
+                            @else 
+                              -
+                            @endif
+                          </td>
+                          <td>
+                            {{ implode(', ', array_filter([
+                                $customer->street_address,
+                                $customer->location_barangay,
+                                $customer->location_city,
+                                $customer->location_province
+                            ])) }} {{ $customer->postal_code }}
+                          </td>
+                          <td>{{ $customer->transactions->sum('points_client') }}</td>
+                          <td>
+                              @php
+                                  $transaction = ($customer->transactions)->sortByDesc('date')->first();
+                              @endphp
+                              @if($transaction)
+                                  {{ date('M d, Y', strtotime($transaction->date)) }}
+                              @else
+                                  No Data
+                              @endif
+                          </td>
+                          
+                          <td style="display:none;">@if($customer->serial && !empty($customer->serial->remarks)) SN# @if($customer->serial) {{ $customer->serial->serial_number }} @endif used to be owned by @if($customer->serial && $customer->serial->remarks) @php $previousOwner = \App\Client::find($customer->serial->remarks); @endphp {{ $previousOwner ? $previousOwner->name : 'Unknown Client' }} @endif  @endif</td>
+                          <td>
+                            @if($customer->status == 'Active')
+                              <span class="badge badge-success">Active</span>
+                            @else 
+                              <span class="badge badge-danger">Inactive</span>
+                            @endif
+                          </td>
+                        </tr>
+                        @endforeach
+
+                      </tbody>
+                  </table>
+                </div>
+              </div>
+          </div>
+      </div>
+  </div>
     
 </section>
 @endsection

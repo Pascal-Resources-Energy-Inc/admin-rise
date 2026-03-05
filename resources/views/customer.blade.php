@@ -63,9 +63,15 @@
                     <!-- Customer Personal Details -->
                     <p><strong>Name:</strong> {{$customer->name}}</p>
                     <p><strong>Contact:</strong> {{$customer->number}}</p>
-                    <p><strong>Address:</strong> {{$customer->address}}</p>
+                    <p><strong>Address:</strong> 
+                        {{ implode(', ', array_filter([
+                            $customer->street_address,
+                            $customer->location_barangay,
+                            $customer->location_city,
+                            $customer->location_province
+                        ])) }} {{ $customer->postal_code }}</p>
                     <p><strong>Serial Number:</strong> {{$customer->serial->serial_number}}</p>
-                    <p><strong>facebook:</strong> {{$customer->facebook}}</p>
+                    <p><strong>Facebook:</strong> {{$customer->facebook}}</p>
 
                     <!-- QR Code Generation -->
                     <div id="qrcode" class="mt-4 text-center">

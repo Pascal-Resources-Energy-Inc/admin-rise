@@ -25,17 +25,27 @@ class DealerController extends Controller
     }
     public function newDealer(Request $request)
     {
-        // dd($request->all());
-
-         $user = new User;
+        $user = new User;
         $user->name = $request->name;
         $user->email = $request->email_address;
         $user->role = 'Dealer';
         $user->password = bcrypt('12345678');
         $user->save();
 
+        // Generate Client Reference
+        $latestDealer = Dealer::orderBy('id', 'desc')->first();
+
+        if ($latestDealer && $latestDealer->dealer_reference) {
+            $number = intval(substr($latestDealer->dealer_reference, 3)) + 1;
+        } else {
+            $number = 1;
+        }
+
+        $dealer_reference = 'PRD' . str_pad($number, 4, '0', STR_PAD_LEFT);
+
         $customer = new Dealer;
         $customer->user_id = $user->id;
+        $customer->dealer_reference = $dealer_reference;
         $customer->name = $request->name;
         $customer->email_address = $request->email_address;
         $customer->number = $request->phone_number;

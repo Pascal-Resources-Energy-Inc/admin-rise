@@ -7,17 +7,23 @@ use App\TransactionDetail;
 use Illuminate\Http\Request;
 use App\Client;
 use RealRashid\SweetAlert\Facades\Alert;
+use GuzzleHttp\Client as GuzzleClient;
 class CustomerController extends Controller
 {
     //
     public function index(Request $request)
     {   
+        $activeCustomers = Client::where('status', 'Active')->count();
+        $inactiveCustomers = Client::where('status', 'Inactive')->count();
+
         $stoves = Stove::where('client_id',null)->get();
         $customers = Client::with(['transactions', 'serial'])->get();
         return view('customers',
             array(
                 'stoves' => $stoves,
-                'customers' => $customers
+                'customers' => $customers,
+                'activeCustomers' => $activeCustomers,
+                'inactiveCustomers' => $inactiveCustomers
             )
         );
     }
@@ -50,9 +56,6 @@ class CustomerController extends Controller
 
     public function saveCustomer(Request $request)
     {
-            // Alert::success('Successfully posted payment! Your server is in the process of being created. Please wait.')->persistent('Dismiss');
-        // dd($request->all());
-
         $user = new User;
         $user->name = $request->name;
         $user->email = $request->email_address;
@@ -60,7 +63,19 @@ class CustomerController extends Controller
         $user->password = bcrypt('12345678');
         $user->save();
 
+        // Generate Client Reference
+        $latestClient = Client::orderBy('id', 'desc')->first();
+
+        if ($latestClient && $latestClient->client_reference) {
+            $number = intval(substr($latestClient->client_reference, 3)) + 1;
+        } else {
+            $number = 1;
+        }
+
+        $client_reference = 'PRC' . str_pad($number, 4, '0', STR_PAD_LEFT);
+
         $customer = new Client;
+        $customer->client_reference = $client_reference;
         $customer->user_id = $user->id;
         $customer->name = $request->name;
         $customer->email_address = $request->email_address;
@@ -68,6 +83,14 @@ class CustomerController extends Controller
         $customer->facebook = $request->facebook;
         $customer->address = $request->address;
         $customer->serial_number = $request->serial_number;
+        $customer->location_region = $request->location_region;
+        $customer->location_province = $request->location_province;
+        $customer->location_city = $request->location_city;
+        $customer->location_barangay = $request->location_barangay;
+        $customer->postal_code = $request->postal_code;
+        $customer->street_address = $request->street_address;
+        $customer->spo = $request->spo;
+        $customer->center = $request->center;
         $customer->status = $request->status;
         $customer->save();
 
@@ -78,8 +101,8 @@ class CustomerController extends Controller
 
         Alert::success('Successfully encoded')->persistent('Dismiss');
         return redirect('view-client/' . $customer->id);
-
     }
+    
     public function changeAvatar(Request $request, $id)
     {
         $customer = Client::findOrfail($id);
@@ -199,5 +222,55 @@ class CustomerController extends Controller
         array(
         'customer' => $customer
         ));
+    }
+
+    public function regions()
+    {
+        try {
+            $client = new GuzzleClient();
+            $response = $client->get('https://psgc.cloud/api/regions');
+            
+            return response()->json(
+                json_decode($response->getBody()->getContents(), true)
+            );
+        } catch (\Exception $e) {
+            return response()->json([], 500);
+        }
+    }
+
+    public function provinces($region)
+    {
+        try {
+            $client = new GuzzleClient();
+            $response = $client->get("https://psgc.cloud/api/regions/{$region}/provinces");
+
+            return response()->json(json_decode($response->getBody()->getContents(), true));
+        } catch (\Exception $e) {
+            return response()->json([], 500);
+        }
+    }
+
+    public function cities($province)
+    {
+        try {
+            $client = new GuzzleClient();
+            $response = $client->get("https://psgc.cloud/api/provinces/{$province}/cities-municipalities");
+
+            return response()->json(json_decode($response->getBody()->getContents(), true));
+        } catch (\Exception $e) {
+            return response()->json([], 500);
+        }
+    }
+
+    public function barangays($city)
+    {
+        try {
+            $client = new GuzzleClient();
+            $response = $client->get("https://psgc.cloud/api/cities-municipalities/{$city}/barangays");
+
+            return response()->json(json_decode($response->getBody()->getContents(), true));
+        } catch (\Exception $e) {
+            return response()->json([], 500);
+        }
     }
 }

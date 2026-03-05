@@ -1104,9 +1104,6 @@
                     <p class="user-name">{{current(explode(' ',auth()->user()->name))}}</p>
                     <p class="user-role">{{auth()->user()->role}}</p>
                 </div>
-                <!-- <button class="logout-btn" onclick="logout(); show();">
-                    <i class="bi bi-box-arrow-right"></i>
-                </button> -->
             </div>
         </div>
     </nav>

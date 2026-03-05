@@ -80,7 +80,6 @@ Route::post('/change-avatar/{id}','CustomerController@changeAvatar')->name('chan
 Route::post('/valid-id/{id}','CustomerController@uploadValidId')->name('uploadValidId');
 Route::post('/submit-contract/{id}','CustomerController@contractSign')->name('sign');
 
-
 Route::get('/signature/{id}','CustomerController@sign');
 Route::get('/signature-dealer/{id}','DealerController@sign');
 
