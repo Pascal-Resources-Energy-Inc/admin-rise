@@ -8,41 +8,115 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
+          <div class="form-section">
+            <label>KASUNDUAN NG GAZ LITE MICRO-ENTREPRENEUR RETAILER</label><br>
+            <p class="text-muted">(GAZ LITE MICRO-ENTREPRENEUR RETAILER AGREEMENT)</p>
+            <p>
+              Ito ay nagpapatunay na ako, <b><u>{{$dealer->name}}</b></u>, ay kusang-loob na pumapayag na maging Gaz Lite Micro-Entrepreneur Retailer ng Pascal Resources Energy Inc.<br>
+              Ang kasunduang ito ay nagtatakda ng mga patakaran, responsibilidad, at obligasyon ng Micro-Entrepreneur Retailer upang matiyak ang maayos na distribusyon ng Gaz Lite clean cooking products sa komunidad.
+              <br><small class="text-muted">(This certifies that I, <b><u>{{$dealer->name}}</b></u>, voluntarily agree to become a Gaz Lite Micro-Entrepreneur Retailer of Pascal Resources Energy Inc. This agreement establishes the responsibilities and obligations of the Micro-Entrepreneur Retailer in distributing Gaz Lite clean cooking products within the community.)</small>
+            </p>
+            <label>Misyon ng Pascal Resources Energy, Inc.</label><br>
+            <p class="text-muted">(Mission of Pascal Resources Energy, Inc.)</p>
+            <p>
+              Ang layunin ng Pascal Resources Energy, Inc. ay palawakin ang access sa malinis, ligtas, at abot-kayang enerhiya sa pagluluto para sa mga sambahayan sa pamamagitan ng paggamit ng Gaz Lite cookstoves at refills. Nilalayon din ng programa na mapabuti ang kalusugan ng pamilya, mabawasan ang paggamit ng kahoy at uling, mapangalagaan ang kapaligiran, at makalikha ng mga oportunidad sa kabuhayan sa komunidad.
+              <br><small class="text-muted">(The mission of Pascal Resources Energy, Inc. is to expand access to clean, safe, and affordable cooking energy for households through the use of Gaz Lite cookstoves and refills. The program also aims to improve family health, reduce reliance on firewood and charcoal, protect the environment and create livelihood opportunities within communities.)</small>
+            </p>
+              {{-- <p>
+                  Ito ay pagpapatunay na ako, <b><u>{{$dealer->name}}</b></u>, ay pumapayag na makibahagi sa proyekto ng <strong>CARBON CREDIT GAZ LITE FEASIBILITY STUDY</strong>.
+              </p> --}}
 
-           <div class="form-section">
-    <p>
-        Ito ay pagpapatunay na ako, <b><u>{{$dealer->name}}</b></u>, ay pumapayag na makibahagi sa proyekto ng <strong>CARBON CREDIT GAZ LITE FEASIBILITY STUDY</strong>.
-    </p>
+            {{-- <h6 class="mt-4"><strong>Mga panuntunan na dapat sundin ng mga kalahok sa proyekto:</strong></h6> --}}
 
-    <h6 class="mt-4"><strong>Mga panuntunan na dapat sundin ng mga kalahok sa proyekto:</strong></h6>
-
-    <ol>
-        <li>
-            Ako ay nagkukusang loob na magbebenta ng Gaz Lite LPG cookstove at micro-cylinders sa halip na kahoy at/o uling para sa pagluluto ng mga kalahok sa aking nasasakupan. 
-            <br><small class="text-muted">(I volunteer to sell and promote Gaz Lite LPG cookstove and micro-cylinders instead of firewood and/or charcoal for cooking to program participants in my area coverage)</small>
-        </li>
-
-        <li class="mt-3">
-            Ako ay nagkukusang loob na gagamit ng Gaz Lite Application upang maitala lahat ng mabibiling produkto ng Gaz Lite cookstove at micro-cylinders ng mga nakilahok sa programa ng Carbon Project Genesis.
-            <br><small class="text-muted">(I volunteer to use the Gaz Lite Application to record all cookstove and micro-cylinders sales from the participating household of the Project Genesis.)</small>
-        </li>
-
-        <li class="mt-3">
-            Ako ay sumasangayon na hindi magbebenta ng kahalintulad na produkto ng Gaz Lite habang ako ay kalahok dito sa programa ng Project Genesis. Ang aking paglabag ay nangangahulugan ng aking kusang loob na pagtigil ng pagbenta ng lahat produkto Gaz Lite at aking kikilalanin ang hakbang ng PREI na magtalaga ng bagong Dealer na mag seserbisyo sa mga kalahok ng 10 taong programa. 
-            <br><small class="text-muted">(I agree not to sell any product similar to Gaz Lite while I am participating in the Project Genesis. Any violation on my part means my voluntary cessation of selling all Gaz Lite products and I further acknowledge that PREI has the right to assign another dealer in my area to serve the participants of the ten year program.)</small>
-        </li>
-
-        <li class="mt-3">
-            Ako ay sumasangayon na sa bawat isang Gaz Lite micro-cylinder refill 330gm na aking maibebenta sa mga kalahok ng programa ay magkakaroon ako ng (1) isang reward point na maari kong gamitin sa marketing promos or pagbili ng produkto. 
-            <br><small class="text-muted">(I agree that for every Gaz Lite micro-cylinder refill (330g) that I sell to the program participants, I will receive 1 point. The total points may be redeemed to purchase gazlite products subject to the redemption policy of PREI.)</small>
-        </li>
-
-        <li class="mt-3">
-            Ako ay sumasangayon na kailangang mapanatili ang angkop na numero ng inbentaryo ng Gaz Lite upang maiwasan ang anumang aberya. 
-            <br><small class="text-muted">(I agree that I have to maintain an adequate inventory of Gaz Lite products to avoid running out of inventory. Any violation on my part means my voluntary cessation of selling all Gaz Lite products and I further acknowledge that PREI has the right to assign another dealer in my area to serve the participants of the ten year program.)</small>
-        </li>
-    </ol>
-</div>
+            <ol>
+              {{-- 1 --}}
+              <li>
+                Katayuan bilang Independent Sales Agent<br>
+                <small>(Independent Sales Agent Status)</small><br><br>
+                Ako ay kikilos bilang independent sales agent ng Kumpanya at hindi bilang empleyado o opisyal na kinatawan nito.
+                <br><small class="text-muted">(I shall operate as an independent sales agent of the Company and not as an employee or official representative.)</small>
+              </li>
+              {{-- 2 --}}
+              <li class="mt-3">
+                Eksklusibong Pagbebenta ng Gaz Lite Products<br>
+                <small>(Exclusive Sale of Gaz Lite Products)</small><br><br>
+                Sumasang-ayon ako na hindi magbebenta o magtataguyod ng anumang produktong kahalintulad o direktang kakumpitensya ng Gaz Lite clean cooking products habang ako ay kalahok sa programang ito.
+                <br><small class="text-muted">(I agree not to sell or promote any products that compete with Gaz Lite clean cooking products while participating in this program.)</small>
+              </li>
+              {{-- 3 --}}
+              <li class="mt-3">
+                Mga Responsibilidad ng Retailer<br>
+                <small>(Retailer Responsibilities)</small><br><br>
+                Sumasang-ayon ako na:<br>
+                  •	magtaguyod at magbenta ng Gaz Lite cookstoves at refills sa komunidad<br>
+                  •	magbigay ng tamang impormasyon tungkol sa ligtas na paggamit ng produkto<br>
+                  •	magpanatili ng talaan ng benta at imbentaryo<br>
+                  •	makipagtulungan sa monitoring at reporting ng programa.
+                <br><small class="text-muted">(I agree to promote and sell Gaz Lite cookstoves and refills, provide accurate product information, maintain sales and inventory records and cooperate with monitoring and reporting.)</small>
+              </li>
+              {{-- 4 --}}
+              <li class="mt-3">
+                Minimum na Antas ng Imbentaryo (50%)<br>
+                <small>(Minimum Inventory Stocking Level)</small><br><br>
+                Ako ay magpapanatili ng hindi bababa sa limampung porsyento (50%) ng aking karaniwang stocking capacity ng Gaz Lite products sa lahat ng oras.
+                <br><small class="text-muted">(I will maintain at least fifty percent (50%) of my normal stocking capacity of Gaz Lite products at all times.)</small>
+              </li>
+              {{-- 5 --}}
+              <li class="mt-3">
+                Minimum na Refill Inventory Requirement<br>
+                <small>(Minimum Inventory Stocking Level)</small><br><br>
+                Ako ay magpapanatili ng minimum na imbentaryo ng Gaz Lite 330g refills na katumbas ng tinatayang dalawang (2) linggong demand.
+                <br><small class="text-muted">(I will maintain a minimum inventory of Gaz Lite 330g refills equivalent to approximately two weeks of expected demand.)</small>
+              </li>
+              {{-- 6 --}}
+              <li class="mt-3">
+                Prayoridad sa mga Kalahok ng Project RISE<br>
+                <small>(Priority Supply for Project RISE Households)</small><br><br>
+                Ako ay magbibigay ng priyoridad sa mga rehistradong kalahok ng Project RISE sa pagbili ng Gaz Lite refills lalo na kung limitado ang suplay.
+                <br><small class="text-muted">(I agree to give priority access to Gaz Lite refills for registered Project RISE households.)</small>
+              </li>
+              {{-- 7 --}}
+              <li class="mt-3">
+                SPARK Digital Monitoring System<br>
+                <small>(Priority Supply for Project RISE Households)</small><br><br>
+                SPARK (Stove Provision Analytics for Residential Kitchens) ay ang opisyal na digital monitoring at point-of-sale platform na ginagamit upang itala at subaybayan ang distribusyon ng stove, refill transactions at partisipasyon ng mga sambahayan sa ilalim ng Project RISE at Genesis sa loob ng sampung (10) taon na programa.<br>Sumasang-ayon ako na gamitin ang SPARK system at tiyakin na ang lahat ng transaksyon ay tumpak at napapanahong naitatala sa system.
+                <br><small class="text-muted">(SPARK (Stove Provision Analytics for Residential Kitchens) is the official digital monitoring and point-of-sale platform used to record stove distribution per unique household, refill transactions and household participation under Project RISE and Genesis for the ten-year program period.)</small>
+              </li>
+              {{-- 8 --}}
+              <li class="mt-3">
+                Responsibilidad sa Internet at Komunikasyon<br>
+                <small>(Connectivity and Communication Responsibility)</small><br><br>
+                Ako ay mananagot sa aking sariling internet connection, mobile data, at communication expenses na kinakailangan upang magamit ang aplikasyon o sistema ng SPARK.
+                <br><small class="text-muted">(I am responsible for my own internet connectivity, mobile data and communication expenses required to operate the SPARK application.)</small>
+              </li>
+              {{-- 9 --}}
+              <li class="mt-3">
+                Data Privacy<br>
+                <small>(Connectivity and Communication Responsibility)</small><br><br>
+                Ang lahat ng personal na impormasyon na makokolekta kaugnay ng kasunduang ito ay pangangalagaan alinsunod sa Data Privacy Act of 2012.
+                <br><small class="text-muted">(All personal information collected shall be protected in accordance with the Data Privacy Act of 2012.)</small>
+              </li>
+              {{-- 10 --}}
+              <li class="mt-3">
+                Paunawa ng Pagtigil at Paglipat ng Retailer<br>
+                <small>(Notice of Discontinuance and Transition Support)</small><br><br>
+                Kung nais kong ihinto ang aking pakikilahok bilang Micro-Entrepreneur Retailer, ako ay magbibigay ng nakasulat na paunawa na hindi bababa sa tatlumpung (30) araw sa Kumpanya.<br>
+                Sa panahong ito, ako ay makikipagtulungan sa Kumpanya upang matiyak ang maayos na paglipat ng operasyon, kabilang ang pagtulong sa paghahanap ng isa pang kwalipikadong Micro-Entrepreneur mula sa komunidad upang ipagpatuloy ang distribusyon ng Gaz Lite products.
+                <br><small class="text-muted">(If I intend to discontinue participation, I will provide written notice of at least thirty (30) days to the Company and assist in identifying another qualified Micro-Entrepreneur in the community to ensure continuity of supply.)</small>
+              </li>
+              {{-- 11 --}}
+              <li class="mt-3">
+                Pagwawakas ng Kasunduan<br>
+                <small>(Termination)</small><br><br>
+                Maaaring wakasan ng Kumpanya ang kasunduang ito kung ako ay:<br>
+                  •	lumabag sa mga patakaran ng programa<br>
+                  •	nagbenta ng competing products<br>
+                  •	hindi sumunod sa inventory requirements<br>
+                  •	hindi nagtala ng mga transaksyon sa SPARK system.
+                <br><small class="text-muted">(The Company may terminate this Agreement if I violate program policies, sell competing products, fail to maintain inventory requirements, or fail to record transactions in SPARK.)</small>
+              </li>
+            </ol>
+          </div>
           <!-- Contract Text -->
           <div class="mb-4">
             <p><strong>Contract Agreement:</strong> By signing below, you acknowledge that you have read and agreed to the terms of the service as described in this document.</p>
