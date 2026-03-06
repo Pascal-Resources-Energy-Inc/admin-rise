@@ -52,7 +52,7 @@
                         <i class="ti ti-user-check fs-8 fw-lighter"></i> <!-- Active icon -->
                     </div>
                     <h5 class="text-white fw-bold fs-14 text-nowrap">
-                        {{$dealers->count()}}
+                        {{ $activeDealers }}
                     </h5>
                     <p class="opacity-50 mb-0" style="font-size: 12px;">ACTIVE DEALERS</p>
                 </div>
@@ -66,7 +66,7 @@
                         <i class="ti ti-user-x fs-8 fw-lighter"></i> <!-- Inactive icon -->
                     </div>
                     <h5 class="text-white fw-bold fs-14 text-nowrap">
-                        0
+                        {{ $inactiveDealers }}
                     </h5>
                     <p class="opacity-50 mb-0" style="font-size: 12px;">INACTIVE DEALERS</p>
                 </div>
@@ -82,6 +82,7 @@
                       <table class="table table-bordered table-striped transaction-table" id="example" style="width:100%">
                         <thead>
                             <tr>
+                                <th scope="col">Dealer Reference</th>
                                 <th scope="col">Dealer Name</th>
                                 <th scope="col">Store Name</th>
                                 <th scope="col">Store Type</th>
@@ -89,11 +90,13 @@
                                 <th scope="col">Qty Sold</th>
                                 <th scope="col">Points Earned</th>
                                 <th scope="col">Address</th>
+                                <th scope="col">Status</th>
                             </tr>
                         </thead>
                         <tbody id="dealerBody">
                             @foreach($dealers as $dealer)
                             <tr>
+                                <td scope="col">{{ $dealer->dealer_reference }}</td>
                                 <td scope="col"><a href='view-dealer/{{$dealer->id}}'>{{$dealer->name}}</a></td>
                                 <td scope="col">{{$dealer->store_name}}</td>
                                 <td scope="col">{{$dealer->store_type}}</td>
@@ -101,10 +104,15 @@
                                 <td scope="col">{{($dealer->sales)->sum('qty')}}</td>
                                 <td scope="col">{{($dealer->sales)->sum('points_dealer')}}</td>
                                 <td scope="col">{{$dealer->address}}</td>
+                                <td>
+                                    @if($dealer->status == 'Active')
+                                        <span class="badge badge-success">Active</span>
+                                    @else 
+                                        <span class="badge badge-danger">Inactive</span>
+                                    @endif
+                                </td>
                             </tr>
-
                             @endforeach
-                         
                         </tbody>
                     </table>
                 </div>

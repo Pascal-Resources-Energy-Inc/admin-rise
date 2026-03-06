@@ -12,10 +12,15 @@ class DealerController extends Controller
     //
     public function index(Request $request)
     {
+        $activeDealers = Dealer::where('status', 'Active')->count();
+        $inactiveDealers = Dealer::where('status', 'Inactive')->count();
+
         $dealers = Dealer::get();
         return view('dealers',
             array(
                 'dealers' => $dealers,
+                'activeDealers' => $activeDealers,
+                'inactiveDealers' => $inactiveDealers
             )
         );
     }
