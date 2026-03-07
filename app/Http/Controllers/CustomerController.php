@@ -72,7 +72,7 @@ class CustomerController extends Controller
             $number = 1;
         }
 
-        $client_reference = 'PRC' . str_pad($number, 4, '0', STR_PAD_LEFT);
+        $client_reference = 'PRC' . str_pad($number, 5, '0', STR_PAD_LEFT);
 
         $customer = new Client;
         $customer->client_reference = $client_reference;

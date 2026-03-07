@@ -46,7 +46,7 @@ class DealerController extends Controller
             $number = 1;
         }
 
-        $dealer_reference = 'PRD' . str_pad($number, 4, '0', STR_PAD_LEFT);
+        $dealer_reference = 'PRD' . str_pad($number, 5, '0', STR_PAD_LEFT);
 
         $customer = new Dealer;
         $customer->user_id = $user->id;
