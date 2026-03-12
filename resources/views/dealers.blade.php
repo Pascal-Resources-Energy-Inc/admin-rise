@@ -2,9 +2,6 @@
 <link rel="icon" type="image/png" href="{{asset('images/logo_nya.png')}}">
 @section('css')
 <style>
-    .transaction-table th {
-        text-align: center;
-    }
     .btn-view {
         width: 100px;
         font-size: 14px;
@@ -82,15 +79,16 @@
                       <table class="table table-bordered table-striped transaction-table" id="example" style="width:100%">
                         <thead>
                             <tr>
-                                <th scope="col">Dealer Reference</th>
-                                <th scope="col">Dealer Name</th>
-                                <th scope="col">Store Name</th>
-                                <th scope="col">Store Type</th>
-                                <th scope="col">Number</th>
-                                <th scope="col">Qty Sold</th>
-                                <th scope="col">Points Earned</th>
-                                <th scope="col">Address</th>
-                                <th scope="col">Status</th>
+                                <th>Dealer Reference</th>
+                                <th>Dealer Name</th>
+                                <th>Store Name</th>
+                                <th>Store Type</th>
+                                <th>Number</th>
+                                <th>Qty Sold</th>
+                                {{-- <th>Points Earned</th> --}}
+                                <th>Address</th>
+                                <th>SPO</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody id="dealerBody">
@@ -98,12 +96,13 @@
                             <tr>
                                 <td scope="col">{{ $dealer->dealer_reference }}</td>
                                 <td scope="col"><a href='view-dealer/{{$dealer->id}}'>{{$dealer->name}}</a></td>
-                                <td scope="col">{{$dealer->store_name}}</td>
-                                <td scope="col">{{$dealer->store_type}}</td>
+                                <td scope="col">{{$dealer->store_name ?? '-'}}</td>
+                                <td scope="col">{{$dealer->store_type ?? '-'}}</td>
                                 <td scope="col">{{$dealer->number}}</td>
                                 <td scope="col">{{($dealer->sales)->sum('qty')}}</td>
-                                <td scope="col">{{($dealer->sales)->sum('points_dealer')}}</td>
-                                <td scope="col">{{$dealer->address}}</td>
+                                {{-- <td scope="col">{{($dealer->sales)->sum('points_dealer')}}</td> --}}
+                                <td scope="col">{{$dealer->address ?? '-'}}</td>
+                                <td scope="col">{{$dealer->spo}}</td>
                                 <td>
                                     @if($dealer->status == 'Active')
                                         <span class="badge badge-success">Active</span>

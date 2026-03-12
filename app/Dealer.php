@@ -8,7 +8,7 @@ class Dealer extends Model
 {
     protected $fillable = [
         'user_id', 'name', 'email_address', 'number', 'facebook', 
-        'address', 'store_name', 'store_type', 'status'
+        'address', 'store_name', 'store_type', 'status', 'spo'
     ];
 
     public function user()

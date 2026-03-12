@@ -108,7 +108,9 @@
                             <th>Serial Number</th>
                             <th>Address</th>
                             <th>Total Points</th>
-                            <th>Last Transaction</th>
+                            {{-- <th>Last Transaction</th> --}}
+                            <th>Center</th>
+                            <th>SPO</th>
                             <th style="display:none;">Remarks</th>
                             <th>Status</th>
                         </tr>
@@ -146,7 +148,7 @@
                             ])) }} {{ $customer->postal_code }}
                           </td>
                           <td>{{ $customer->transactions->sum('points_client') }}</td>
-                          <td>
+                          {{-- <td>
                               @php
                                   $transaction = ($customer->transactions)->sortByDesc('date')->first();
                               @endphp
@@ -155,9 +157,11 @@
                               @else
                                   No Data
                               @endif
-                          </td>
+                          </td> --}}
                           
                           <td style="display:none;">@if($customer->serial && !empty($customer->serial->remarks)) SN# @if($customer->serial) {{ $customer->serial->serial_number }} @endif used to be owned by @if($customer->serial && $customer->serial->remarks) @php $previousOwner = \App\Client::find($customer->serial->remarks); @endphp {{ $previousOwner ? $previousOwner->name : 'Unknown Client' }} @endif  @endif</td>
+                          <td>{{ $customer->center }}</td>
+                          <td>{{ $customer->spo }}</td>
                           <td>
                             @if($customer->status == 'Active')
                               <span class="badge badge-success">Active</span>

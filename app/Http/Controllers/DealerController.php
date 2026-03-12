@@ -52,6 +52,7 @@ class DealerController extends Controller
         $customer->user_id = $user->id;
         $customer->dealer_reference = $dealer_reference;
         $customer->name = $request->name;
+        $customer->spo = $request->spo;
         $customer->email_address = $request->email_address;
         $customer->number = $request->phone_number;
         $customer->facebook = $request->facebook;
