@@ -68,6 +68,7 @@ Route::post('/change-avatar-dealer/{id}', 'DealerController@changeAvatar')->name
 Route::post('valid-id-dealer/{id}', 'DealerController@uploadValidId')->name('dealer.view');
 Route::post('/submit-contract-dealer/{id}','DealerController@contractSign')->name('sign');
 Route::get('/dashboard-dealer','DealerController@show')->name('Dealer');
+Route::post('/dealer/update/{id}', 'DealerController@update')->name('dealer.update');
 
 
 Route::get('/customers','CustomerController@index')->name('customers');

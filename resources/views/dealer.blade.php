@@ -53,10 +53,13 @@
             <img src="{{$dealer->avatar ? asset($dealer->avatar) : asset('design/assets/images/profile/user-1.png')}}" alt="Avatar Image" class="img-fluid rounded-circle" style="width: 100px; height: 100px;">
           </div>  
           <br>
-          <div class='text-center'>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal"  data-bs-target="#uploadAvatarModal" title="Upload Avatar">
+          <div class='text-center mb-3'>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadAvatarModal" title="Upload Avatar">
               <i class="fas fa-camera"></i>
               <span class="sr-only">Upload Avatar</span>
+            </button>
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editDealerModal">
+              <i class="fas fa-edit"></i>
             </button>
           </div>
           <!-- Customer Personal Details -->
@@ -180,6 +183,7 @@
 @include('viewValidIdDealer')
 @include('sign_contract_dealer')
 @include('view_contract_signed_dealer')
+@include('edit_dealer')
 @endsection
 
 @section('javascript')
