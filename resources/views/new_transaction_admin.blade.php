@@ -11,34 +11,33 @@
         <div class="modal-body">
           <!-- Customer Select -->
           <div class='mb-3'>
-             <label for="dealer" class="form-label">Select Dealer</label>
-             <select id="dealer" name="dealer" class="form-select chosen-select" style='font-size:10px;' required>
-                   <option value=''></option>
-                   @foreach($dealers as $dealer)
-                   <option value="{{ $dealer->user_id }}">{{$dealer->name}}</option>
-                   @endforeach
-             </select>
+            <label for="dealer" class="form-label">Select Dealer</label>
+            <select id="dealer" name="dealer" class="form-select chosen-select" style='font-size:10px;' required>
+              <option value=''></option>
+              @foreach($dealers as $dealer)
+                <option value="{{ $dealer->user_id }}">{{$dealer->name}}</option>
+              @endforeach
+            </select>
           </div>
           <div class="mb-3">
-  <label for="customerSelect" class="form-label">Select Customer</label>
-  <select id="customerSelect" name="customer_id" class="form-select chosen-select" style="font-size: 10px;" required>
-    <option value=""></option>
-    @foreach($customers as $customer)
-      @php
-        $fullName = $customer->name;
-        $parts = explode(' ', $fullName);
-        $lastName = array_pop($parts);
-        $masked = str_repeat('*', strlen(implode(' ', $parts))) . ' ' . $lastName;
-        $serial = $customer->serial->serial_number ?? '';
-        $masked_serial = str_repeat('*', max(0, strlen($serial) - 5)) . substr($serial, -5);
-        $number = $customer->number;
-        $masked_number = str_repeat('*', max(0, strlen($number) - 5)) . substr($number, -5);
-      @endphp
-      <option value="{{ $customer->id }}">{{ $masked }} - {{ $masked_serial }} - {{ $masked_number }}</option>
-    @endforeach
-  </select>
-</div>
-
+            <label for="customerSelect" class="form-label">Select Customer</label>
+            <select id="customerSelect" name="customer_id" class="form-select chosen-select" style="font-size: 10px;" required>
+              <option value=""></option>
+              @foreach($customers as $customer)
+                @php
+                  $fullName = $customer->name;
+                  $parts = explode(' ', $fullName);
+                  $lastName = array_pop($parts);
+                  $masked = str_repeat('*', strlen(implode(' ', $parts))) . ' ' . $lastName;
+                  $serial = $customer->serial->serial_number ?? '';
+                  $masked_serial = str_repeat('*', max(0, strlen($serial) - 5)) . substr($serial, -5);
+                  $number = $customer->center;
+                  $masked_number = str_repeat('*', max(0, strlen($number) - 5)) . substr($number, -5);
+                @endphp
+                <option value="{{ $customer->id }}">{{ $masked }} - {{ $masked_serial }} - {{ $masked_number }}</option>
+              @endforeach
+            </select>
+          </div>
           <!-- Item Select -->
           <div class="mb-3">
             <label for="itemSelect" class="form-label">Select Item</label> 

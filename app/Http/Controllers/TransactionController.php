@@ -14,7 +14,7 @@ class TransactionController extends Controller
 
     public function index(Request $request)
     {
-        $customers = Client::whereHas('serial')->get();
+        $customers = Client::where('status', 'Active')->whereHas('serial')->get();
         $items = Item::get();
         $dealers = Dealer::get();
          $transactions = [];
