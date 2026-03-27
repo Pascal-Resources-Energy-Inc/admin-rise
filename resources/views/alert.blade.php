@@ -14,21 +14,22 @@
                     <div class="table-responsive" id='table-container' data-simplebar>
                       <table class="table table-bordered align-middle text-nowrap">
                         <thead>
-                         <tr>
-                                <th scope="col">Client</th>
-                                <th scope="col">Number</th>
-                                <th scope="col">Address</th>
-                                <th scope="col">Last Purchase</th>
-                            </tr>
+                          <tr>
+                            <th scope="col">Client</th>
+                            <th scope="col">Barangay</th>
+                            <th scope="col">SPO</th>
+                            <th scope="col">Center</th>
+                            <th scope="col">Last Purchase</th>
+                          </tr>
                         </thead>
                         <tbody>
                            @foreach($customers_less as $cus)
                             <tr>
                               <td>{{strtoupper($cus->name)}}</td>
-                              <td>{{$cus->number}}</td>
-                              <td>{{$cus->address}}</td>
+                              <td>{{$cus->location_barangay}}</td>
+                              <td>{{$cus->spo}}</td>
+                              <td>{{$cus->center}}</td>
                               <td>{{date('M d, Y',strtotime($cus->latestTransaction->date))}}</td>
-                          
                             </tr>
                           @endforeach
                         </tbody>

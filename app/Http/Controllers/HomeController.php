@@ -39,7 +39,7 @@ class HomeController extends Controller
         $selectedMonth = $request->get('month', null);
         $viewType = $selectedMonth ? 'monthly' : 'yearly';
         
-        $customers_less = Client::whereDoesntHave('latestTransaction', function ($q) use ($threeDaysAgo) {
+        $customers_less = Client::where('status', 'Active')->whereDoesntHave('latestTransaction', function ($q) use ($threeDaysAgo) {
             $q->where('date', '>=', $threeDaysAgo);
         })
         ->whereHas('latestTransaction')
