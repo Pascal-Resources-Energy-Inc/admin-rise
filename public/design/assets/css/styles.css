@@ -623,13 +623,13 @@
   --bs-btn-hover-bg: #096b8b;
   --bs-btn-hover-border-color: #096b8b;
 }
-[data-bs-theme="light"][data-color-theme="Green_Theme"]:root .btn-secondary,
+/* [data-bs-theme="light"][data-color-theme="Green_Theme"]:root .btn-secondary,
 [data-bs-theme="dark"][data-color-theme="Green_Theme"]:root .btn-secondary {
   --bs-btn-bg: #ccda4e;
   --bs-btn-border-color: #ccda4e;
   --bs-btn-hover-bg: #d4e069;
   --bs-btn-hover-border-color: #d4e069;
-}
+} */
 
 [data-bs-theme="light"][data-color-theme="Cyan_Theme"]:root,
 [data-bs-theme="dark"][data-color-theme="Cyan_Theme"]:root {
@@ -719,7 +719,7 @@
   --bs-inverse: #111c2d;
   --bs-info: #46caeb;
   --bs-warning: #f8c076;
-  --bs-danger: #fb977d;
+  --bs-danger: #ef1009;
   --bs-light: #e7ecf0;
   --bs-dark: #111c2d;
   --bs-indigo: #8763da;
@@ -728,8 +728,8 @@
   --bs-success-rgb: 75, 208, 139;
   --bs-inverse-rgb: 17, 28, 45;
   --bs-info-rgb: 70, 202, 235;
-  --bs-warning-rgb: 248, 192, 118;
-  --bs-danger-rgb: 251, 151, 125;
+  --bs-warning-rgb: 239, 16, 9;
+  --bs-danger-rgb: 227, 52, 47;
   --bs-light-rgb: 231, 236, 240;
   --bs-dark-rgb: 17, 28, 45;
   --bs-indigo-rgb: 135, 99, 218;
@@ -3940,7 +3940,8 @@ textarea.form-control.is-invalid {
   --bs-btn-bg: transparent;
   --bs-btn-border-width: var(--bs-border-width);
   --bs-btn-border-color: transparent;
-  --bs-btn-border-radius: 30px;
+  /* --bs-btn-border-radius: 30px; */
+  --bs-btn-border-radius: 20px;
   --bs-btn-hover-border-color: transparent;
   --bs-btn-box-shadow: unset;
   --bs-btn-disabled-opacity: 0.65;
@@ -6726,7 +6727,7 @@ fieldset:disabled .btn {
   opacity: var(--bs-backdrop-opacity);
 }
 
-.modal-header {
+/* .modal-header {
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -6736,7 +6737,7 @@ fieldset:disabled .btn {
     var(--bs-modal-header-border-color);
   border-top-left-radius: var(--bs-modal-inner-border-radius);
   border-top-right-radius: var(--bs-modal-inner-border-radius);
-}
+} */
 .modal-header .btn-close {
   padding: calc(var(--bs-modal-header-padding-y) * 0.5)
     calc(var(--bs-modal-header-padding-x) * 0.5);
@@ -11006,11 +11007,13 @@ fieldset:disabled .btn {
 }
 
 .bg-primary {
-  --bs-bg-opacity: 1;
+  /* --bs-bg-opacity: 1;
   background-color: rgba(
     var(--bs-primary-rgb),
     var(--bs-bg-opacity)
-  ) !important;
+  ) !important; */
+   --bs-bg-opacity: 1; 
+   background-color: rgba(var(--bs-danger-rgb), var(--bs-bg-opacity)) !important;
 }
 
 .bg-secondary {

@@ -45,13 +45,16 @@
     }
 
     .tab-button:hover {
-        color: #5DADE2;
+        color: #e3342f;
     }
 
     .tab-button.active {
-        background: linear-gradient(180deg, #5DADE2 0%, #6BB8E8 100%);
+        /* background: linear-gradient(180deg, #5DADE2 0%, #6BB8E8 100%);
         color: white;
-        box-shadow: 0 4px 12px rgba(93, 173, 226, 0.4);
+        box-shadow: 0 4px 12px rgba(93, 173, 226, 0.4); */
+        background: linear-gradient(180deg, #ff6b59 0%, #e3342f 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(255, 107, 89, 0.38);
     }
 
     .tab-badge {
@@ -89,7 +92,8 @@
     }
 
     .add-reward-btn {
-        background: linear-gradient(180deg, #5DADE2 0%, #6BB8E8 100%);
+        /* background: linear-gradient(180deg, #5DADE2 0%, #6BB8E8 100%); */
+        background: linear-gradient(180deg, #ff6b59 0%, #e3342f 100%);
         color: white;
         border: none;
         padding: 12px 20px;
@@ -323,11 +327,6 @@
         border-radius: 0 12px 0 0;
     }
 
-    .user-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
 
     .user-avatar1 {
         width: 40px;
@@ -529,7 +528,7 @@
 
                 @if($canAdd)
                 <div class="col-12 col-md-auto ms-md-auto" id="addRewardBtnContainer">
-                    <button class="add-reward-btn" data-bs-toggle="modal" data-bs-target="#addRewardModal">
+                    <button class="add-reward-btn btn-danger" data-bs-toggle="modal" data-bs-target="#addRewardModal">
                         <i class="fas fa-plus"></i> Add New Reward
                     </button>
                 </div>

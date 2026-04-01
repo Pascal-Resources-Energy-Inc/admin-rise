@@ -195,7 +195,8 @@ body {
 }
 
 .dot.active {
-    background-color: #5DADE2;
+    /* background-color: #5DADE2; */
+    background-color: #e3342f;
 }
 
 .landing-signin-button {
@@ -204,7 +205,8 @@ body {
     height: 57px;
     border: none;
     border-radius: 28px;
-    background-color: #5DADE2;
+    /* background-color: #5DADE2; */
+    background-color: #e3342f;
     color: white;
     font-size: 16px;
     font-weight: 500;
@@ -214,7 +216,7 @@ body {
 }
 
 .landing-signin-button:hover {
-    background-color: #3498DB;
+    background-color: #f15752;
     transform: translateY(-2px);
 }
 
@@ -401,7 +403,8 @@ body {
     height: 40px;
     border-radius: 50%;
     border: none;
-    background-color: #5DADE2;
+    /* background-color: #5DADE2; */
+    background-color: #e3342f;
     color: white;
     display: flex;
     align-items: center;
@@ -413,7 +416,8 @@ body {
 }
 
 .back-btn:hover {
-    background-color: #3498DB;
+    /* background-color: #3498DB; */
+    background-color: #f15752;
 }
 
 .page-title {
@@ -421,7 +425,8 @@ body {
     margin-left: 20px;
     font-size: 27px;
     font-weight: 550;
-    color: #5DADE2;
+    /* color: #5DADE2; */
+    color: #f15752;
     letter-spacing: 1px;
 }
 
@@ -565,7 +570,8 @@ body {
     height: 56px;
     border: none;
     border-radius: 12px;
-    background-color: #5DADE2;
+    /* background-color: #5DADE2; */
+    background-color: #e3342f;
     color: white;
     font-size: 16px;
     font-weight: 500;
@@ -575,7 +581,8 @@ body {
 }
 
 .signin-button:hover {
-    background-color: #3498DB;
+    /* background-color: #3498DB; */
+    background-color: #f15752;
 }
 
 .forgot-section {
@@ -585,6 +592,7 @@ body {
 
 .forgot-link {
     color: #5DADE2;
+    color: #e3342f;
     text-decoration: none;
     font-size: 16px;
     font-weight: 400;

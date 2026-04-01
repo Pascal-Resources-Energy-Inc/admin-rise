@@ -49,9 +49,9 @@
         }
 
         /* Layout Reset - Higher specificity to prevent conflicts */
-        .main-layout * {
+        /* .main-layout * {
             box-sizing: border-box;
-        }
+        } */
 
         .main-layout {
             margin: 0;
@@ -65,7 +65,8 @@
 
         body.main-layout {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-            background-color: #D8E9F0 !important;
+            /* background-color: #D8E9F0 !important; */
+            background-color: #f3f0f0 !important;
             overflow-x: hidden !important;
         }
 
@@ -228,7 +229,7 @@
         }
 
         .badges {
-            color: white;
+            color: #FFF;
         }   
 
         /* Badge positioning for collapsed state */
@@ -301,14 +302,14 @@
 
         .notification-dropdown .notif-badge
         {
-            width: 12px; 
-            height: 12px; 
-            font-size: 7px; 
+            width: 25px; 
+            height: 25px; 
+            font-size: 10px; 
             border-radius: 50%;
             display: inline-flex; 
             align-items: center; 
             justify-content: center;
-            background-color: red;
+            background-color: #ff6b59;
         }
 
         .main-layout .logo {
@@ -388,16 +389,20 @@
         }
 
         .nav-link:hover {
-            background: #f1f5f9;
-            color: var(--primary-color);
+            background: #ffd1c8;
+            color: var(--bs-danger);
             transform: translateX(2px);
         }
-
         .nav-link.active {
+            background: #ffd1c8;
+            color: var(--bs-danger);
+            border-left: 3px solid var(--bs-danger);
+        }
+        /* .nav-link.active {
             background: #dbeafe;
             color: var(--primary-color);
             border-left: 3px solid var(--primary-color);
-        }
+        } */
 
         .nav-icon {
             width: 20px;
@@ -532,23 +537,24 @@
         .sidebar.collapsed + .main-content {
     margin-left: var(--sidebar-collapsed-width);
 }
-        .main-layout .topbar {
-    background: #5BC2E7 !important;
-    border-bottom: 1px solid var(--border-color) !important;
-    padding: 0 32px !important;
-    height: 80px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: var(--sidebar-width) !important;
-    width: calc(100% - var(--sidebar-width)) !important;
-    z-index: 999 !important;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    border-radius: 0 !important;
-    transition: all 0.3s ease !important;
-}
+    .main-layout .topbar {
+        /* background: #5BC2E7 !important; */
+        background: #e3342f !important;
+        border-bottom: 1px solid var(--border-color) !important;
+        padding: 0 30px !important;
+        height: 80px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: var(--sidebar-width) !important;
+        width: calc(100% - var(--sidebar-width)) !important;
+        z-index: 999 !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        border-radius: 0 !important;
+        transition: all 0.3s ease !important;
+    }
 
 .sidebar.collapsed ~ .main-content .topbar {
     left: var(--sidebar-collapsed-width) !important;
@@ -605,8 +611,8 @@
             height: 40px !important;
             border: 1px solid var(--border-color) !important;
             border-radius: 20px !important;
-            padding: 0 16px 0 44px !important;
-            background: #D8E9F0 !important;
+            padding: 0 16px 0 30px !important;
+            /* background: #D8E9F0 !important; */
             transition: all 0.2s ease !important;
             font-size: 14px !important;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
@@ -614,11 +620,12 @@
         }
 
         .main-layout .search-input::placeholder{
-            color: #5BC2E7 !important;
+            /* color: #5BC2E7 !important; */
+            color: #e3342f !important;
         }
 
         .main-layout .search-input:focus {
-            border-color: var(--primary-color) !important;
+            border-color: var(--danger-color) !important;
             background: white !important;
         }
 
@@ -627,7 +634,8 @@
             right: 16px !important;
             top: 50% !important;
             transform: translateY(-50%) !important;
-            color: #5BC2E7 !important;
+            /* color: #5BC2E7 !important; */
+            color: #e3342f !important;
         }
 
         .main-layout .profile-dropdown {
@@ -679,7 +687,7 @@
 
         /* Content Area */
         .content-area {
-            padding: 32px;
+            padding: 30px 30px 10px 30px;
             position: absolute;
             left: var(--sidebar-width);
             right: 0;
@@ -828,7 +836,7 @@
         .footer {
             border-top: 1px solid #676565ff;
             padding: 2rem 0 1.5rem 0;
-            margin-top: 170px !important; /* Change this from 170px to auto */
+            margin-top: 50px !important; /* Change this from 170px to auto */
             margin-left: 0;
             width: 100%;
             background: none;
@@ -1161,7 +1169,8 @@
                     <a class="" id="notificationDropdown" 
                         data-bs-toggle="dropdown" aria-expanded="false">
                     <div class="rounded-circle danger">
-                        <iconify-icon icon="solar:bell-linear" class="fs-7" style="color: #DFDFEC"></iconify-icon>
+                        {{-- <iconify-icon icon="solar:bell-linear" class="fs-7" style="color: #DFDFEC"></iconify-icon> --}}
+                        <i class="bi bi-bell-fill fs-7" style="color: #ffffff"></i>
                         @if($totalUnreadCount > 0)
                         <span class="position-absolute bottom-45 start-100 translate-middle badges rounded-pill notif-badge" 
                             id="notification-badge">
@@ -1304,7 +1313,7 @@
                         </div>
                         
                         <div class="px-3 py-2 border-top text-center">
-                        <a href="{{ url('/transactions') }}" class="btn btn-sm btn-outline-primary">View All Transactions</a>
+                        <a href="{{ url('/transactions') }}" class="btn btn-sm btn-danger">View All Transactions</a>
                         </div>
                     </div>
                 </div>
