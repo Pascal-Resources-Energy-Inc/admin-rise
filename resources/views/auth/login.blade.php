@@ -195,13 +195,8 @@ body {
 }
 
 .dot.active {
-<<<<<<< HEAD
     /* background-color: #5DADE2; */
     background-color: #e3342f;
-=======
-    background-color: #5DADE2;
-    /* background-color: #e3342f; */
->>>>>>> f67a1dd8b030bf7c00ba882863b5d08cbe53244e
 }
 
 .landing-signin-button {
@@ -210,13 +205,7 @@ body {
     height: 57px;
     border: none;
     border-radius: 28px;
-<<<<<<< HEAD
-    /* background-color: #5DADE2; */
-    background-color: #e3342f;
-=======
     background-color: #5DADE2;
-    /* background-color: #e3342f; */
->>>>>>> f67a1dd8b030bf7c00ba882863b5d08cbe53244e
     color: white;
     font-size: 16px;
     font-weight: 500;
@@ -226,14 +215,8 @@ body {
 }
 
 .landing-signin-button:hover {
-<<<<<<< HEAD
-    background-color: #f15752;
-    transform: translateY(-2px);
-=======
-    /* background-color: #f15752; */
-    transform: translateY(-2px);
+    transform: translateY(-2px); 
     background-color: #3498DB;
->>>>>>> f67a1dd8b030bf7c00ba882863b5d08cbe53244e
 }
 
 .role-selection-page {
@@ -419,13 +402,7 @@ body {
     height: 40px;
     border-radius: 50%;
     border: none;
-<<<<<<< HEAD
-    /* background-color: #5DADE2; */
-    background-color: #e3342f;
-=======
     background-color: #5DADE2;
-    /* background-color: #e3342f; */
->>>>>>> f67a1dd8b030bf7c00ba882863b5d08cbe53244e
     color: white;
     display: flex;
     align-items: center;
@@ -437,13 +414,7 @@ body {
 }
 
 .back-btn:hover {
-<<<<<<< HEAD
-    /* background-color: #3498DB; */
-    background-color: #f15752;
-=======
     background-color: #3498DB;
-    /* background-color: #f15752; */
->>>>>>> f67a1dd8b030bf7c00ba882863b5d08cbe53244e
 }
 
 .page-title {
@@ -451,13 +422,7 @@ body {
     margin-left: 20px;
     font-size: 27px;
     font-weight: 550;
-<<<<<<< HEAD
-    /* color: #5DADE2; */
-    color: #f15752;
-=======
     color: #5DADE2; 
-    /* color: #f15752; */
->>>>>>> f67a1dd8b030bf7c00ba882863b5d08cbe53244e
     letter-spacing: 1px;
 }
 
@@ -601,13 +566,7 @@ body {
     height: 56px;
     border: none;
     border-radius: 12px;
-<<<<<<< HEAD
-    /* background-color: #5DADE2; */
-    background-color: #e3342f;
-=======
     background-color: #5DADE2; 
-    /* background-color: #e3342f; */
->>>>>>> f67a1dd8b030bf7c00ba882863b5d08cbe53244e
     color: white;
     font-size: 16px;
     font-weight: 500;
@@ -617,13 +576,7 @@ body {
 }
 
 .signin-button:hover {
-<<<<<<< HEAD
-    /* background-color: #3498DB; */
-    background-color: #f15752;
-=======
     background-color: #3498DB;
-    /* background-color: #f15752; */
->>>>>>> f67a1dd8b030bf7c00ba882863b5d08cbe53244e
 }
 
 .forgot-section {
@@ -632,12 +585,7 @@ body {
 }
 
 .forgot-link {
-    color: #5DADE2;
-<<<<<<< HEAD
-    color: #e3342f;
-=======
-    /* color: #e3342f; */
->>>>>>> f67a1dd8b030bf7c00ba882863b5d08cbe53244e
+    color: #5DADE2; 
     text-decoration: none;
     font-size: 16px;
     font-weight: 400;
