@@ -25,8 +25,7 @@
     height: 48px;
     border-radius: 50%;
     background: white;
-    /* border: 2px solid #17a2b8; */
-    border: 2px solid #e3342f;
+    border: 2px solid #17a2b8;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -36,8 +35,7 @@
   
   .icon-circle i {
     font-size: 20px;
-    /* color: #17a2b8; */
-    color: #e3342f;
+    color: #17a2b8;
   }
   
   .stats-number {
@@ -84,8 +82,7 @@
   .icon-circle svg {
     width: 24px;
     height: 24px;
-    /* stroke: #17a2b8; */
-    stroke: #e3342f;
+    stroke: #17a2b8;
   }
 
   .legends {
@@ -332,7 +329,7 @@
                     </select>
                   </div>
                   
-                  <span id="viewModeIndicator" class="badge bg-primary">
+                  <span id="viewModeIndicator" class="badge bg-info">
                     {{ $view_type === 'monthly' ? 'Daily View' : 'Monthly View' }}
                   </span>
                 </div>
@@ -930,8 +927,7 @@
                             <div class="avatar-circle position-relative" style="width: 45px; height: 45px;">
                               <img src="{{ optional($transaction->customer)->avatar ? asset($transaction->customer->avatar) : asset('/design/assets/images/profile/user-1.png') }}" 
                                   alt="{{ optional($transaction->customer)->name ?? 'Customer' }}"
-                                  class="rounded-circle w-100 h-100 object-fit-cover"
-                                  style="border: 2px solid #ff0000">
+                                  class="rounded-circle w-100 h-100 object-fit-cover">
                             </div>
                           </div>
                           
@@ -2151,14 +2147,14 @@ function renderChart(categories, qty, year, month = null, viewType = 'yearly') {
         left: 10
       },
     },
-    colors: ["#e3342f"],
+    colors: ["#5BC2E7"],
     fill: {
       type: "gradient",
       gradient: {
         shade: "light",
         type: "vertical",
         shadeIntensity: 0.3,
-        gradientToColors: ["#ff0000"],
+        gradientToColors: ["#5BC2E7"],
         inverseColors: false,
         opacityFrom: 1,
         opacityTo: 0.8,
