@@ -1,8 +1,8 @@
 <div class="modal fade" id="homeModal" tabindex="-1" aria-labelledby="homeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title text-danger" id="homeModalLabel">Last purchase was more than 7 days ago.</h5>
+      <div class="modal-header" style="background-color: #3498DB">
+        <h5 class="modal-title text-white" id="homeModalLabel">Last purchase was more than 7 days ago.</h5>
         <button type="button" class="btn-close text-danger" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -14,8 +14,9 @@
                   <thead>
                     <tr>
                       <th scope="col">Client</th>
-                      <th scope="col">Number</th>
                       <th scope="col">Address</th>
+                      <th scope="col">Spo</th>
+                      <th scope="col">Center</th>
                       <th scope="col">Last Purchase</th>
                     </tr>
                   </thead>
@@ -23,8 +24,9 @@
                     @foreach($customers_less as $cus)
                       <tr>
                         <td>{{strtoupper($cus->name)}}</td>
-                        <td>{{$cus->number}}</td>
-                        <td>{{$cus->address}}</td>
+                        <td>{{$cus->location_barangay}}, {{$cus->location_city}}, Bicol Region</td>
+                        <td>{{$cus->spo}}</td>
+                        <td>{{$cus->center}}</td>
                         <td>{{date('M d, Y',strtotime($cus->latestTransaction->date))}}</td>
                       </tr>
                     @endforeach
