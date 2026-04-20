@@ -70,7 +70,7 @@ $showLoginDirectly = $hasErrors || $isDirect;
                         autofocus
                     >
                     @if($errors->has('email'))
-                        <div class="error-text">{{ $errors->first('email') }}</div>
+                        <div class="text-danger mt-2 fw-semibold">{{ $errors->first('email') }}</div>
                     @endif
                 </div>
 
@@ -85,7 +85,7 @@ $showLoginDirectly = $hasErrors || $isDirect;
                         required
                     >
                     @if($errors->has('password'))
-                        <div class="error-text">{{ $errors->first('password') }}</div>
+                        <div class="text-danger mt-2 fw-semibold">{{ $errors->first('password') }}</div>
                     @endif
                 </div>
 
@@ -195,8 +195,7 @@ body {
 }
 
 .dot.active {
-    /* background-color: #5DADE2; */
-    background-color: #e3342f;
+    background-color: #5DADE2;
 }
 
 .landing-signin-button {
