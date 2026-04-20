@@ -43,7 +43,6 @@ Route::get('/api/location-details/{id}/{type}', 'HomeController@getLocationDetai
 Route::get('/home/monthly-data', 'HomeController@getMonthlyDataAjax')->name('home.monthly-data');
 Route::get('/home/chart-data', 'HomeController@getChartDataAjax')->name('home.chart-data');
 
-
 Route::post('/store-transaction','TransactionController@store')->name('new-transaction');
 Route::post('/store-transaction-admin','TransactionController@storeAdmin')->name('new-transaction');
 Route::get('user-profile','UserController@view');
@@ -55,11 +54,17 @@ Route::get('/profile/{id}/{type}', 'SearchController@viewProfile')->name('profil
 Route::post('/notification/save', 'NotificationController@saveNotification')->name('notification.save');
 Route::post('/notifications/mark-all-read', 'NotificationController@markAllAsRead')->name('notifications.markAllAsRead');
 
-
 Route::get('/users','EditUserController@index')->name('users');
 Route::put('edit-users/{id}', 'EditUserController@update')->name('edit-users');
 Route::post('/new-admin','EditUserController@store')->name('new-admin');
 Route::post('admin-privillege/{id}', 'EditUserController@updatePrivilege')->name('admin.privilege.update');
+Route::get('/users-data', 'EditUserController@datatable')->name('users.data');
+
+// Area Distributor 
+Route::get('/ads','AreaDistributorController@index')->name('ads');
+Route::post('/new-ad','AreaDistributorController@newAd');
+Route::post('/ads/get-zipcode', 'AreaDistributorController@getZipCode')->name('get.zipcode');
+Route::post('/geocode-location', 'AreaDistributorController@geocodeLocation')->name('geocode.location');
 
 Route::get('/dealers','DealerController@index')->name('dealers');
 Route::post('/new-dealer','DealerController@newDealer');
@@ -69,7 +74,6 @@ Route::post('valid-id-dealer/{id}', 'DealerController@uploadValidId')->name('dea
 Route::post('/submit-contract-dealer/{id}','DealerController@contractSign')->name('sign');
 Route::get('/dashboard-dealer','DealerController@show')->name('Dealer');
 Route::post('/dealer/update/{id}', 'DealerController@update')->name('dealer.update');
-
 
 Route::get('/customers','CustomerController@index')->name('customers');
 Route::get('/customer','CustomerController@view')->name('customer');

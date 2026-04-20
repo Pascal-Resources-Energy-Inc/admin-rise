@@ -7,20 +7,36 @@ use App\Dealer;
 use App\Client;
 use App\Stove;
 use App\TransactionDetail;
+use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Request;
 
 class EditUserController extends Controller
 {
+    // public function index(Request $request)
+    // {
+    //     $stoves = Stove::where('client_id', null)->get();
+    //     $users = User::with(['dealer', 'client'])->get();
+        
+    //     return view('users', 
+    //     array(
+    //         'stoves' => $stoves,
+    //         'users' => $users
+    //     ));
+    // }
+
     public function index(Request $request)
     {
-        $stoves = Stove::where('client_id', null)->get();
-        $users = User::with(['dealer', 'client'])->get();
-        
-        return view('users', 
-        array(
-            'stoves' => $stoves,
-            'users' => $users
-        ));
+        $stoves = Stove::whereNull('client_id')->get(['id', 'serial_number']);
+
+        $users = User::with([
+                'dealer:id,user_id,address,status',
+                'client:id,user_id,address,status'
+            ])
+            ->select('id', 'name', 'email', 'role', 'address', 'can_add', 'can_edit')
+            ->latest()
+            ->paginate(20); // ✅ IMPORTANT
+
+        return view('users', compact('stoves', 'users'));
     }
     
     public function show(Request $request)
@@ -164,39 +180,113 @@ class EditUserController extends Controller
     }
 
     public function updatePrivilege(Request $request, $id)
-        {
-            try {
-                $user = User::findOrFail($id);
-                
-                if ($user->role !== 'Admin') {
-                    Alert::error('Error', 'Permissions can only be assigned to Admin users.');
-                    return redirect()->back();
-                }
-
-                $user->can_edit = $request->has('can_edit') ? 'on' : null;
-                $user->can_add = $request->has('can_add') ? 'on' : null;
-                $user->can_delete = $request->has('can_delete') ? 'on' : null;
-                $user->can_edit_rewards = $request->has('can_edit_rewards') ? 'on' : null;
-                $user->can_add_rewards = $request->has('can_add_rewards') ? 'on' : null;
-                $user->can_delete_rewards = $request->has('can_delete_rewards') ? 'on' : null;
-                $user->save();
-
-                $permissions = [];
-                if ($user->can_edit) $permissions[] = 'Edit';
-                if ($user->can_add) $permissions[] = 'Add';
-                if ($user->can_delete) $permissions[] = 'Delete';
-                if ($user->can_edit_rewards) $permissions[] = 'Edit';
-                if ($user->can_add_rewards) $permissions[] = 'Add';
-                if ($user->can_delete_rewards) $permissions[] = 'Delete';
-                
-                $permissionText = empty($permissions) ? 'No permissions' : implode(' and ', $permissions);
-                
-                Alert::success('Success', "Admin permissions updated to '{$permissionText}' successfully!");
-                return redirect()->back();
-
-            } catch (\Exception $e) {
-                Alert::error('Error', 'Failed to update admin permissions: ' . $e->getMessage());
+    {
+        try {
+            $user = User::findOrFail($id);
+            
+            if ($user->role !== 'Admin') {
+                Alert::error('Error', 'Permissions can only be assigned to Admin users.');
                 return redirect()->back();
             }
+
+            $user->can_edit = $request->has('can_edit') ? 'on' : null;
+            $user->can_add = $request->has('can_add') ? 'on' : null;
+            $user->can_delete = $request->has('can_delete') ? 'on' : null;
+            $user->can_edit_rewards = $request->has('can_edit_rewards') ? 'on' : null;
+            $user->can_add_rewards = $request->has('can_add_rewards') ? 'on' : null;
+            $user->can_delete_rewards = $request->has('can_delete_rewards') ? 'on' : null;
+            $user->save();
+
+            $permissions = [];
+            if ($user->can_edit) $permissions[] = 'Edit';
+            if ($user->can_add) $permissions[] = 'Add';
+            if ($user->can_delete) $permissions[] = 'Delete';
+            if ($user->can_edit_rewards) $permissions[] = 'Edit';
+            if ($user->can_add_rewards) $permissions[] = 'Add';
+            if ($user->can_delete_rewards) $permissions[] = 'Delete';
+            
+            $permissionText = empty($permissions) ? 'No permissions' : implode(' and ', $permissions);
+            
+            Alert::success('Success', "Admin permissions updated to '{$permissionText}' successfully!");
+            return redirect()->back();
+
+        } catch (\Exception $e) {
+            Alert::error('Error', 'Failed to update admin permissions: ' . $e->getMessage());
+            return redirect()->back();
         }
+    }
+
+    public function datatable(Request $request)
+    {
+        $query = User::with([
+            'dealer:id,user_id,address,status',
+            'client:id,user_id,address,status'
+        ])->select('users.*');
+
+        if ($request->role) {
+            $query->where('role', $request->role);
+        }
+
+        return DataTables::of($query)
+
+            ->addColumn('address', function ($user) {
+                return optional($user->dealer)->address
+                    ?? optional($user->client)->address
+                    ?? $user->address
+                    ?? 'N/A';
+            })
+
+            ->addColumn('status', function ($user) {
+                return optional($user->dealer)->status
+                    ?? optional($user->client)->status
+                    ?? '';
+            })
+
+            ->addColumn('actions', function ($user) {
+
+                $currentUser = auth()->user();
+                $canEdit = $currentUser && $currentUser->role === 'Admin' && $currentUser->can_edit === 'on';
+                $canAdd  = $currentUser && $currentUser->role === 'Admin' && $currentUser->can_add === 'on';
+
+                $html = '<div class="action-buttons">';
+
+                // VIEW
+                if ($user->role === 'Dealer' && $user->dealer) {
+                    $html .= '<a href="view-dealer/'.$user->dealer->id.'" class="btn-custom btn-view-custom">
+                                <i class="fas fa-eye"></i>
+                            </a>';
+                }
+
+                if ($user->role === 'Client' && $user->client) {
+                    $html .= '<a href="view-client/'.$user->client->id.'" class="btn-custom btn-view-custom">
+                                <i class="fas fa-eye"></i>
+                            </a>';
+                }
+
+                // EDIT (Admin + permission)
+                if ($canEdit) {
+                    $html .= '<button class="btn-custom btn-edit-custom"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit-users-'.$user->id.'">
+                                <i class="fas fa-edit"></i>
+                            </button>';
+                }
+
+                // ACCESS (Admin only logic)
+                if ($user->role === 'Admin' && ($canEdit || $canAdd)) {
+                    $html .= '<button class="btn-custom btn-access-custom"
+                                data-bs-toggle="modal"
+                                data-bs-target="#access-admin-'.$user->id.'">
+                                <i class="fas fa-key"></i>
+                            </button>';
+                }
+
+                $html .= '</div>';
+
+                return $html;
+            })
+
+            ->rawColumns(['actions'])
+            ->make(true);
+    }
 }

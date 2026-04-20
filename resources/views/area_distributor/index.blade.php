@@ -49,9 +49,9 @@
                         <i class="ti ti-user-check fs-8 fw-lighter"></i> <!-- Active icon -->
                     </div>
                     <h5 class="text-white fw-bold fs-14 text-nowrap">
-                        {{ $activeDealers }}
+                        {{ $activeAds }}
                     </h5>
-                    <p class="opacity-50 mb-0" style="font-size: 12px;">ACTIVE DEALERS</p>
+                    <p class="opacity-50 mb-0" style="font-size: 12px;">ACTIVE AREA DISTRIBUTOR</p>
                 </div>
             </div>
         </div>
@@ -63,9 +63,9 @@
                         <i class="ti ti-user-x fs-8 fw-lighter"></i> <!-- Inactive icon -->
                     </div>
                     <h5 class="text-white fw-bold fs-14 text-nowrap">
-                        {{ $inactiveDealers }}
+                        {{ $inactiveAds }}
                     </h5>
-                    <p class="opacity-50 mb-0" style="font-size: 12px;">INACTIVE DEALERS</p>
+                    <p class="opacity-50 mb-0" style="font-size: 12px;">INACTIVE AREA DISTRIBUTOR</p>
                 </div>
             </div>
         </div>
@@ -74,13 +74,13 @@
         <div class="col-lg-12 col-xl-12 d-flex align-items-stretch">
             <div class="card w-100">
                 <div class="card-body">
-                    <h5>Dealers <button class="btn-sm btn-success btn" data-bs-toggle="modal"  data-bs-target="#new_dealer">+ Add</button></h5></h5>
+                    <h5>Area Distributors <button class="btn-sm btn-success btn" data-bs-toggle="modal"  data-bs-target="#new_area_distributor">+ Add</button></h5>
                     <div class="table-responsive">
-                      <table class="table table-bordered table-striped transaction-table" id="adTable" style="width:100%">
+                      <table class="table table-bordered table-striped transaction-table" id="example" style="width:100%">
                         <thead>
                             <tr>
-                                <th>Dealer Reference</th>
-                                <th>Dealer Name</th>
+                                <th>AD Reference</th>
+                                <th>Name</th>
                                 <th>Store Name</th>
                                 <th>Store Type</th>
                                 <th>Number</th>
@@ -91,20 +91,20 @@
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody id="adBody">
-                            @foreach($dealers as $dealer)
+                        <tbody id="dealerBody">
+                            @foreach($ads as $ad)
                             <tr>
-                                <td scope="col">{{ $dealer->dealer_reference }}</td>
-                                <td scope="col"><a href='view-dealer/{{$dealer->id}}'>{{$dealer->name}}</a></td>
-                                <td scope="col">{{$dealer->store_name ?? '-'}}</td>
-                                <td scope="col">{{$dealer->store_type ?? '-'}}</td>
-                                <td scope="col">{{$dealer->number}}</td>
-                                <td scope="col">{{($dealer->sales)->sum('qty')}}</td>
-                                {{-- <td scope="col">{{($dealer->sales)->sum('points_dealer')}}</td> --}}
-                                <td scope="col">{{$dealer->address ?? '-'}}</td>
-                                <td scope="col">{{$dealer->spo}}</td>
+                                <td scope="col">{{ $ad->dealer_reference }}</td>
+                                <td scope="col"><a href='view-dealer/{{$ad->id}}'>{{$ad->name}}</a></td>
+                                <td scope="col">{{$ad->store_name ?? '-'}}</td>
+                                <td scope="col">{{$ad->store_type ?? '-'}}</td>
+                                <td scope="col">{{$ad->number}}</td>
+                                <td scope="col">{{($ad->sales)->sum('qty')}}</td>
+                                {{-- <td scope="col">{{($ad->sales)->sum('points_dealer')}}</td> --}}
+                                <td scope="col">{{$ad->address ?? '-'}}</td>
+                                <td scope="col">{{$ad->spo}}</td>
                                 <td>
-                                    @if($dealer->status == 'Active')
+                                    @if($ad->status == 'Active')
                                         <span class="badge badge-success">Active</span>
                                     @else 
                                         <span class="badge badge-danger">Inactive</span>
@@ -120,7 +120,7 @@
     </div>
 </section>
 @endsection
-@include('new_dealer')
+@include('area_distributor.create')
 @section('javascript')
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
@@ -128,21 +128,21 @@
 <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
 <script>
   $(document).ready(function() {
-    $('#adTable').DataTable();
+    $('#example').DataTable();
   });
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("adFilter").addEventListener("change", function () {
-            const selectedAdDealer = this.value;
-            filterAdsByName(selectedAdDealer);
+        document.getElementById("dealerFilter").addEventListener("change", function () {
+            const selectedDealer = this.value;
+            filterDealersByName(selectedDealer);
         });
 
-        function filterAdsByName(adName) {
-            const rows = document.querySelectorAll('#adBody tr');
+        function filterDealersByName(dealerName) {
+            const rows = document.querySelectorAll('#dealerBody tr');
             rows.forEach(row => {
                 const dealerColumn = row.cells[0].textContent;
-                if (adName === 'All' || dealerColumn === adName) {
+                if (dealerName === 'All' || dealerColumn === dealerName) {
                     row.style.display = '';
                 } else {
                     row.style.display = 'none';

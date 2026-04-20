@@ -251,7 +251,7 @@ table td:nth-child(6) {
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="userBody">
+                        {{-- <tbody id="userBody">
                             @foreach($users as $user)
                             <tr>
                                  <td scope="col">
@@ -365,7 +365,8 @@ table td:nth-child(6) {
                                 </td>
                             </tr>
                             @endforeach
-                        </tbody>
+                        </tbody> --}}
+                        <tbody></tbody>
                     </table>
                   </div>
                 </div>
@@ -378,10 +379,10 @@ table td:nth-child(6) {
 
 @endsection
 
-@foreach($users as $user)
+{{-- @foreach($users as $user)
 @include('admin-privillege')
 @include('edit_users')
-@endforeach
+@endforeach --}}
 
 @section('javascript')
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -391,10 +392,36 @@ table td:nth-child(6) {
 
 <script>
     $(document).ready(function() {
+        // var table = $('#example').DataTable({
+        //     "pageLength": 25,
+        //     "order": [[ 0, "asc" ]],
+        //     "responsive": true
+        // });
+
         var table = $('#example').DataTable({
-            "pageLength": 25,
-            "order": [[ 0, "asc" ]],
-            "responsive": true
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('users.data') }}",
+                data: function (d) {
+                    d.role = $('#roleFilter').val();
+                }
+            },
+            columns: [
+                { data: 'name' },
+                { data: 'email' },
+                { data: 'address' },
+                { data: 'status' },
+                { data: 'role' },
+                { data: 'actions', orderable: false, searchable: false }
+            ],
+            pageLength: 25,
+            order: [[0, 'asc']]
+        });
+
+        // ✅ ONLY THIS (remove column search completely)
+        $('#roleFilter').on('change', function () {
+            table.ajax.reload();
         });
 
         $('#roleFilter').on('change', function () {
@@ -412,7 +439,7 @@ table td:nth-child(6) {
                 alert('Passwords do not match!');
                 return false;
             }
-            
+
             if (password.length < 8) {
                 e.preventDefault();
                 alert('Password must be at least 8 characters long!');
