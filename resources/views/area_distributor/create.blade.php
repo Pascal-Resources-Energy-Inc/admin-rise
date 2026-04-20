@@ -1,246 +1,239 @@
 <div id="new_area_distributor" class="modal fade" tabindex="-1" aria-labelledby="bs-example-modal-md" aria-hidden="true" style="display: none;">
-  {{-- <div class="modal-dialog modal-dialog-scrollable modal-lg"> --}}
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header d-flex align-items-center">
-        <h4 class="modal-title" id="myModalLabel">
-          New Dealer
-        </h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"
-          aria-label="Close"></button>
-      </div>
-      <form method='POST' action='{{url('new-dealer')}}' onsubmit='show()' enctype="multipart/form-data">
-      @csrf
-      <input type="hidden" name="latitude" id="hidden_latitude">
-      <input type="hidden" name="longitude" id="hidden_longitude">
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-md-12 mb-3">
-            <label class="form-label" for="wfirstName2"> Full Name  <span class="text-danger">*</span></label>
-            <input type="text" class="form-control required" id="wfirstName2" name="name" placeholder="Enter Full Name" required/>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label" for="wemailAddress2"> Email Address <span class="text-danger">*</span></label>
-            <input type="email" class="form-control required" id="wemailAddress2" name="email_address" placeholder="Enter Email Address" required/>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label" for="spo"> SPO <span class="text-danger">*</span></label>
-            <input type="text" class="form-control required" id="spo" name="spo" placeholder="Enter SPO" required/>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label" for="wphoneNumber2">Phone Number <span class="text-danger">*</span></label>
-            <input type="number" class="form-control required" id="wphoneNumber2" name="phone_number" placeholder="Enter Phone Number" step="0.01">
-          </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label" for="facebook2">Facebook <span class="text-danger">*</span></label>
-            <input type="text" class="form-control required" id="facebook2" name='facebook' placeholder="Enter Facebook" required/>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label" for="store_name">Store Name  <span class="text-danger">*</span></label>
-            <input type="text" class="form-control required" name='store_name' id="store_name" placeholder="Enter Store Name" />
-          </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label" for="store_type">Store Type  <span class="text-danger">*</span></label>
-            <input type="text" class="form-control required" name='store_type' id="store_type" placeholder="Enter Store Type" />
-          </div>
-          <div class="col-md-12 mb-3">
-            <label class="form-label" for="wlocation2"> Address <span class="text-danger">*</span></label>
-            <textarea class="form-control required" name='address' placeholder="Enter Address" required></textarea>
-          </div>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-flex align-items-center">
+                <h4 class="modal-title" id="myModalLabel">
+                    New Area Distributor
+                </h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method='POST' action='{{url('new-dealer')}}' onsubmit='show()' enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="latitude" id="hidden_latitude">
+                <input type="hidden" name="longitude" id="hidden_longitude">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Store Code</label>
+                            <input type="text" class="form-control" id="store_code" name="store_code" placeholder="Enter Store Code">
+                        </div>
+
+                        <!-- Avatar Upload -->
+                        <div class="col-md-6 text-center">
+                            <div class="avatar-wrapper mx-auto mb-2">
+                                <img id="avatar"
+                                    src="{{ asset('design/assets/images/profile/user-1.png') }}"
+                                    onerror="this.src='{{ asset('design/assets/images/profile/user-1.png') }}'"
+                                    alt="Avatar Preview">
+                            </div>
+
+                            <label for="inputImage" class="btn btn-outline-primary btn-sm">
+                                <i class="ti ti-upload"></i> Upload Image
+                            </label>
+                            <input type="file" 
+                                accept="image/*" 
+                                name="file" 
+                                id="inputImage" 
+                                hidden 
+                                onchange="uploadImage(this)">
+                            
+                            <small class="d-block text-muted mt-1">
+                                JPG, PNG (Max: 2MB)
+                            </small>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label" for="wfirstName2"> Full Name  <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control required" id="wfirstName2" name="name" placeholder="Enter Full Name" required/>
+                        </div>
+                            <div class="col-md-6 mb-3">
+                            <label class="form-label" for="wemailAddress2"> Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control required" id="wemailAddress2" name="email_address" placeholder="Enter Email Address" required/>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="wphoneNumber2">Phone Number <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control required" id="wphoneNumber2" name="phone_number" placeholder="Enter Phone Number" step="0.01">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                        <label class="form-label" for="spo"> SPO <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control required" id="spo" name="spo" placeholder="Enter SPO" required/>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                        <label class="form-label" for="facebook2">Facebook <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control required" id="facebook2" name='facebook' placeholder="Enter Facebook" required/>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                        <label class="form-label" for="store_name">Store Name  <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control required" name='store_name' id="store_name" placeholder="Enter Store Name" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                        <label class="form-label" for="store_type">Store Type  <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control required" name='store_type' id="store_type" placeholder="Enter Store Type" />
+                        </div>
+                        <div class="col-md-12 mb-3">
+                        <label class="form-label" for="wlocation2"> Address <span class="text-danger">*</span></label>
+                        <textarea class="form-control required" name='address' placeholder="Enter Address" required></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                        <label>Region <span class="text-danger">*</span></label>
+                        <select class="form-control" id="location_region" name="location_region" required onclick="event.stopPropagation();">
+                            <option value="">-- Select Region --</option>
+                        </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                        <label>Province <span class="text-danger">*</span></label>
+                        <select class="form-control" id="location_province" name="location_province" required onclick="event.stopPropagation();" disabled>
+                            <option value="">-- Select Region First --</option>
+                        </select>
+                        </div>
+                    </div>
+                    </div>
+
+                    <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                        <label>City/Municipality <span class="text-danger">*</span></label>
+                        <select class="form-control" id="location_city" name="location_city" required onclick="event.stopPropagation();" disabled>
+                            <option value="">-- Select Province First --</option>
+                        </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Barangay <span class="text-danger">*</span></label>
+                            <select class="form-control" 
+                                    name="location_barangay" 
+                                    id="location_barangay" 
+                                    required 
+                                    onclick="event.stopPropagation();" 
+                                    disabled>
+                                <option value="">-- Select City First --</option>
+                            </select>
+                            <small class="form-text text-muted">Select barangay from the list</small>
+                        </div>
+                    </div>
+                    </div>
+
+                    <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                        <label>Postal Code</span></label>
+                        <input type="text" class="form-control" 
+                                name="postal_code" id="postal_code" value="{{ old('postal_code') }}" 
+                                placeholder="e.g., 1121">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                        <label>Street Name, Building, House No. <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" 
+                                name="street_address" id="street_address" value="{{ old('street_address') }}" 
+                                placeholder="e.g., 1868 Kapalaran St" required>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                        <label>Pin Exact Location</span></label>
+                        <div class="alert alert-warning d-flex align-items-start" role="alert">
+                            <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16" style="min-width: 24px; margin-right: 10px;">
+                            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                            </svg>
+                            <div>
+                            <strong>Place an accurate pin</strong><br>
+                            <small>We will deliver to your map location. Please check if it is correct, else click the map to adjust the pin location.</small>
+                            </div>
+                        </div>
+                        <div id="location_map" style="height: 400px; border-radius: 8px; border: 2px solid #dee2e6;"></div>
+                        <div class="mt-2 p-2 bg-light rounded">
+                            <strong>Current Pin Location:</strong><br>
+                            Latitude: <span id="display_lat">--</span>, Longitude: <span id="display_lng">--</span>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+
+                    <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                        <label>Complete Address Preview</label>
+                        <textarea class="form-control bg-light" id="full_address_preview" rows="2" readonly></textarea>
+                        <input type="hidden" name="location" id="location_hidden">
+                        </div>
+                    </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-danger-subtle text-danger  waves-effect"data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-info-subtle text-info  waves-effect">Submit</button>
+                </div>
+            </form>
         </div>
-        <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>Region <span class="text-danger">*</span></label>
-                <select class="form-control" id="location_region" name="location_region" required onclick="event.stopPropagation();">
-                  <option value="">-- Select Region --</option>
-                </select>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>Province <span class="text-danger">*</span></label>
-                <select class="form-control" id="location_province" name="location_province" required onclick="event.stopPropagation();" disabled>
-                  <option value="">-- Select Region First --</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>City/Municipality <span class="text-danger">*</span></label>
-                <select class="form-control" id="location_city" name="location_city" required onclick="event.stopPropagation();" disabled>
-                  <option value="">-- Select Province First --</option>
-                </select>
-              </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>Barangay <span class="text-danger">*</span></label>
-                    <select class="form-control" 
-                            name="location_barangay" 
-                            id="location_barangay" 
-                            required 
-                            onclick="event.stopPropagation();" 
-                            disabled>
-                        <option value="">-- Select City First --</option>
-                    </select>
-                    <small class="form-text text-muted">Select barangay from the list</small>
-                </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>Postal Code</span></label>
-                <input type="text" class="form-control" 
-                       name="postal_code" id="postal_code" value="{{ old('postal_code') }}" 
-                       placeholder="e.g., 1121">
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>Street Name, Building, House No. <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" 
-                       name="street_address" id="street_address" value="{{ old('street_address') }}" 
-                       placeholder="e.g., 1868 Kapalaran St" required>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12">
-              <div class="form-group">
-                <label>Pin Exact Location</span></label>
-                <div class="alert alert-warning d-flex align-items-start" role="alert">
-                  <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16" style="min-width: 24px; margin-right: 10px;">
-                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                  </svg>
-                  <div>
-                    <strong>Place an accurate pin</strong><br>
-                    <small>We will deliver to your map location. Please check if it is correct, else click the map to adjust the pin location.</small>
-                  </div>
-                </div>
-                <div id="location_map" style="height: 400px; border-radius: 8px; border: 2px solid #dee2e6;"></div>
-                <div class="mt-2 p-2 bg-light rounded">
-                  <strong>Current Pin Location:</strong><br>
-                  Latitude: <span id="display_lat">--</span>, Longitude: <span id="display_lng">--</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-12">
-              <div class="form-group">
-                <label>Complete Address Preview</label>
-                <textarea class="form-control bg-light" id="full_address_preview" rows="2" readonly></textarea>
-                <input type="hidden" name="location" id="location_hidden">
-              </div>
-            </div>
-          </div>
-
-        </div>
-      <div class="modal-footer">
-        <button type="button" class="btn bg-danger-subtle text-danger  waves-effect"data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn bg-info-subtle text-info  waves-effect">Submit</button>
-      </div>
-      </form>
     </div>
-    <!-- /.modal-content -->
-  </div>
-<!-- /.modal-dialog -->
 </div>
 
+<style>
+    #location_map {
+        height: 400px;
+        width: 100%;
+    }
+    .avatar-wrapper {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+    }
+
+    .avatar-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-    document.getElementById('lead_generator').addEventListener('change', function () {
-      const referenceFields = document.querySelectorAll('.reference_field');
-      const referenceRequired = document.querySelectorAll('.reference-required');
+    function uploadImage(input) {
+        const file = input.files[0];
 
-      const referenceInput = document.getElementById('lead_reference');
-      const fbNameInput = document.getElementById('fb_name');
+        if (!file) return;
 
-      const requiresReference = ['FB', 'Shopee', 'Gaz Lite Website'].includes(this.value);
+        // ✅ Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('Please upload a valid image file.');
+            input.value = '';
+            return;
+        }
 
-      if (requiresReference) {
+        // ✅ Validate file size (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Image must be less than 2MB.');
+            input.value = '';
+            return;
+        }
 
-          // SHOW ALL reference fields
-          referenceFields.forEach(el => el.style.display = 'block');
+        const reader = new FileReader();
 
-          // REQUIRED
-          referenceInput.required = true;
-          fbNameInput.required = true;
+        reader.onload = function (e) {
+            document.getElementById('avatar').src = e.target.result;
+        };
 
-          referenceRequired.forEach(el => el.style.display = 'inline');
-
-      } else {
-
-          // HIDE ALL reference fields
-          referenceFields.forEach(el => el.style.display = 'none');
-
-          // REMOVE REQUIRED
-          referenceInput.required = false;
-          fbNameInput.required = false;
-
-          // CLEAR VALUES
-          referenceInput.value = '';
-          fbNameInput.value = '';
-
-          referenceRequired.forEach(el => el.style.display = 'none');
-      }
-  });
-
-
-  document.addEventListener('DOMContentLoaded', function() {
-      const leadGenerator = document.getElementById('lead_generator');
-      if (leadGenerator.value) {
-          leadGenerator.dispatchEvent(new Event('change'));
-      }
-  });
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const imageInput = document.querySelector('input[name="business_image"]');
-    const imagePreview = document.getElementById('imagePreview');
-    const previewImg = imagePreview.querySelector('img');
-    
-    if (imageInput) {
-        imageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('Image size must not exceed 5MB');
-                    this.value = '';
-                    imagePreview.style.display = 'none';
-                    return;
-                }
-                
-                const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-                if (!validTypes.includes(file.type)) {
-                    alert('Please upload a valid image (JPG, JPEG, or PNG)');
-                    this.value = '';
-                    imagePreview.style.display = 'none';
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    imagePreview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            } else {
-                imagePreview.style.display = 'none';
-            }
-        });
+        reader.readAsDataURL(file);
     }
-
+    document.addEventListener('DOMContentLoaded', function() {
     const BASE_URL = 'https://psgc.cloud/api';
     
     let map, marker;
@@ -253,8 +246,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let geocodeTimeout = null;
 
     function initMap() {
-        map = L.map('location_map').setView([currentLat, currentLng], 13);
-        
+        map = L.map('location_map', {
+            center: [currentLat, currentLng],
+            zoom: 13
+        });
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors',
             maxZoom: 19
@@ -264,14 +260,19 @@ document.addEventListener('DOMContentLoaded', function() {
             draggable: true
         }).addTo(map);
 
+        // 🔥 Fix rendering issue
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 200);
+
         updateCoordinates(currentLat, currentLng);
 
-        marker.on('dragend', function(e) {
+        marker.on('dragend', function (e) {
             const position = marker.getLatLng();
             updateCoordinates(position.lat, position.lng);
         });
 
-        map.on('click', function(e) {
+        map.on('click', function (e) {
             marker.setLatLng(e.latlng);
             updateCoordinates(e.latlng.lat, e.latlng.lng);
         });
@@ -735,53 +736,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     $('#new_area_distributor').on('shown.bs.modal', function () {
-      loadRegions();
+        loadRegions();
 
-      if (!map) {
-          initMap();
-      } else {
-          map.invalidateSize(); // important for Leaflet inside modal
-      }
+        setTimeout(() => {
+            if (!map) {
+                initMap();
+            } else {
+                map.invalidateSize();
+            }
+        }, 300); // delay is important
     });
-
-});
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-
-    const statusSelect = document.getElementById('status-select');
-    const supplierWrapper = document.querySelector('.supplier-wrapper');
-    const supplierInput = document.getElementById('supplier_name');
-    const deliveryDateInput = document.getElementById('delivery_date');
-    
-    function toggleSupplier() {
-        const value = statusSelect.value;
-
-        if (value === 'For Delivery' || value === 'Delivered') {
-            supplierWrapper.style.display = 'block';
-            supplierInput.required = true;
-            deliveryDateInput.required = true;
-        } else {
-            supplierWrapper.style.display = 'none';
-            supplierInput.required = false;
-            supplierInput.value = '';
-            deliveryDateInput.required = false;
-            deliveryDateInput.value = '';
-        }
-    }
-
-    // Normal change event
-    statusSelect.addEventListener('change', toggleSupplier);
-
-    // If using Select2
-    if (window.jQuery) {
-      $('#status-select').on('change', function () {
-          toggleSupplier();
-      });
-    }
-
-    // On page load (for old() value)
-    toggleSupplier();
 
 });
 </script>
