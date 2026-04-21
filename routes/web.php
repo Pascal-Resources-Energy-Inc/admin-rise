@@ -62,8 +62,8 @@ Route::get('/users-data', 'EditUserController@datatable')->name('users.data');
 
 // Area Distributor 
 Route::get('/ads','AreaDistributorController@index')->name('ads');
-Route::post('/new-ad','AreaDistributorController@newAd');
-Route::post('/ads/get-zipcode', 'AreaDistributorController@getZipCode')->name('get.zipcode');
+Route::post('/new-ad','AreaDistributorController@store')->name('new-ad');
+Route::put('edit-ads/{id}', 'AreaDistributorController@update')->name('edit-ads');
 Route::post('/geocode-location', 'AreaDistributorController@geocodeLocation')->name('geocode.location');
 
 Route::get('/dealers','DealerController@index')->name('dealers');

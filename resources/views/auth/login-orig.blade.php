@@ -1,17 +1,15 @@
 @extends('layouts.app')
+
 @section('content')
 <?php
 $hasErrors = $errors->any();
-$hasSelectedRole = old('selected_role');
-$showLoginDirectly = $hasErrors && $hasSelectedRole;
 
 $isDirect = request('direct') === 'true';
-$showRoleSelection = $isDirect && !$showLoginDirectly;
+$showLoginDirectly = $hasErrors || $isDirect;
 ?>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<div class="landing-page" id="landingPage" style="display: {{ $showLoginDirectly || $showRoleSelection ? 'none' : 'flex' }};">
+{{-- Landing Page --}}
+<div class="landing-page" id="landingPage" style="display: {{ $showLoginDirectly ? 'none' : 'flex' }};">
     <div class="landing-content">
         <div class="landing-wrapper">
             <div class="logo-section">
@@ -29,66 +27,20 @@ $showRoleSelection = $isDirect && !$showLoginDirectly;
             <div class="progress-dots">
                 <span class="dot active"></span>
                 <span class="dot"></span>
-                <span class="dot"></span>
             </div>
 
-            <button class="landing-signin-button" onclick="showRoleSelection()">
+            <button class="landing-signin-button" onclick="showLoginForm()">
                 Sign in
             </button>
         </div>
     </div>
 </div>
 
-<div class="role-selection-page" id="roleSelectionPage" style="display: {{ $showRoleSelection ? 'flex' : 'none' }};">
-    <div class="role-header">
-        <div class="header-left">
-        </div>
-    </div>
-
-    <div class="role-content">
-        <div class="role-wrapper">
-            <div class="welcome-section">
-                <h1 class="welcome-title">Welcome to Gaz Lite !</h1>
-                <p class="welcome-subtitle">Select 'Admin' or 'Employee' to get started.</p>
-            </div>
-
-            <div class="context-image-section">
-                <img src="{{asset('images/context.png')}}" alt="Role Selection Context" class="context-image">
-            </div>
-
-            <div class="progress-dots">
-                <span class="dot"></span>
-                <span class="dot active"></span>
-                <span class="dot"></span>
-            </div>
-
-            <div class="role-buttons">
-                <button class="role-button dealer-btn" onclick="selectRole('admin')">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="role-icon">
-                        <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Admin
-                    <span class="selected-indicator" style="display: none;">✓</span>
-                </button>
-                
-                <button class="role-button client-btn" onclick="selectRole('area distributor')">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="role-icon">
-                        <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Partner
-                    <span class="selected-indicator" style="display: none;">✓</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
+{{-- Login Page --}}
 <div class="login-page" id="loginFormPage" style="display: {{ $showLoginDirectly ? 'flex' : 'none' }};">
     <div class="login-header">
         <div class="header-left">
-            <button type="button" class="back-btn" onclick="showRoleSelection()">
+            <button type="button" class="back-btn" onclick="showLandingPage()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -102,30 +54,24 @@ $showRoleSelection = $isDirect && !$showLoginDirectly;
 
     <div class="login-content">
         <div class="form-container">
-            <div class="role-indicator" id="roleIndicator" style="display: {{ $showLoginDirectly ? 'block' : 'none' }};">
-                <div class="role-info">
-                    <span class="role-label">Signing in as:</span>
-                    <span class="role-name" id="selectedRoleName">{{ $hasSelectedRole ? ucfirst(old('selected_role')) : 'User' }}</span>
-                </div>
-            </div>
-
-            <form id="loginForm" aria-label="{{ __('Login') }}">
+            <form method="POST" action="{{ route('login') }}">
                 @csrf
-                
-                <input type="hidden" name="selected_role" id="selectedRoleInput" value="{{ old('selected_role') }}">
 
                 <div class="input-group">
                     <label for="email" class="input-label">Email or Phone Number</label>
                     <input 
                         id="email" 
                         type="text" 
-                        class="form-input" 
+                        class="form-input{{ $errors->has('email') ? ' error' : '' }}" 
                         name="email" 
                         value="{{ old('email') }}" 
                         placeholder="Email or Phone Number"
                         required 
                         autofocus
                     >
+                    @if($errors->has('email'))
+                        <div class="text-danger mt-2 fw-semibold">{{ $errors->first('email') }}</div>
+                    @endif
                 </div>
 
                 <div class="input-group">
@@ -133,14 +79,23 @@ $showRoleSelection = $isDirect && !$showLoginDirectly;
                     <input 
                         id="password" 
                         type="password" 
-                        class="form-input" 
+                        class="form-input{{ $errors->has('password') ? ' error' : '' }}" 
                         placeholder="At least 8 characters" 
                         name="password" 
                         required
                     >
+                    @if($errors->has('password'))
+                        <div class="text-danger mt-2 fw-semibold">{{ $errors->first('password') }}</div>
+                    @endif
                 </div>
 
-                <button class="signin-button" type="submit" id="signinButton">
+                @if($errors->any() && !$errors->has('email') && !$errors->has('password'))
+                    <div class="alert-error">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
+
+                <button class="signin-button" type="submit">
                     Sign in
                 </button>
 
@@ -151,7 +106,6 @@ $showRoleSelection = $isDirect && !$showLoginDirectly;
                 </div>
 
                 <div class="progress-dots">
-                    <span class="dot"></span>
                     <span class="dot"></span>
                     <span class="dot active"></span>
                 </div>
@@ -260,8 +214,8 @@ body {
 }
 
 .landing-signin-button:hover {
+    transform: translateY(-2px); 
     background-color: #3498DB;
-    transform: translateY(-2px);
 }
 
 .role-selection-page {
@@ -358,6 +312,7 @@ body {
     transform: translateY(-2px);
 }
 
+/* New styles for role selection indication */
 .role-button.selected {
     opacity: 0.8;
     box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #5DADE2;
@@ -376,6 +331,7 @@ body {
     stroke: white;
 }
 
+/* Continue button styles */
 .continue-section {
     margin-bottom: 20px;
     opacity: 0;
@@ -465,7 +421,7 @@ body {
     margin-left: 20px;
     font-size: 27px;
     font-weight: 550;
-    color: #5DADE2;
+    color: #5DADE2; 
     letter-spacing: 1px;
 }
 
@@ -494,6 +450,7 @@ body {
     max-width: 400px;
 }
 
+/* Role indicator in login form */
 .role-indicator {
     background-color: #F0F8FF;
     border-left: 4px solid #5DADE2;
@@ -553,12 +510,62 @@ body {
     background-color: #EEEEEE;
 }
 
+.form-input.error {
+    background-color: #FFE5E5;
+    border: 1px solid #FF6B6B;
+}
+
+.error-text {
+    color: #FF6B6B;
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+.otp-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.otp-text {
+    font-size: 16px;
+    color: #666666;
+}
+
+.email-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background-color: #5DADE2;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.email-btn:hover {
+    background-color: #3498DB;
+}
+
+.email-icon {
+    width: 16px;
+    height: 16px;
+    stroke: white;
+    fill: none;
+}
+
 .signin-button {
     width: 100%;
     height: 56px;
     border: none;
     border-radius: 12px;
-    background-color: #5DADE2;
+    background-color: #5DADE2; 
     color: white;
     font-size: 16px;
     font-weight: 500;
@@ -577,7 +584,7 @@ body {
 }
 
 .forgot-link {
-    color: #5DADE2;
+    color: #5DADE2; 
     text-decoration: none;
     font-size: 16px;
     font-weight: 400;
@@ -585,6 +592,16 @@ body {
 
 .forgot-link:hover {
     text-decoration: underline;
+}
+
+.alert-error {
+    background-color: #FFE5E5;
+    color: #FF6B6B;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border-left: 4px solid #FF6B6B;
+    margin-bottom: 20px;
+    font-size: 14px;
 }
 
 @media (max-width: 480px) {
@@ -651,87 +668,16 @@ body {
     }
 }
 </style>
+
 <script>
-    let currentRole = '';
+function showLoginForm() {
+    document.getElementById('landingPage').style.display = 'none';
+    document.getElementById('loginFormPage').style.display = 'flex';
+}
 
-    window.selectRole = function(role) {
-        currentRole = role;
-
-        document.querySelectorAll('.role-button').forEach(btn => {
-            btn.classList.remove('selected');
-            const check = btn.querySelector('.selected-indicator');
-            if (check) check.style.display = 'none';
-        });
-
-        const selectedBtn = event.currentTarget;
-        selectedBtn.classList.add('selected');
-
-        const checkmark = selectedBtn.querySelector('.selected-indicator');
-        if (checkmark) checkmark.style.display = 'inline';
-
-        document.getElementById('selectedRoleInput').value = role;
-
-        setTimeout(() => {
-            showLoginForm();
-        }, 300);
-    };
-
-    window.showRoleSelection = function () {
-        document.getElementById('landingPage').style.display = 'none';
-        document.getElementById('roleSelectionPage').style.display = 'flex';
-        document.getElementById('loginFormPage').style.display = 'none';
-    };
-
-    window.showLoginForm = function () {
-        document.getElementById('landingPage').style.display = 'none';
-        document.getElementById('roleSelectionPage').style.display = 'none';
-        document.getElementById('loginFormPage').style.display = 'flex';
-
-        updateLoginFormRole();
-    };
-
-    function updateLoginFormRole() {
-        if (!currentRole) return;
-
-        document.getElementById('roleIndicator').style.display = 'block';
-        document.getElementById('selectedRoleName').innerText =
-            currentRole.replace(/\b\w/g, l => l.toUpperCase());
-    }
-
-    document.getElementById('loginForm').addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        const btn = document.getElementById('signinButton');
-        const formData = new FormData(this);
-
-        btn.disabled = true;
-        btn.innerHTML = "Signing in...";
-
-        try {
-            const res = await fetch("{{ route('login') }}", {
-                method: "POST",
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            });
-
-            const data = await res.json();
-
-            if (data.success) {
-                window.location.href = data.redirect;
-            } else {
-                Swal.fire("Error", data.message, "error");
-            }
-
-        } catch (err) {
-            Swal.fire("Error", "Server error", "error");
-        }
-
-        btn.disabled = false;
-        btn.innerHTML = "Sign in";
-    });
+function showLandingPage() {
+    document.getElementById('loginFormPage').style.display = 'none';
+    document.getElementById('landingPage').style.display = 'flex';
+}
 </script>
-
 @endsection
