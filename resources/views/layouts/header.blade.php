@@ -1055,7 +1055,7 @@
                     </a>
                 </div>
                 
-                @if((auth()->user()->role == "Admin") || (auth()->user()->role == "Dealer"))
+                @if((auth()->user()->role == "Admin") || (auth()->user()->role == "Dealer") || (auth()->user()->role == "Area Distributor"))
                 <div class="nav-item">
                     <a href="{{url('/transactions')}}" class="nav-link @if(Route::currentRouteName() == 'transactions')active @endif">
                         <div class="nav-icon">
@@ -1066,7 +1066,7 @@
                 </div>
                 @endif
                 
-                @if(auth()->user()->role == "Admin")
+                @if(auth()->user()->role == "Admin" || auth()->user()->role == "Area Distributor")
                 <div class="nav-item">
                     <a href="{{url('/ads')}}" class="nav-link @if(Route::currentRouteName() == 'ads')active @endif">
                         <div class="nav-icon">
@@ -1138,7 +1138,7 @@
                     <small>Welcome back to dashboard</small>
                 </div>
             </div>
-            @if((auth()->user()->role == "Admin"))
+            @if((auth()->user()->role == "Admin" || auth()->user()->role == "Area Distributor"))
             <div class="topbar-right">
                 <li class="nav-item d-none d-md-block me-2 mt-3 search-container">
                     <form action="{{ url('/search') }}" method="GET" class="position-relative">
@@ -1338,7 +1338,7 @@
                                 </div>
                             </div>
                         </li>
-                        @if(auth()->user()->role != "Admin")
+                        @if(auth()->user()->role != "Admin" && auth()->user()->role != "Area Distributor")
                         <li><a class="dropdown-item" href="{{url('user-profile')}}">
                             <i class="bi bi-person"></i>
                             <span>My Profile</span>

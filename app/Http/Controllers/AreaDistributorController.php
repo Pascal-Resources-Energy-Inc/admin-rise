@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\AreaDistributor;
+use App\AreaAd;
+use App\Center;
+use App\User;
 use Illuminate\Http\Request;
 
 class AreaDistributorController extends Controller
@@ -11,13 +14,15 @@ class AreaDistributorController extends Controller
     {
         $activeAds = AreaDistributor::where('status', 'Active')->count();
         $inactiveAds = AreaDistributor::where('status', 'Inactive')->count();
-
-        $ads = AreaDistributor::get();
+        $centers = Center::get();
+        
+        $ads = AreaDistributor::with('areas')->get();
         return view('area_distributor.index',
             array(
                 'ads' => $ads,
                 'activeAds' => $activeAds,
-                'inactiveAds' => $inactiveAds
+                'inactiveAds' => $inactiveAds,
+                'centers' => $centers
             )
         );
     }
@@ -40,7 +45,61 @@ class AreaDistributorController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = new User;
+        $user->name = $request->name;
+        $user->email = $request->email_address;
+        $user->role = 'Area Distributor';
+        $user->password = bcrypt('12345678');
+        $user->save();
+        
+        $latestAd = AreaDistributor::orderBy('id', 'desc')->first();
+
+        $number = ($latestAd && $latestAd->ad_reference)
+            ? intval(substr($latestAd->ad_reference, 4)) + 1
+            : 1;
+
+        $ad_reference = 'PRAD' . str_pad($number, 5, '0', STR_PAD_LEFT);
+
+        $imagePath = null;
+
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/area_distributor'), $filename);
+            $imagePath = 'uploads/area_distributor/' . $filename;
+        }
+
+        $fullAddress = $request->address;
+
+        $areaDistributor = new AreaDistributor;
+        $areaDistributor->user_id = $user->id;
+        $areaDistributor->ad_reference = $ad_reference;
+        $areaDistributor->name = $request->name;
+        $areaDistributor->store_code = $request->store_code;
+        $areaDistributor->email_address = $request->email_address;
+        $areaDistributor->contact_number = $request->contact_number;
+        $areaDistributor->facebook = $request->facebook;
+        $areaDistributor->address = $fullAddress;
+        $areaDistributor->business_name = $request->business_name;
+        $areaDistributor->business_type = $request->business_type;
+        $areaDistributor->latitude = $request->latitude;
+        $areaDistributor->longitude = $request->longitude;
+        $areaDistributor->status = "Active";
+
+        if ($imagePath) {
+            $areaDistributor->avatar = $imagePath;
+        }
+
+        $areaDistributor->save();
+
+        foreach ($request->area_name as $area) {
+            AreaAd::create([
+                'ad_id' => $areaDistributor->id,
+                'area_name' => $area
+            ]);
+        }
+
+        return redirect()->route('ads')->with('success', 'Successfully encoded');
     }
 
     /**
@@ -54,27 +113,76 @@ class AreaDistributorController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\AreaDistributor  $areaDistributor
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(AreaDistributor $areaDistributor)
+    public function edit($id)
     {
-        //
+        $ad = AreaDistributor::with('areas')->findOrFail($id);
+        $centers = Center::all(); // same source as your create
+
+        return view('area_distributor.edit', compact('ad', 'centers'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\AreaDistributor  $areaDistributor
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, AreaDistributor $areaDistributor)
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email_address' => 'required|email',
+            'contact_number' => 'required',
+            'business_name' => 'required',
+            'business_type' => 'required',
+            'area_name' => 'required|array',
+        ]);
+
+        $areaDistributor = AreaDistributor::findOrFail($id);
+
+        // ✅ Update user
+        if ($areaDistributor->user_id) {
+            User::where('id', $areaDistributor->user_id)->update([
+                'name' => $request->name,
+                'email' => $request->email_address
+            ]);
+        }
+
+        // ✅ Image Upload
+        if ($request->hasFile('avatar')) {
+
+            // delete old
+            if ($areaDistributor->avatar && file_exists(public_path($areaDistributor->avatar))) {
+                unlink(public_path($areaDistributor->avatar));
+            }
+
+            $file = $request->file('avatar');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/area_distributor'), $filename);
+
+            // ✅ IMPORTANT: assign BEFORE update
+            $areaDistributor->avatar = 'uploads/area_distributor/' . $filename;
+        }
+
+        // ✅ Update main data
+        $areaDistributor->update([
+            'name' => $request->name,
+            'store_code' => $request->store_code,
+            'email_address' => $request->email_address,
+            'contact_number' => $request->contact_number,
+            'facebook' => $request->facebook,
+            'address' => $request->address,
+            'business_name' => $request->business_name,
+            'business_type' => $request->business_type,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+        ]);
+
+        // ✅ Sync Areas (cleaner)
+        AreaAd::where('ad_id', $areaDistributor->id)->delete();
+
+        foreach ($request->area_name as $area) {
+            AreaAd::create([
+                'ad_id' => $areaDistributor->id,
+                'area_name' => $area
+            ]);
+        }
+
+        return back()->with('success', 'Updated successfully');
     }
 
     /**
