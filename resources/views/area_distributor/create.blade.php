@@ -51,7 +51,7 @@
                         </div>
                         <div class="col-md-6 mb-2">
                             <label class="form-label" for="contact_number">Contact Number&nbsp;<span class="text-danger">*</span></label>
-                            <input type="number" class="form-control required" id="contact_number" name="contact_number" placeholder="Enter Contact Number" step="0.01" required>
+                            <input type="text" class="form-control" id="contact_number" name="contact_number" placeholder="Enter Contact Number" maxlength="11" pattern="09[0-9]{9}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required >
                         </div>
                         <div class="col-md-6 mb-2">
                             <label class="form-label" for="facebook">Facebook<span class="text-danger">*</span></label>

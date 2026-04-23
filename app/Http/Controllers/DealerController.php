@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\User;
 use App\Dealer;
+use App\Center;
 use App\TransactionDetail;
 use Illuminate\Http\Request;
 
@@ -14,13 +15,15 @@ class DealerController extends Controller
     {
         $activeDealers = Dealer::where('status', 'Active')->count();
         $inactiveDealers = Dealer::where('status', 'Inactive')->count();
+        $centers = Center::get();
 
         $dealers = Dealer::get();
         return view('dealers',
             array(
                 'dealers' => $dealers,
                 'activeDealers' => $activeDealers,
-                'inactiveDealers' => $inactiveDealers
+                'inactiveDealers' => $inactiveDealers,
+                'centers' => $centers
             )
         );
     }
@@ -28,6 +31,7 @@ class DealerController extends Controller
     {
         return view('dashboard-dealer');
     }
+
     public function newDealer(Request $request)
     {
         $user = new User;
@@ -48,35 +52,37 @@ class DealerController extends Controller
 
         $dealer_reference = 'PRD' . str_pad($number, 5, '0', STR_PAD_LEFT);
 
-        $customer = new Dealer;
-        $customer->user_id = $user->id;
-        $customer->dealer_reference = $dealer_reference;
-        $customer->name = $request->name;
-        $customer->spo = $request->spo;
-        $customer->email_address = $request->email_address;
-        $customer->number = $request->phone_number;
-        $customer->facebook = $request->facebook;
-        $customer->address = $request->address;
-        $customer->store_name = $request->store_name;
-        $customer->store_type = $request->store_type;
-        $customer->status = "Active";
-        $customer->save();
+        $dealer = new Dealer;
+        $dealer->user_id = $user->id;
+        $dealer->dealer_reference = $dealer_reference;
+        $dealer->name = $request->name;
+        $dealer->spo = $request->spo;
+        $dealer->email_address = $request->email_address;
+        $dealer->number = $request->phone_number;
+        $dealer->facebook = $request->facebook;
+        $dealer->address = $request->address;
+        $dealer->store_name = $request->store_name;
+        $dealer->store_type = $request->store_type;
+        $dealer->center = $request->center;
+        $dealer->status = "Active";
+        $dealer->save();
         
 
         Alert::success('Successfully encoded')->persistent('Dismiss');
-        return redirect('view-dealer/' . $customer->id);
+        return redirect('view-dealer/' . $dealer->id);
     }
 
     public function view(Request $request,$id)
     {
-           $dealer = Dealer::findOrfail($id);
-         $transactions = TransactionDetail::where('dealer_id',$dealer->user_id)->orderBy('id','desc')->get();
-     
+        $dealer = Dealer::findOrfail($id);
+        $transactions = TransactionDetail::where('dealer_id',$dealer->user_id)->orderBy('id','desc')->get();
+        $centers = Center::get();
 
         return view('dealer',
             array(
                 'dealer' => $dealer,
                 'transactions' => $transactions,
+                'centers' => $centers,
                 
             )
         );
@@ -147,7 +153,8 @@ class DealerController extends Controller
         Alert::success('Successfully Uploaded')->persistent('Dismiss');
         return back();
     }
-     public function contractSign(Request $request,$id)
+    
+    public function contractSign(Request $request,$id)
     {
         // dd($request->all());
 
@@ -168,7 +175,7 @@ class DealerController extends Controller
 
     public function sign($id)
     {
-         $dealer = Dealer::findOrfail($id);
+        $dealer = Dealer::findOrfail($id);
 
         return view('signature_dealer',
         array(
@@ -187,6 +194,7 @@ class DealerController extends Controller
         $dealer->store_type = $request->store_type;
         $dealer->facebook = $request->facebook;
         $dealer->email_address = $request->email_address;
+        $dealer->center = $request->center;
 
         $dealer->save();
 
