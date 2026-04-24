@@ -52,7 +52,7 @@
                         </div>
                         <div class="col-md-6 mb-2">
                             <label class="form-label" for="contact_number">Contact Number&nbsp;<span class="text-danger">*</span></label>
-                            <input type="number" class="form-control required" id="contact_number" name="contact_number" placeholder="Enter Contact Number" step="0.01" value="{{ $ad->contact_number }}" required>
+                            <input type="number" class="form-control required" id="contact_number" name="contact_number" placeholder="Enter Contact Number" step="0.01" value="{{ $ad->contact_number }}" maxlength="11" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label class="form-label" for="facebook">Facebook<span class="text-danger">*</span></label>
@@ -143,9 +143,7 @@
                                 </div>
                             </div>
                         </div> --}}
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
+                        <div class="col-md-12">
                             <label>Complete Address Preview</label>
                             <textarea class="form-control bg-light" id="full_address_preview" rows="2" readonly>{{ $ad->address }}</textarea>
                             <input type="hidden" name="address" value="{{ $ad->address }}">
