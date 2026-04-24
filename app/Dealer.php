@@ -8,7 +8,7 @@ class Dealer extends Model
 {
     protected $fillable = [
         'user_id', 'name', 'email_address', 'number', 'facebook', 
-        'address', 'store_name', 'store_type', 'status', 'spo'
+        'address', 'store_name', 'store_type', 'status', 'center'
     ];
 
     public function user()
@@ -19,6 +19,11 @@ class Dealer extends Model
     public function sales()
     {
         return $this->hasMany(TransactionDetail::class, 'dealer_id', 'user_id');
+    }
+    
+    public function orders()
+    {
+        return $this->hasMany(OrderDetail::class, 'dealer_id', 'user_id');
     }
 
     public function transactions()

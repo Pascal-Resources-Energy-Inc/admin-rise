@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\AreaDistributor;
 use App\AreaAd;
 use App\Center;
+use App\Dealer;
 use App\User;
+use App\Item;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class AreaDistributorController extends Controller
@@ -255,4 +258,43 @@ class AreaDistributorController extends Controller
             ], 200);
         }
     }
+
+    public function myDealer(Request $request)
+    {
+        $user = auth()->user();
+
+        // $centers = $user->ad->areas->pluck('area_name')->toArray();
+        $centers = optional($user->ad)
+            ->areas
+            ? $user->ad->areas->pluck('area_name')->toArray()
+            : [];
+
+        $dealers = Dealer::with([
+            'orders' => function ($q) {
+                $q->select('dealer_id', 'item', \DB::raw('SUM(qty) as total_qty'))
+                ->groupBy('dealer_id', 'item');
+            },
+            'sales' => function ($q) {
+                $q->select('dealer_id', 'item_description', \DB::raw('SUM(qty) as total_qty'))
+                ->groupBy('dealer_id', 'item_description');
+            }
+        ])->whereIn('center', $centers)->get();
+       
+        $items = Item::select('item')->get(); // master list of items
+        $activeDealers = Dealer::whereIn('center', $centers)
+            ->where('status', 'Active')
+            ->count();
+
+        $inactiveDealers = Dealer::whereIn('center', $centers)
+            ->where('status', 'Inactive')
+            ->count();
+
+        return view('dealers', [
+            'dealers' => $dealers,
+            'items' => $items,
+            'activeDealers' => $activeDealers,
+            'inactiveDealers' => $inactiveDealers
+        ]);
+    }
+
 }

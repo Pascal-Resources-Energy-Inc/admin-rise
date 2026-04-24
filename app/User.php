@@ -32,6 +32,16 @@ class User extends Authenticatable
     {
         return $this->hasOne(Client::class, 'user_id');
     }
+
+    // public function ad()
+    // {
+    //     return $this->belongsTo(AreaDistributor::class, 'id', 'user_id');
+    // }
+
+    public function ad()
+    {
+        return $this->hasOne(AreaDistributor::class);
+    }
     
     public function redeemedHistory()
     {

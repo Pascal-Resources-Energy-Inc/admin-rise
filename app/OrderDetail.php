@@ -4,22 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TransactionDetail extends Model
+class OrderDetail extends Model
 {
     //
     public function dealer()
     {
         return $this->belongsTo(User::class,'dealer_id','id');
-    }
-    
-    public function customer()
-    {
-        return $this->belongsTo(Client::class,'client_id','id');
-    }
-    
-    public function client()
-    {
-        return $this->belongsTo(Client::class,'client_id','id');
     }
     
     public function product()
@@ -30,5 +20,5 @@ class TransactionDetail extends Model
     public function adDealer()
     {
         return $this->belongsTo(Dealer::class,'dealer_id','user_id');
-    }   
+    } 
 }
