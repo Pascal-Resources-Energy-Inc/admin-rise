@@ -12,6 +12,7 @@
 */
 
 Route::get('/', 'HomeController@index')->name('home');
+Route::get('/ad-dashboard', 'HomeController@adDashboard')->name('ad-dashboard');
 
 Auth::routes();
 
@@ -27,6 +28,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/transactions','TransactionController@index')->name('transactions');
+Route::get('/ad-transactions','TransactionController@adTransactions')->name('ad-transactions');
 Route::delete('/transactions/{id}', 'TransactionController@destroy')->name('transactions.destroy');
 Route::post('/transactions/bulk-delete', 'TransactionController@bulkDelete')->name('transactions.bulkDelete');
 
@@ -65,6 +67,12 @@ Route::get('/ads','AreaDistributorController@index')->name('ads');
 Route::post('/new-ad','AreaDistributorController@store')->name('new-ad');
 Route::put('edit-ads/{id}', 'AreaDistributorController@update')->name('edit-ads');
 Route::post('/geocode-location', 'AreaDistributorController@geocodeLocation')->name('geocode.location');
+
+// Dealers Area Distributor
+Route::get('/dealer-ads','AreaDistributorController@myDealer')->name('dealer-ads');
+
+// Orders
+Route::get('/orders','OrderController@index')->name('orders');   
 
 Route::get('/dealers','DealerController@index')->name('dealers');
 Route::post('/new-dealer','DealerController@newDealer');

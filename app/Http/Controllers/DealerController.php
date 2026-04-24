@@ -5,6 +5,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 use App\User;
 use App\Dealer;
 use App\TransactionDetail;
+use App\Item;
 use Illuminate\Http\Request;
 
 class DealerController extends Controller
@@ -14,16 +15,19 @@ class DealerController extends Controller
     {
         $activeDealers = Dealer::where('status', 'Active')->count();
         $inactiveDealers = Dealer::where('status', 'Inactive')->count();
-
+        $items = Item::select('item')->get(); // master list of items
+        
         $dealers = Dealer::get();
         return view('dealers',
             array(
                 'dealers' => $dealers,
                 'activeDealers' => $activeDealers,
-                'inactiveDealers' => $inactiveDealers
+                'inactiveDealers' => $inactiveDealers,
+                'items' => $items
             )
         );
     }
+    
     public function show(Request $request)
     {
         return view('dashboard-dealer');

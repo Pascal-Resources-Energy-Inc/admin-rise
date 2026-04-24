@@ -3,226 +3,9 @@
 <link rel="stylesheet" href="{{asset('design/assets/libs/jvectormap/jquery-jvectormap.css')}}">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.40.0/tabler-icons.min.css" rel="stylesheet">
-
-
 @endsection
-<style>
-  .content-area:has(.welcome-dealer) {
-      margin-top: 90px !important;
-  }
-  .stats-card {
-      background: white;
-      border: none;
-      border-radius: 16px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-      padding: 20px;
-      position: relative;
-      height: 130px;
-  }
-  
-  .icon-circle {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: white;
-    border: 2px solid #17a2b8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 12px;
-    box-shadow: 0 1px 4px rgba(23, 162, 184, 0.15);
-  }
-  
-  .icon-circle i {
-    font-size: 20px;
-    color: #17a2b8;
-  }
-  
-  .stats-number {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #2c3e50;
-      margin-bottom: 4px;
-      line-height: 1.2;
-  }
-  
-  .stats-label {
-      font-size: 0.875rem;
-      color: #6c757d;
-      font-weight: 500;
-      margin-bottom: 8px;
-  }
-  
-  .trend-indicator {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      color: #28a745;
-      font-size: 0.75rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 2px;
-  }
-  
-  .trend-indicator i {
-      font-size: 20px;
-  }
 
-  .trend-indicator.text-success {
-      color: #28a745 !important;
-  }
-  .trend-indicator.text-danger {
-      color: #dc3545 !important;
-  }
-  .trend-indicator.text-muted {
-      color: #6c757d !important;
-  }
-  
-  .icon-circle svg {
-    width: 24px;
-    height: 24px;
-    stroke: #17a2b8;
-  }
-
-  .legends {
-    background: #FFFFFF;
-    height: 20%;
-    width: 50%;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    border-radius: 8px;
-    position: relative;
-    padding: 10px;
-    padding-bottom: 100px !important;
-  }
-
-  .legends::before {
-    content: "";
-    position: absolute;
-    inset: 0; 
-    padding: 1px;
-    border-radius: inherit;
-    background: linear-gradient(
-      90deg,
-      #5BC2E7 20%,
-      #32C600 50%,
-      #DA291C 90%
-    );
-    -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-  }
-
-  .legend-label {
-    font-weight: 700;
-    font-size: 15px;
-  }
-
-  .badge-legend-high {
-    background-color: #5BC2E7;
-    height: 20px;
-    width: 20px;
-    border-radius: 4px;
-  }
-
-  .badge-legend-average {
-    background-color: #02437B;
-    height: 20px;
-    width: 20px;
-    border-radius: 4px;
-  }
-
-  .badge-legend-low {
-    background-color: #DA291C;
-    height: 20px;
-    width: 20px;
-    border-radius: 4px;
-  }
-
-  
-  .map-tooltip {
-      position: absolute;
-      background: white;
-      border: 1px solid #ddd;
-      padding: 12px;
-      border-radius: 6px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      font-size: 13px;
-      z-index: 10000;
-      pointer-events: none;
-      min-width: 200px;
-  }
-
-  .map-container-dashboard svg path {
-      fill: #f8f8f8;
-      stroke: #000000;
-      stroke-width: 0.5;
-      transition: all 0.3s ease;
-  }
-
-  .map-container-dashboard svg path:hover {
-      stroke-width: 1.5;
-      stroke: #ffcc00;
-  }
-
-  #provinceModal .modal-header {
-      background: #ffff !important;
-      border-bottom: 2px solid #000000;
-  }
-
-  #provinceModal .table thead {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-  }
-
-  #provinceModal .table tbody tr {
-      transition: all 0.2s ease;
-  }
-
-  #provinceModal .table tbody tr:hover {
-      background-color: #f8f9fa;
-      transform: translateX(2px);
-  }
-
-  .location-badge {
-      display: inline-block;
-      padding: 4px 12px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-  }
-
-  .stat-badge {
-      display: inline-block;
-      padding: 4px 10px;
-      background-color: #e9ecef;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 13px;
-  }
-
-  @media (max-width: 768px) {
-    .text-nowrap {
-      white-space: nowrap;
-    }
-    
-    .flex-grow-1 {
-      flex: 1;
-      min-width: 0;
-    }
-  }
-
-  .customer-link{
-    font-size: 14px !important;
-  }
-</style>
+<link rel="stylesheet" href="{{ asset('design/assets/css/dashboard.css') }}">
 @section('content')
 
 <!--  Header End -->
@@ -272,20 +55,7 @@
                     </div> --}}
                 </div>
             </div>
-
-            <div class="col-sm-3 d-flex align-items-stretch">
-                <div class="card stats-card w-100 border-0">
-                    <div class="icon-circle">
-                        <i class="ti ti-map-pin"></i>
-                    </div>
-                    <div class="stats-number">
-                        {{count($dealers)}} 
-                    </div>
-                    <div class="stats-label">Dealer</div>
-                </div>
-            </div>
-
-            <div class="col-sm-3 d-flex align-items-stretch">
+            {{-- <div class="col-sm-3 d-flex align-items-stretch">
                 <div class="card stats-card w-100 border-0">
                     <div class="icon-circle">
                         <i class="ti ti-users"></i>
@@ -293,7 +63,18 @@
                     <div class="stats-number">
                         {{$customers->count()}} 
                     </div>
-                    <div class="stats-label">Customers</div>
+                    <div class="stats-label">Mega Dealer</div>
+                </div>
+            </div> --}}
+            <div class="col-sm-3 d-flex align-items-stretch">
+                <div class="card stats-card w-100 border-0">
+                    <div class="icon-circle">
+                        <i class="ti ti-map-pin"></i>
+                    </div>
+                    <div class="stats-number">
+                        {{count($adDealers)}} 
+                    </div>
+                    <div class="stats-label">Dealer</div>
                 </div>
             </div>
         </div>

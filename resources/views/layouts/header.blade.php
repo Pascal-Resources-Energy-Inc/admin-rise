@@ -65,8 +65,8 @@
 
         body.main-layout {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-            /* background-color: #D8E9F0 !important; */
-            background-color: #f3f0f0 !important;
+            background-color: #D8E9F0 !important;
+            /* background-color: #f3f0f0 !important; */
             overflow-x: hidden !important;
         }
 
@@ -1046,6 +1046,7 @@
         <div class="sidebar-nav">
             <div class="nav-section">
                 <div class="nav-section-title">HOME</div>
+                @if((auth()->user()->role == "Admin"))
                 <div class="nav-item">
                     <a href="{{url('/')}}" class="nav-link @if(Route::currentRouteName() == 'home')active @endif">
                         <div class="nav-icon">
@@ -1054,8 +1055,42 @@
                         <span class="nav-text">Dashboard</span>
                     </a>
                 </div>
+                @elseif(auth()->user()->role == "Area Distributor")
+                    <div class="nav-item">
+                        <a href="{{url('ad-dashboard')}}" class="nav-link @if(Route::currentRouteName() == 'ad-dashboard') active @endif">
+                            <div class="nav-icon">
+                                <i class="bi bi-grid-1x2"></i>
+                            </div>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{url('/ad-transactions')}}" class="nav-link @if(Route::currentRouteName() == 'ad-transactions') active @endif">
+                            <div class="nav-icon">
+                                <i class="bi bi-currency-dollar"></i>
+                            </div>
+                            <span class="nav-text">Transactions</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{url('/dealer-ads')}}" class="nav-link @if(Route::currentRouteName() == 'dealer-ads')active @endif">
+                            <div class="nav-icon">
+                                <i class="bi bi-shop"></i>
+                            </div>
+                            <span class="nav-text">My Dealers</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{url('/orders')}}" class="nav-link @if(Route::currentRouteName() == 'orders')active @endif">
+                            <div class="nav-icon">
+                                <i class="bi bi-shop"></i>
+                            </div>
+                            <span class="nav-text">Orders</span>
+                        </a>
+                    </div>
+                @endif
                 
-                @if((auth()->user()->role == "Admin") || (auth()->user()->role == "Dealer") || (auth()->user()->role == "Area Distributor"))
+                @if((auth()->user()->role == "Admin") || (auth()->user()->role == "Dealer"))
                 <div class="nav-item">
                     <a href="{{url('/transactions')}}" class="nav-link @if(Route::currentRouteName() == 'transactions')active @endif">
                         <div class="nav-icon">
@@ -1066,47 +1101,48 @@
                 </div>
                 @endif
                 
-                @if(auth()->user()->role == "Admin" || auth()->user()->role == "Area Distributor")
-                <div class="nav-item">
-                    <a href="{{url('/ads')}}" class="nav-link @if(Route::currentRouteName() == 'ads')active @endif">
-                        <div class="nav-icon">
-                            <i class="bi bi-shop"></i>
-                        </div>
-                        <span class="nav-text">Area Distributor</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="{{url('/dealers')}}" class="nav-link @if(Route::currentRouteName() == 'dealers')active @endif">
-                        <div class="nav-icon">
-                            <i class="bi bi-shop"></i>
-                        </div>
-                        <span class="nav-text">Dealers</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="{{url('/customers')}}" class="nav-link @if(Route::currentRouteName() == 'customers')active @endif">
-                        <div class="nav-icon">
-                            <i class="bi bi-people"></i>
-                        </div>
-                        <span class="nav-text">Customers</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="{{url('/users')}}" class="nav-link @if(Route::currentRouteName() == 'users')active @endif">
-                        <div class="nav-icon">
-                            <i class="bi bi-gear"></i>
-                        </div>
-                        <span class="nav-text">Users</span>
-                    </a>
-                </div>
-                 <div class="nav-item">
-                    <a href="{{url('/rewards')}}" class="nav-link @if(Route::currentRouteName() == 'rewards')active @endif">
-                        <div class="nav-icon">
-                            <i class="bi bi-gift"></i>
-                        </div>
-                        <span class="nav-text">Rewards</span>
-                    </a>
-                </div>
+                @if(auth()->user()->role == "Admin")
+                    <div class="nav-item">
+                        <a href="{{url('/ads')}}" class="nav-link @if(Route::currentRouteName() == 'ads')active @endif">
+                            <div class="nav-icon">
+                                <i class="bi bi-shop"></i>
+                            </div>
+                            <span class="nav-text">Area Distributor</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{url('/dealers')}}" class="nav-link @if(Route::currentRouteName() == 'dealers')active @endif">
+                            <div class="nav-icon">
+                                <i class="bi bi-shop"></i>
+                            </div>
+                            <span class="nav-text">Dealers</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{url('/customers')}}" class="nav-link @if(Route::currentRouteName() == 'customers')active @endif">
+                            <div class="nav-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <span class="nav-text">Customers</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{url('/users')}}" class="nav-link @if(Route::currentRouteName() == 'users')active @endif">
+                            <div class="nav-icon">
+                                <i class="bi bi-gear"></i>
+                            </div>
+                            <span class="nav-text">Users</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{url('/rewards')}}" class="nav-link @if(Route::currentRouteName() == 'rewards')active @endif">
+                            <div class="nav-icon">
+                                <i class="bi bi-gift"></i>
+                            </div>
+                            <span class="nav-text">Rewards</span>
+                        </a>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -1353,7 +1389,7 @@
                 </div>
             </div>
         </header>
-        @endif
+        {{-- @endif --}} {{-- Mark Ian 04/23/2026 --}}
 
         <!-- Redeem Area -->
         @yield('contents')

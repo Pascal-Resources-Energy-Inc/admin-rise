@@ -786,4 +786,147 @@ class HomeController extends Controller
 
         return $customers;
     }
+
+    public function adDashboard(Request $request)
+    {
+        $dealer = "";
+        $customer = "";
+        $threeDaysAgo = Carbon::now()->subDays(7)->toDateString();
+        $user = auth()->user();
+        $centers = $user->ad->areas->pluck('area_name')->toArray();
+        
+        $selectedYear = $request->get('year', Carbon::now()->year);
+        $selectedMonth = $request->get('month', null);
+        $viewType = $selectedMonth ? 'monthly' : 'yearly';
+        
+        $customers_less = Client::where('status', 'Active')->whereDoesntHave('latestTransaction', function ($q) use ($threeDaysAgo) {
+            $q->where('date', '>=', $threeDaysAgo);
+        })
+        ->whereHas('latestTransaction')
+        ->orderBy(
+            DB::raw('(SELECT date FROM transaction_details WHERE transaction_details.client_id = clients.id ORDER BY date DESC LIMIT 1)'),
+            'desc'
+        )
+        ->get();
+
+        $customers = Client::whereHas('transactions')->get();
+        $transactions = Transaction::orderBy('id','desc')->get();
+        
+        $adDealers = Dealer::whereIn('center', $centers)->get();
+        $transactions_details = TransactionDetail::orderBy('id','desc')->get();
+
+        if(auth()->user()->role == "Dealer")
+        {
+            $dealer = Dealer::with('sales')->where('user_id',auth()->user()->id)->first();
+            $transactions_details = TransactionDetail::where('dealer_id',auth()->user()->id)->orderBy('id','desc')->get();
+            $total_sales = TransactionDetail::where('dealer_id',auth()->user()->id)->sum('price');
+
+            $totalEarnedPointsDealer = $dealer->sales->sum('points_dealer');
+            $redeemedPointsDealer = abs(RedeemedHistory::where('user_id', auth()->user()->id)->sum('points_amount'));
+            $dealerAvailablePoints = $totalEarnedPointsDealer - $redeemedPointsDealer;
+        }
+        if(auth()->user()->role == "Client")
+        {
+            $customer = Client::where('user_id',auth()->user()->id)->first();
+            $transactions_details = TransactionDetail::where('client_id',$customer->id)->orderBy('id','desc')->get();
+            $total_sales = TransactionDetail::where('client_id',$customer->id)->sum('price');
+
+            $totalEarnedPointsCustomer = $customer->transactions->sum('points_client');
+            $redeemedPointsCustomer = abs(RedeemedHistory::where('user_id', auth()->user()->id)->sum('points_amount'));
+            $customerAvailablePoints = $totalEarnedPointsCustomer - $redeemedPointsCustomer;
+        }
+
+        $total_sales = TransactionDetail::get()->sum(function($transaction) {
+            return $transaction->price * $transaction->qty;
+        });
+
+        // Get chart data based on view type
+        if ($viewType === 'monthly') {
+            $chartData = $this->getDailyData($selectedYear, $selectedMonth);
+        } else {
+            $chartData = $this->getMonthlyData($selectedYear);
+        }
+        
+        $categories = $chartData['categories'];
+        $qty = $chartData['qty'];
+
+        // Get available years and months for dropdowns
+        $availableYears = $this->getAvailableYears();
+        $availableMonths = $this->getAvailableMonths($selectedYear);
+
+        $dealers = TransactionDetail::select(
+            'dealer_id',
+            DB::raw('SUM(points_dealer) as total_points'),
+            DB::raw('MAX(date) as latest_transaction')
+        )
+        ->with('dealer')
+        ->groupBy('dealer_id')
+        ->orderByDesc('total_points')
+        ->get();
+
+        $top_customers = TransactionDetail::select(
+            'client_id',
+            DB::raw('SUM(points_client) as total_points'),
+            DB::raw('MAX(created_at) as latest_transaction')
+        )
+        ->with('customer')
+        ->whereNotNull('client_id')
+        ->groupBy('client_id')
+        ->orderByDesc('total_points')
+        ->limit(10)
+        ->get();
+
+        $salesTrend = $this->calculateSalesTrend();
+        $qtyTrend = $this->calculateQtyTrend();
+
+        $threeDaysAgo = Carbon::now()->subDays(3)->toDateString();
+
+        $dealers_inactive = Dealer::whereDoesntHave('sales', function ($q) use ($threeDaysAgo) {
+            $q->where('created_at', '>=', $threeDaysAgo);
+        })
+        ->whereHas('sales')
+        ->get()
+        ->map(function($dealer) {
+            $lastTransaction = TransactionDetail::where('dealer_id', $dealer->user_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            
+            $dealer->last_transaction_date = $lastTransaction ? $lastTransaction->created_at : null;
+            $dealer->days_since_transaction = $lastTransaction 
+                ? \Carbon\Carbon::parse($lastTransaction->created_at)->diffInDays(\Carbon\Carbon::now()) 
+                : null;
+            return $dealer;
+        })
+        ->sortByDesc('days_since_transaction');
+
+        $mapData = $this->getPhilippineMapData();
+
+        return view('area_distributor.home',
+            array(
+                'transactions' => $transactions,
+                'transactions_details' => $transactions_details,
+                'dealers' => $dealers,
+                'categories' =>  $categories,
+                'qty' =>  $qty,
+                'customers' =>  $customers,
+                'dealer' =>  $dealer,
+                'customer' =>  $customer,
+                'customers_less' =>  $customers_less,
+                'total_sales' => $total_sales,
+                'top_customers' => $top_customers,
+                'sales_trend' => $salesTrend,
+                'qty_trend' => $qtyTrend,
+                'available_years' => $availableYears,
+                'available_months' => $availableMonths,
+                'selected_year' => $selectedYear,
+                'selected_month' => $selectedMonth,
+                'view_type' => $viewType,
+                'dealer_available_points' => $dealerAvailablePoints ?? 0,
+                'customer_available_points' => $customerAvailablePoints ?? 0,
+                'dealers_inactive' => $dealers_inactive,
+                'map_data' => $mapData,
+                'adDealers' => $adDealers,
+            )
+        );
+    }
 }

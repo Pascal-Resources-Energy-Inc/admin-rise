@@ -37,6 +37,40 @@ class TransactionController extends Controller
         );
     }
 
+    public function adTransactions(Request $request)
+    {
+        $customers = Client::where('status', 'Active')->whereHas('serial')->get();
+        $items = Item::get();
+        $dealers = Dealer::get();
+
+        $user = auth()->user();
+
+        $centers = $user->ad->areas->pluck('area_name')->toArray();
+
+        $transactions = [];
+        //  dd(auth()->user());
+        $transactions = TransactionDetail::whereHas('adDealer', function($q) use ($centers) {
+            $q->whereIn('center', $centers);
+        })->get();
+
+        // if(auth()->user()->role == "Admin")
+        // {
+        //     $transactions = TransactionDetail::get();
+        // }
+        // elseif(auth()->user()->role == "Area Distributor")
+        // {
+        //     $transactions = TransactionDetail::where('dealer_id',auth()->user()->id)->get();
+        // }
+        return view('area_distributor.transactions',
+            array(
+                'transactions' => $transactions,
+                'items' => $items,
+                'customers' => $customers,
+                'dealers' => $dealers,
+            )
+        );
+    }
+
 
     public function store(Request $request)
     {

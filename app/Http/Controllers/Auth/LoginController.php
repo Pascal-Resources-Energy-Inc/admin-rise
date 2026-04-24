@@ -131,7 +131,7 @@ class LoginController extends Controller
             case 'admin':
                 return '/';
             case 'area distributor':
-                return '/';
+                return '/ad-dashboard';
             default:
                 return '/dashboard';
         }
