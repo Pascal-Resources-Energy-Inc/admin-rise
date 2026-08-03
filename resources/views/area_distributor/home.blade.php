@@ -1774,7 +1774,7 @@ $(function () {
   $('#yearSelect').on('change', function() {
     const selectedYear = $(this).val();
     const selectedMonth = $('#monthSelect').val();
-    loadChartData(selectedYear, selectedMonth);
+    loadChartData(selectedYear, selectedMonth, true);
   });
   
   // Handle month selection change
@@ -1785,7 +1785,7 @@ $(function () {
   });
 });
 
-function loadChartData(year, month = null) {
+function loadChartData(year, month = null, refreshMonths = false) {
   // Disable dropdowns to prevent multiple requests
   $('#yearSelect, #monthSelect').prop('disabled', true);
   
@@ -1793,21 +1793,22 @@ function loadChartData(year, month = null) {
   $('#chartLoading').show();
   $('#chart-bar-stacked').hide();
   
-  // Add a small delay to ensure UI updates are visible
-  setTimeout(() => {
-    $.ajax({
+  $.ajax({
       url: '{{ route("home.chart-data") }}',
       method: 'GET',
       data: { 
         year: year, 
-        month: month || null 
+        month: month || null,
+        include_months: refreshMonths ? '1' : '0'
       },
       cache: false,
       success: function(response) {
         console.log('Data loaded for year:', year, 'month:', month, response);
         
         // Update available months dropdown
-        updateMonthsDropdown(response.available_months, month);
+        if (response.available_months) {
+          updateMonthsDropdown(response.available_months, month);
+        }
         
         // Update view mode indicator
         updateViewModeIndicator(response.view_type);
@@ -1830,7 +1831,6 @@ function loadChartData(year, month = null) {
         alert('Error loading data. Please try again.');
       }
     });
-  }, 100);
 }
 
 function updateMonthsDropdown(availableMonths, selectedMonth) {
@@ -1856,15 +1856,6 @@ function updateViewModeIndicator(viewType) {
 }
 
 function renderChart(categories, qty, year, month = null, viewType = 'yearly') {
-  // Destroy existing chart if it exists
-  if (chartInstance) {
-    chartInstance.destroy();
-    chartInstance = null;
-  }
-  
-  // Clear the chart container
-  document.querySelector("#chart-bar-stacked").innerHTML = '';
-  
   // Determine chart title and axis labels based on view type
   const chartTitle = viewType === 'monthly' 
     ? `Daily LPG Refills - ${getMonthName(month)} ${year}`
@@ -1881,7 +1872,7 @@ function renderChart(categories, qty, year, month = null, viewType = 'yearly') {
     ],
     chart: {
       fontFamily: "inherit",
-      type: "area",
+      type: "bar",
       height: 500,
       toolbar: {
         show: false,
@@ -1951,8 +1942,9 @@ function renderChart(categories, qty, year, month = null, viewType = 'yearly') {
       width: 0,
     },
     plotOptions: {
-      area: {
-        fillTo: "origin",
+      bar: {
+        borderRadius: 5,
+        columnWidth: viewType === 'monthly' ? '60%' : '45%',
       },
     },
     dataLabels: {
@@ -2092,13 +2084,16 @@ function renderChart(categories, qty, year, month = null, viewType = 'yearly') {
     ],
   };
 
-  setTimeout(() => {
-    chartInstance = new ApexCharts(
-      document.querySelector("#chart-bar-stacked"),
-      options_area
-    );
-    chartInstance.render();
-  }, 50);
+  if (chartInstance) {
+    chartInstance.updateOptions(options_area, true, false);
+    return;
+  }
+
+  chartInstance = new ApexCharts(
+    document.querySelector("#chart-bar-stacked"),
+    options_area
+  );
+  chartInstance.render();
 }
 
 function getMonthName(monthNumber) {

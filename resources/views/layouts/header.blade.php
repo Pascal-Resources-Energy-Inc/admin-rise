@@ -1102,14 +1102,14 @@
                 @endif
                 
                 @if(auth()->user()->role == "Admin")
-                    <div class="nav-item">
+                    {{-- <div class="nav-item">
                         <a href="{{url('/ads')}}" class="nav-link @if(Route::currentRouteName() == 'ads')active @endif">
                             <div class="nav-icon">
                                 <i class="bi bi-shop"></i>
                             </div>
                             <span class="nav-text">Area Distributor</span>
                         </a>
-                    </div>
+                    </div> --}}
                     <div class="nav-item">
                         <a href="{{url('/dealers')}}" class="nav-link @if(Route::currentRouteName() == 'dealers')active @endif">
                             <div class="nav-icon">

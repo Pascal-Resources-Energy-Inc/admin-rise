@@ -489,6 +489,7 @@ class HomeController extends Controller
     {
         $year = $request->get('year', Carbon::now()->year);
         $month = $request->get('month', null);
+        $includeMonths = $request->get('include_months') === '1';
         $viewType = $month ? 'monthly' : 'yearly';
         
         if (!is_numeric($year) || $year < 1900 || $year > Carbon::now()->year + 10) {
@@ -505,28 +506,13 @@ class HomeController extends Controller
             $chartData = $this->getMonthlyData($year);
         }
         
-        $availableMonths = $this->getAvailableMonths($year);
-        
-        $totalRecords = DB::table('transaction_details')
-            ->whereYear('created_at', $year)
-            ->when($month, function ($query) use ($year, $month) {
-                return $query->whereMonth('created_at', $month);
-            })
-            ->count();
-        
         return response()->json([
             'categories' => $chartData['categories'],
             'qty' => $chartData['qty'],
             'year' => (int) $year,
             'month' => $month ? (int) $month : null,
             'view_type' => $viewType,
-            'available_months' => $availableMonths,
-            'total_records' => $totalRecords,
-            'debug' => [
-                'requested_year' => $year,
-                'requested_month' => $month,
-                'data_found' => $totalRecords > 0
-            ]
+            'available_months' => $includeMonths ? $this->getAvailableMonths($year) : null,
         ]);
     }
 
