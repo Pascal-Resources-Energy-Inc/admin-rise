@@ -39,15 +39,7 @@ class HomeController extends Controller
         $selectedMonth = $request->get('month', null);
         $viewType = $selectedMonth ? 'monthly' : 'yearly';
         
-        $customers_less = Client::where('status', 'Active')->whereDoesntHave('latestTransaction', function ($q) use ($threeDaysAgo) {
-            $q->where('date', '>=', $threeDaysAgo);
-        })
-        ->whereHas('latestTransaction')
-        ->orderBy(
-            DB::raw('(SELECT date FROM transaction_details WHERE transaction_details.client_id = clients.id ORDER BY date DESC LIMIT 1)'),
-            'desc'
-        )
-        ->get();
+        $customers_less = $this->getInactiveCustomersForAlert($threeDaysAgo);
 
         $customers = Client::whereHas('transactions')->get();
         $transactions = Transaction::orderBy('id','desc')->get();
@@ -787,6 +779,38 @@ class HomeController extends Controller
         return $customers;
     }
 
+    /**
+     * Get the compact customer list used by the follow-up alert.
+     *
+     * Aggregating the latest purchase once avoids a query per customer when
+     * the alert modal is rendered.
+     */
+    private function getInactiveCustomersForAlert($cutoffDate)
+    {
+        $latestTransactions = TransactionDetail::query()
+            ->select('client_id', DB::raw('MAX(date) as latest_transaction_date'))
+            ->whereNotNull('client_id')
+            ->groupBy('client_id');
+
+        return Client::query()
+            ->joinSub($latestTransactions, 'latest_transactions', function ($join) {
+                $join->on('latest_transactions.client_id', '=', 'clients.id');
+            })
+            ->where('clients.status', 'Active')
+            ->where('latest_transactions.latest_transaction_date', '<', $cutoffDate)
+            ->orderByDesc('latest_transactions.latest_transaction_date')
+            ->select(
+                'clients.id',
+                'clients.name',
+                'clients.location_barangay',
+                'clients.location_city',
+                'clients.spo',
+                'clients.center',
+                'latest_transactions.latest_transaction_date'
+            )
+            ->get();
+    }
+
     public function adDashboard(Request $request)
     {
         $dealer = "";
@@ -799,15 +823,7 @@ class HomeController extends Controller
         $selectedMonth = $request->get('month', null);
         $viewType = $selectedMonth ? 'monthly' : 'yearly';
         
-        $customers_less = Client::where('status', 'Active')->whereDoesntHave('latestTransaction', function ($q) use ($threeDaysAgo) {
-            $q->where('date', '>=', $threeDaysAgo);
-        })
-        ->whereHas('latestTransaction')
-        ->orderBy(
-            DB::raw('(SELECT date FROM transaction_details WHERE transaction_details.client_id = clients.id ORDER BY date DESC LIMIT 1)'),
-            'desc'
-        )
-        ->get();
+        $customers_less = $this->getInactiveCustomersForAlert($threeDaysAgo);
 
         $customers = Client::whereHas('transactions')->get();
         $transactions = Transaction::orderBy('id','desc')->get();

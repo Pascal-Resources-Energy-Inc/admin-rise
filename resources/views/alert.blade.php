@@ -32,50 +32,60 @@
         </div>
 
         <div class="customer-alert-table-wrap">
-          <div class="table-responsive">
-            <table class="table align-middle mb-0 customer-alert-table" id="table-alert">
-              <thead>
-                <tr>
-                  <th scope="col">Client</th>
-                  <th scope="col">Address</th>
-                  <th scope="col">SPO</th>
-                  <th scope="col">Center</th>
-                  <th scope="col">Last Purchase</th>
-                </tr>
-              </thead>
-              <tbody id="alertTableBody">
-                @foreach($customers_less as $cus)
-                  <tr class="customer-alert-row">
-                    <td>
-                      <div class="fw-semibold text-dark">{{ strtoupper($cus->name) }}</div>
-                    </td>
-                    <td class="text-wrap">
-                      <span class="text-muted">{{ $cus->location_barangay }}, {{ $cus->location_city }}, Bicol Region</span>
-                    </td>
-                    <td>{{ $cus->spo }}</td>
-                    <td>{{ $cus->center }}</td>
-                    <td>
-                      <span class="customer-alert-date">{{ date('M d, Y', strtotime($cus->latestTransaction->date)) }}</span>
-                    </td>
-                  </tr>
-                @endforeach
-                <tr id="alertNoResultsRow" class="d-none">
-                  <td colspan="5" class="text-center text-muted py-5">
-                    <i class="bi bi-search d-block fs-2 mb-2"></i>
-                    No customers match your search.
-                  </td>
-                </tr>
-                @if($customers_less->isEmpty())
-                  <tr>
-                    <td colspan="5" class="text-center text-muted py-5">
-                      <i class="bi bi-check-circle d-block fs-2 text-success mb-2"></i>
-                      No inactive customers found.
-                    </td>
-                  </tr>
-                @endif
-              </tbody>
-            </table>
-          </div>
+          @if($customers_less->isNotEmpty())
+            <div class="accordion customer-alert-accordion" id="customerAlertAccordion">
+              @foreach($customers_less->groupBy(function ($customer) { return \Carbon\Carbon::parse($customer->latest_transaction_date)->toDateString(); }) as $purchaseDate => $customers)
+                <div class="accordion-item customer-alert-group">
+                  <h2 class="accordion-header" id="alertGroupHeading{{ $loop->iteration }}">
+                    <button class="accordion-button {{ $loop->first ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#alertGroup{{ $loop->iteration }}" aria-expanded="{{ $loop->first ? 'true' : 'false' }}" aria-controls="alertGroup{{ $loop->iteration }}">
+                      <span class="customer-alert-group-date">
+                        <i class="bi bi-calendar3" aria-hidden="true"></i>
+                        {{ date('M d, Y', strtotime($purchaseDate)) }}
+                      </span>
+                      <span class="customer-alert-group-count">{{ $customers->count() }} customer{{ $customers->count() === 1 ? '' : 's' }}</span>
+                    </button>
+                  </h2>
+                  <div id="alertGroup{{ $loop->iteration }}" class="accordion-collapse collapse {{ $loop->first ? 'show' : '' }}" aria-labelledby="alertGroupHeading{{ $loop->iteration }}">
+                    <div class="accordion-body p-0">
+                      <div class="table-responsive">
+                        <table class="table align-middle mb-0 customer-alert-table">
+                          <thead>
+                            <tr>
+                              <th scope="col">Client</th>
+                              <th scope="col">Address</th>
+                              <th scope="col">SPO</th>
+                              <th scope="col">Center</th>
+                              <th scope="col">Last Purchase</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @foreach($customers as $cus)
+                              <tr class="customer-alert-row">
+                                <td><div class="fw-semibold text-dark">{{ strtoupper($cus->name) }}</div></td>
+                                <td class="text-wrap"><span class="text-muted">{{ $cus->location_barangay }}, {{ $cus->location_city }}, Bicol Region</span></td>
+                                <td>{{ $cus->spo }}</td>
+                                <td>{{ $cus->center }}</td>
+                                <td><span class="customer-alert-date">{{ date('M d, Y', strtotime($cus->latest_transaction_date)) }}</span></td>
+                              </tr>
+                            @endforeach
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              @endforeach
+            </div>
+            <div id="alertNoResults" class="customer-alert-empty d-none">
+              <i class="bi bi-search d-block fs-2 mb-2"></i>
+              No customers match your search.
+            </div>
+          @else
+            <div class="customer-alert-empty">
+              <i class="bi bi-check-circle d-block fs-2 text-success mb-2"></i>
+              No inactive customers found.
+            </div>
+          @endif
         </div>
       </div>
 
@@ -198,6 +208,64 @@
   .customer-alert-table-wrap {
     max-height: min(62vh, 620px);
     overflow: auto;
+    padding: 16px;
+  }
+
+  .customer-alert-accordion {
+    display: grid;
+    gap: 10px;
+  }
+
+  .customer-alert-group {
+    border: 1px solid #e4e7ec;
+    border-radius: 10px !important;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    overflow: hidden;
+  }
+
+  .customer-alert-group .accordion-button {
+    background: #fff;
+    box-shadow: none;
+    color: #1d2939;
+    font-weight: 700;
+    gap: 12px;
+    padding: 14px 18px;
+  }
+
+  .customer-alert-group .accordion-button:not(.collapsed) {
+    background: #f0f9ff;
+    color: #075985;
+  }
+
+  .customer-alert-group .accordion-button:focus {
+    box-shadow: inset 0 0 0 2px rgba(14, 116, 144, 0.18);
+  }
+
+  .customer-alert-group-date {
+    align-items: center;
+    display: inline-flex;
+    gap: 8px;
+  }
+
+  .customer-alert-group-count {
+    background: #f2f4f7;
+    border-radius: 999px;
+    color: #475467;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-left: auto;
+    padding: 4px 9px;
+  }
+
+  .customer-alert-group .accordion-button:not(.collapsed) .customer-alert-group-count {
+    background: #dff5ff;
+    color: #0369a1;
+  }
+
+  .customer-alert-empty {
+    color: #667085;
+    padding: 48px 24px;
+    text-align: center;
   }
 
   .customer-alert-table {
@@ -277,8 +345,9 @@
     var input = document.getElementById('alertSearchInput');
     var clearButton = document.getElementById('alertSearchClear');
     var searchBox = input.closest('.customer-alert-search');
-    var rows = document.querySelectorAll('#alertTableBody .customer-alert-row');
-    var noResultsRow = document.getElementById('alertNoResultsRow');
+    var rows = document.querySelectorAll('.customer-alert-row');
+    var groups = document.querySelectorAll('.customer-alert-group');
+    var noResults = document.getElementById('alertNoResults');
     var visibleCount = document.getElementById('alertVisibleCount');
     var query = input.value.trim().toLowerCase();
     var shown = 0;
@@ -294,8 +363,19 @@
       }
     });
 
+    groups.forEach(function(group) {
+      var hasVisibleRows = group.querySelectorAll('.customer-alert-row:not(.d-none)').length > 0;
+      group.classList.toggle('d-none', !hasVisibleRows);
+
+      if (query && hasVisibleRows && window.bootstrap) {
+        window.bootstrap.Collapse.getOrCreateInstance(group.querySelector('.accordion-collapse'), { toggle: false }).show();
+      }
+    });
+
     visibleCount.textContent = shown;
-    noResultsRow.classList.toggle('d-none', shown !== 0 || rows.length === 0);
+    if (noResults) {
+      noResults.classList.toggle('d-none', shown !== 0 || rows.length === 0);
+    }
     clearButton.disabled = query.length === 0;
   }
 
@@ -326,7 +406,7 @@
   }
 
   function printTable() {
-    var sourceRows = document.querySelectorAll('#alertTableBody .customer-alert-row:not(.d-none)');
+    var sourceRows = document.querySelectorAll('.customer-alert-row:not(.d-none)');
     var searchInput = document.getElementById('alertSearchInput');
     var searchText = searchInput && searchInput.value.trim() ? searchInput.value.trim() : '';
     var tableRows = '';
