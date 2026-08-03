@@ -5,6 +5,8 @@ use App\Stove;
 use App\User;
 use App\TransactionDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use App\Client;
 use RealRashid\SweetAlert\Facades\Alert;
 use GuzzleHttp\Client as GuzzleClient;
@@ -31,12 +33,16 @@ class CustomerController extends Controller
     {
         $transactions = TransactionDetail::where('client_id',$id)->orderBy('id','desc')->get();
         $customer = Client::findOrfail($id);
+        $stoves = Stove::whereNull('client_id')
+            ->orWhere('id', $customer->serial_number)
+            ->orderBy('serial_number')
+            ->get();
 
         return view('customer',
             array(
                 'customer' => $customer,
                 'transactions' => $transactions,
-                
+                'stoves' => $stoves,
             )
         );
     }
@@ -101,6 +107,74 @@ class CustomerController extends Controller
 
         Alert::success('Successfully encoded')->persistent('Dismiss');
         return redirect('view-client/' . $customer->id);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $customer = Client::findOrFail($id);
+        $emailRule = 'required|email|max:255';
+
+        if ($customer->user_id) {
+            $emailRule .= '|unique:users,email,' . $customer->user_id;
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email_address' => $emailRule,
+            'number' => 'nullable|string|max:30',
+            'serial_number' => 'nullable|exists:stoves,id',
+            'facebook' => 'nullable|string|max:255',
+            'location_region' => 'nullable|string|max:255',
+            'location_province' => 'nullable|string|max:255',
+            'location_city' => 'nullable|string|max:255',
+            'location_barangay' => 'nullable|string|max:255',
+            'postal_code' => 'nullable|string|max:20',
+            'street_address' => 'nullable|string|max:255',
+            'spo' => 'nullable|string|max:255',
+            'center' => 'nullable|string|max:255',
+            'status' => 'required|in:Active,Inactive',
+        ]);
+
+        DB::transaction(function () use ($customer, $validated) {
+            $newSerialId = $validated['serial_number'] ?? null;
+            $newStove = $newSerialId ? Stove::lockForUpdate()->findOrFail($newSerialId) : null;
+
+            if ($newStove && $newStove->client_id && (int) $newStove->client_id !== (int) $customer->id) {
+                throw ValidationException::withMessages([
+                    'serial_number' => 'The selected serial number is already assigned to another customer.',
+                ]);
+            }
+
+            if ((int) $customer->serial_number !== (int) $newSerialId) {
+                $oldStove = Stove::where('id', $customer->serial_number)
+                    ->where('client_id', $customer->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($oldStove) {
+                    $oldStove->client_id = null;
+                    $oldStove->save();
+                }
+            }
+
+            $customer->fill($validated);
+            $customer->save();
+
+            if ($newStove) {
+                $newStove->client_id = $customer->id;
+                $newStove->save();
+            }
+
+            // Keep the login account aligned with the customer's editable name and email.
+            if ($customer->user) {
+                $customer->user->name = $validated['name'];
+                $customer->user->email = $validated['email_address'];
+                $customer->user->save();
+            }
+        });
+
+        Alert::success('Success', 'Customer information updated successfully!');
+        return redirect()->back();
     }
     
     public function changeAvatar(Request $request, $id)

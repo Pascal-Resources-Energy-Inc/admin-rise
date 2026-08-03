@@ -89,6 +89,7 @@ Route::get('/dashboard-customer','CustomerController@show')->name('customer');
 Route::get('/new-customer','CustomerController@newCustomer')->name('newcustomer');
 Route::get('view-client/{id}', 'CustomerController@view')->name('client.view');
 Route::post('new-customer','CustomerController@saveCustomer')->name('saveCustomer');
+Route::put('/customer/update/{id}', 'CustomerController@update')->name('customer.update');
 Route::post('/change-avatar/{id}','CustomerController@changeAvatar')->name('changeAvatar');
 Route::post('/valid-id/{id}','CustomerController@uploadValidId')->name('uploadValidId');
 Route::post('/submit-contract/{id}','CustomerController@contractSign')->name('sign');

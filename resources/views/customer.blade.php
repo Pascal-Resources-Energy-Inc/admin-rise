@@ -35,6 +35,26 @@
     .filter-container {
         margin-bottom: 20px;
     }
+    .customer-info-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .customer-info-header h5 {
+        margin: 0;
+    }
+    .customer-info-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+    @media (max-width: 575.98px) {
+        .customer-info-back .back-label {
+            display: none;
+        }
+    }
     
 </style>
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.6/dist/signature_pad.umd.min.js"></script>
@@ -46,18 +66,26 @@
      <div class="row">
         <div class="col-md-4">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header customer-info-header">
                     <h5>Customer Information</h5>
+                    <a href="{{ route('customers') }}" class="btn btn-outline-secondary btn-sm customer-info-back" aria-label="Back to customers">
+                        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                        <span class="back-label">Back to Customers</span>
+                    </a>
                 </div>
                 <div class="card-body">
                     <div class='text-center'>
                     <img src="{{$customer->avatar ? asset($customer->avatar) : asset('design/assets/images/profile/user-1.png')}}" alt="Avatar Image" class="img-fluid rounded-circle" style="width: 100px; height: 100px;">
                     </div>  
                     <br>
-                   <div class='text-center'>
+                   <div class='text-center mb-3'>
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal"  data-bs-target="#uploadAvatarModal" title="Upload Avatar">
                         <i class="fas fa-camera"></i>
                         <span class="sr-only">Upload Avatar</span>
+                        </button>
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editCustomerModal" title="Edit customer information">
+                            <i class="fas fa-edit"></i>
+                            <span class="sr-only">Edit customer information</span>
                         </button>
                     </div>
                     <!-- Customer Personal Details -->
@@ -190,6 +218,7 @@
 
 </section>
 @include('change_avatar')
+@include('edit_customer')
 @include('upload_valid_id')
 @include('sign_contract')
 @include('viewValidId')
