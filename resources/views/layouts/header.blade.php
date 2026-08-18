@@ -1143,6 +1143,14 @@
                         </a>
                     </div>
                     <div class="nav-item">
+                        <a href="{{url('/serial-numbers')}}" class="nav-link @if(Route::currentRouteName() == 'serial-numbers')active @endif">
+                            <div class="nav-icon">
+                                <i class="bi bi-upc"></i>
+                            </div>
+                            <span class="nav-text">Serial Numbers</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
                         <a href="{{url('/rewards')}}" class="nav-link @if(Route::currentRouteName() == 'rewards')active @endif">
                             <div class="nav-icon">
                                 <i class="bi bi-gift"></i>

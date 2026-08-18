@@ -98,7 +98,7 @@
                             $customer->location_city,
                             $customer->location_province
                         ])) }} {{ $customer->postal_code }}</p>
-                    <p><strong>Serial Number:</strong> {{$customer->serial->serial_number}}</p>
+                    <p><strong>Serial Number:</strong> {{$customer->serial->serial_number ?? ''}}</p>
                     <p><strong>Facebook:</strong> {{$customer->facebook}}</p>
 
                     <!-- QR Code Generation -->

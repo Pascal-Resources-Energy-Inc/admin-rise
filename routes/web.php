@@ -65,6 +65,12 @@ Route::get('/users-data', 'EditUserController@datatable')->name('users.data');
 // Centers
 Route::resource('centers', 'CenterController')->only(['index', 'store', 'update', 'destroy']);
 
+// Serial Numbers
+Route::get('/serial-numbers', 'SerialNumberController@index')->name('serial-numbers');
+Route::post('/serial-numbers', 'SerialNumberController@store')->name('serial-numbers.store');
+Route::put('/serial-numbers/{stove}', 'SerialNumberController@update')->name('serial-numbers.update');
+Route::delete('/serial-numbers/{stove}', 'SerialNumberController@destroy')->name('serial-numbers.destroy');
+
 // Area Distributor 
 Route::get('/ads','AreaDistributorController@index')->name('ads');
 Route::post('/new-ad','AreaDistributorController@store')->name('new-ad');
