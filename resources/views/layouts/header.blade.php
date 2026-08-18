@@ -1135,6 +1135,14 @@
                         </a>
                     </div>
                     <div class="nav-item">
+                        <a href="{{url('/centers')}}" class="nav-link @if(Route::currentRouteName() == 'centers')active @endif">
+                            <div class="nav-icon">
+                                <i class="bi bi-align-center"></i>
+                            </div>
+                            <span class="nav-text">Centers</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
                         <a href="{{url('/rewards')}}" class="nav-link @if(Route::currentRouteName() == 'rewards')active @endif">
                             <div class="nav-icon">
                                 <i class="bi bi-gift"></i>

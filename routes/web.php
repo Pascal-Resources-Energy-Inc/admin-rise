@@ -62,6 +62,9 @@ Route::post('/new-admin','EditUserController@store')->name('new-admin');
 Route::post('admin-privillege/{id}', 'EditUserController@updatePrivilege')->name('admin.privilege.update');
 Route::get('/users-data', 'EditUserController@datatable')->name('users.data');
 
+// Centers
+Route::resource('centers', 'CenterController')->only(['index', 'store', 'update', 'destroy']);
+
 // Area Distributor 
 Route::get('/ads','AreaDistributorController@index')->name('ads');
 Route::post('/new-ad','AreaDistributorController@store')->name('new-ad');
