@@ -131,11 +131,17 @@
            
           </div>
 
-          <!-- Hidden input to store signature -->
-          <input type="hidden" name="contract_signature" id="contract_signature" />
+          <div class="mb-3">
+            <label for="contract_signature" class="form-label">Or upload a signed contract</label>
+            <input class="form-control" type="file" name="contract_signature" id="contract_signature" accept=".pdf,image/jpeg,image/png,image/jpg" required>
+            <div class="form-text">Accepted formats: PDF, JPG, JPEG, or PNG. Maximum file size: 10 MB.</div>
+          </div>
 
         </div>
          <div class="modal-footer">
+        <button type="submit" class="btn btn-success">
+          <i class="bi bi-upload"></i> Upload Signed Contract
+        </button>
         <button type="button" class="btn bg-danger-subtle text-danger  waves-effect"
           data-bs-dismiss="modal">
           Close

@@ -96,7 +96,13 @@
 
           <!-- Signature Pad -->
           <div class="mb-3 text-right">
-             <img src="{{ asset($customer->signature)}}" alt="Valid ID" class="img-fluid rounded shadow-sm" style="max-height: 250px;" />
+            @if(strtolower(pathinfo($customer->signature, PATHINFO_EXTENSION)) === 'pdf')
+              <a href="{{ asset($customer->signature) }}" target="_blank" rel="noopener" class="btn btn-primary">
+                <i class="bi bi-file-earmark-pdf"></i> View Uploaded Contract
+              </a>
+            @else
+              <img src="{{ asset($customer->signature)}}" alt="Signed contract" class="img-fluid rounded shadow-sm" style="max-height: 250px;" />
+            @endif
            
           </div>
 

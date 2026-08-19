@@ -163,6 +163,10 @@ class DealerController extends Controller
     {
         // dd($request->all());
 
+        $request->validate([
+            'contract_signature' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        ]);
+
         $customer = Dealer::findOrfail($id);
 
         $attachment = $request->file('contract_signature');
