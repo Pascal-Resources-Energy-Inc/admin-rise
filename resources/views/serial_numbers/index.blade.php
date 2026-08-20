@@ -34,6 +34,7 @@
                             <th style="width:90px">#</th>
                             <th>Serial Number</th>
                             <th>Assignment</th>
+                            <th>Contract</th>
                             <th class="text-end" style="width:190px">Actions</th>
                         </tr>
                     </thead>
@@ -47,6 +48,13 @@
                                         <span class="badge bg-light-warning text-warning">Assigned{{ $stove->client ? ': ' . $stove->client->name : '' }}</span>
                                     @else
                                         <span class="badge bg-light-success text-success">Available</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($stove->client && $stove->client->signature)
+                                        <span class="badge bg-light-success text-success"><i class="ti ti-file-check me-1"></i>Uploaded</span>
+                                    @else
+                                        <span class="badge bg-light-danger text-danger"><i class="ti ti-file-x me-1"></i>Not uploaded</span>
                                     @endif
                                 </td>
                                 <td class="text-end">
@@ -109,8 +117,8 @@ $(function () {
         pageLength: 10,
         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, 'All']],
         order: [[1, 'asc']],
-        columnDefs: [{ orderable: false, targets: [0, 3] }],
-        language: { search: '', searchPlaceholder: 'Search serial number or assignment...', lengthMenu: 'Show _MENU_ serial numbers', emptyTable: 'No serial numbers have been added yet.', zeroRecords: 'No serial numbers match your search.' }
+        columnDefs: [{ orderable: false, targets: [0, 4] }],
+        language: { search: '', searchPlaceholder: 'Search serial number, assignment, or contract...', lengthMenu: 'Show _MENU_ serial numbers', emptyTable: 'No serial numbers have been added yet.', zeroRecords: 'No serial numbers match your search.' }
     });
 
     $('#serialNumbersTable tbody').on('click', '.edit-serial-number-btn', function () {
