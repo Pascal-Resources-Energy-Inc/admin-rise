@@ -172,10 +172,12 @@ class CustomerController extends Controller
             'street_address' => 'nullable|string|max:255',
             'spo' => 'nullable|string|max:255',
             'center' => 'nullable|string|max:255',
-            'area' => 'required|string|max:255|exists:dms_prei.areas,name',
+            'area' => 'nullable|string|max:255|exists:dms_prei.areas,name',
             'status' => 'required|in:Active,Inactive',
         ]);
-        $this->ensureSalesTerritoryCoverage($validated['area'], $validated);
+        if (!empty($validated['area'])) {
+            $this->ensureSalesTerritoryCoverage($validated['area'], $validated);
+        }
 
         DB::transaction(function () use ($customer, $validated) {
             $newSerialId = $validated['serial_number'] ?? null;

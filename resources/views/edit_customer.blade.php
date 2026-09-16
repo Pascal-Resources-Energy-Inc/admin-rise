@@ -1,29 +1,58 @@
 <style>
-    #editCustomerModal .modal-dialog {
-        height: calc(100% - 1rem);
-        margin: 0.5rem auto;
+    #editCustomerModal .edit-customer-dialog {
+        height: calc(100vh - 1rem);
+        height: calc(100dvh - 1rem);
+        margin: .5rem;
+        max-width: none;
+        width: calc(100% - 1rem);
     }
 
-    #editCustomerModal .modal-content {
-        max-height: 100%;
-        overflow: hidden;
+    #editCustomerModal .modal-content,
+    #editCustomerModal form {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
     }
 
+    #editCustomerModal .modal-content { height: 100%; overflow: hidden; }
+    #editCustomerModal form { flex: 1 1 auto; }
+    #editCustomerModal .modal-header,
+    #editCustomerModal .modal-footer { flex: 0 0 auto; }
     #editCustomerModal .modal-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-x: hidden;
         overflow-y: auto;
+        padding: 1rem;
         -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
     }
 
     @media (min-width: 576px) {
-        #editCustomerModal .modal-dialog {
-            height: calc(100% - 3.5rem);
-            margin: 1.75rem auto;
+        #editCustomerModal .edit-customer-dialog {
+            height: calc(100vh - 2rem);
+            height: calc(100dvh - 2rem);
+            margin: 1rem auto;
+            max-width: 760px;
+            width: calc(100% - 2rem);
         }
+    }
+
+    @media (min-width: 992px) {
+        #editCustomerModal .edit-customer-dialog { max-width: 980px; }
+        #editCustomerModal .modal-body { padding: 1.5rem; }
+    }
+
+    @media (max-width: 575.98px) {
+        #editCustomerModal .modal-header { padding: .85rem 1rem; }
+        #editCustomerModal .modal-title { font-size: 1rem; }
+        #editCustomerModal .modal-footer { gap: .5rem; padding: .75rem 1rem; }
+        #editCustomerModal .modal-footer .btn { flex: 1 1 0; }
     }
 </style>
 
 <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-scrollable edit-customer-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editCustomerModalLabel">Edit Customer Information</h5>
@@ -102,11 +131,11 @@
                             <input id="customer_center" type="text" name="center" class="form-control" value="{{ old('center', $customer->center) }}">
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label class="form-label" for="customer_area">Sales Territory <span class="text-danger">*</span></label>
-                            <select id="customer_area" name="area" class="form-select sales-territory-select" data-match-url="{{ route('customer.sales-territories') }}" data-current-area="{{ old('area', $customer->area) }}" required disabled>
+                            <label class="form-label" for="customer_area">Sales Territory <span class="text-muted">(Optional)</span></label>
+                            <select id="customer_area" name="area" class="form-select sales-territory-select" data-match-url="{{ route('customer.sales-territories') }}" data-current-area="{{ old('area', $customer->area) }}" disabled>
                                 <option value="">Checking geographic coverage…</option>
                             </select>
-                            <small class="form-text text-muted sales-territory-help">The territory is matched from the selected location.</small>
+                            <small class="form-text text-muted sales-territory-help">Optional: matched from the selected location when available.</small>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label" for="customer_status">Status</label>
