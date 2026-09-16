@@ -1,5 +1,6 @@
 @extends('layouts.header')
 @section('css')
+<link rel="stylesheet" href="{{asset('design/vendors/select2/select2.min.css')}}">
 <style>
     /* Custom styling */
     .transaction-table th {
@@ -53,6 +54,48 @@
     @media (max-width: 575.98px) {
         .customer-info-back .back-label {
             display: none;
+        }
+
+        #editCustomerModal .modal-dialog {
+            margin: 0.5rem;
+        }
+    }
+
+    .sales-territory-select + .select2-container {
+        width: 100% !important;
+    }
+
+    .sales-territory-select + .select2-container .select2-selection--single {
+        min-height: 38px;
+        padding: 0.375rem 0.75rem;
+        border-color: #ced4da;
+    }
+
+    .sales-territory-select + .select2-container .select2-selection__rendered {
+        line-height: 24px;
+        padding: 0;
+    }
+
+    .sales-territory-select + .select2-container .select2-selection__arrow {
+        height: 36px;
+    }
+
+    #editCustomerModal .select2-container--open {
+        z-index: 1060;
+    }
+
+    @media (max-width: 575.98px) {
+        .sales-territory-select + .select2-container .select2-selection--single {
+            min-height: 44px;
+        }
+
+        .select2-search__field,
+        .select2-results__option {
+            font-size: 16px;
+        }
+
+        .select2-results__options {
+            max-height: 45vh;
         }
     }
     
@@ -226,6 +269,184 @@
 @endsection
 
 @section('javascript')
+<script src="{{asset('design/vendors/select2/select2.min.js')}}"></script>
+<script>
+  $('#editCustomerModal').on('shown.bs.modal', function () {
+    const $territory = $(this).find('.sales-territory-select');
+
+    if (!$territory.hasClass('select2-hidden-accessible')) {
+      $territory.select2({
+        width: '100%',
+        placeholder: 'Search Sales Territory',
+        minimumResultsForSearch: 0,
+        dropdownParent: $(this)
+      });
+    }
+
+    initializeEditLocation();
+    updateEditSalesTerritory();
+  }).on('hidden.bs.modal', function () {
+    const $territory = $(this).find('.sales-territory-select');
+    if ($territory.hasClass('select2-hidden-accessible')) {
+      $territory.select2('close');
+    }
+  });
+
+  let territoryLookupTimer;
+
+  function updateEditSalesTerritory() {
+    const $territory = $('#customer_area');
+    const $territoryHelp = $('#editCustomerModal .sales-territory-help');
+    const location = {
+      region: $('#customer_region').val().trim(),
+      province: $('#customer_province').val().trim(),
+      city: $('#customer_city').val().trim(),
+      barangay: $('#customer_barangay').val().trim()
+    };
+
+    if (!location.region || !location.province || !location.city || !location.barangay) {
+      $territory.prop('disabled', true).html('<option value="">Complete the location first</option>').trigger('change');
+      $territoryHelp.text('Enter Region, Province, City/Municipality, and Barangay to match a territory.');
+      return;
+    }
+
+    $territory.prop('disabled', true).html('<option value="">Finding matching territory…</option>').trigger('change');
+
+    $.get($territory.data('match-url'), location)
+      .done(function(response) {
+        const areas = response.areas || [];
+        const currentArea = $territory.data('current-area');
+        let options = '';
+
+        if (areas.length === 0) {
+          options = '<option value="">No territory covers this location</option>';
+          $territoryHelp.text('No Sales Territory matches the selected geographic coverage.');
+        } else if (areas.length === 1) {
+          const safeArea = $('<div>').text(areas[0]).html();
+          options = `<option value="${safeArea}" selected>${safeArea}</option>`;
+          $territoryHelp.text('Sales Territory was selected automatically from geographic coverage.');
+        } else {
+          options = '<option value="">Select Sales Territory</option>';
+          areas.forEach(function(area) {
+            const safeArea = $('<div>').text(area).html();
+            options += `<option value="${safeArea}" ${area === currentArea ? 'selected' : ''}>${safeArea}</option>`;
+          });
+          $territoryHelp.text(`${areas.length} Sales Territories cover this location. Select one.`);
+        }
+
+        $territory.html(options).prop('disabled', areas.length === 0).trigger('change');
+      })
+      .fail(function() {
+        $territory.prop('disabled', true).html('<option value="">Unable to match territory</option>').trigger('change');
+        $territoryHelp.text('Sales Territory lookup is currently unavailable.');
+      });
+  }
+
+  $('#customer_region, #customer_province, #customer_city, #customer_barangay').on('input change', function () {
+    clearTimeout(territoryLookupTimer);
+    territoryLookupTimer = setTimeout(updateEditSalesTerritory, 300);
+  });
+
+  let editLocationInitialized = false;
+
+  function optionMarkup(items, selected) {
+    let options = '<option value="">Select</option>';
+    items.forEach(function (item) {
+      const safeName = $('<div>').text(item.name).html();
+      options += `<option value="${safeName}" ${item.name === selected ? 'selected' : ''}>${safeName}</option>`;
+    });
+    return options;
+  }
+
+  function initializeEditLocation() {
+    if (editLocationInitialized) {
+      return;
+    }
+
+    editLocationInitialized = true;
+    const $region = $('#customer_region');
+    const $province = $('#customer_province');
+    const $city = $('#customer_city');
+    const $barangay = $('#customer_barangay');
+    const selectedRegion = $region.data('selected') || '';
+    const selectedProvince = $province.data('selected') || '';
+    const selectedCity = $city.data('selected') || '';
+    const selectedBarangay = $barangay.data('selected') || '';
+    let restoringLocation = true;
+
+    function finishLocationRestore() {
+      if (restoringLocation) {
+        restoringLocation = false;
+        updateEditSalesTerritory();
+      }
+    }
+
+    function loadBarangays(city, selected) {
+      $barangay.prop('disabled', true).html('<option value="">Loading…</option>');
+      $.get('/api/cities/' + encodeURIComponent(city) + '/barangays')
+        .done(function (items) {
+          $barangay.html(optionMarkup(items, selected)).prop('disabled', false).trigger('change');
+          finishLocationRestore();
+        });
+    }
+
+    function loadCities(province, selected, barangay) {
+      $city.prop('disabled', true).html('<option value="">Loading…</option>');
+      $.get('/api/provinces/' + encodeURIComponent(province) + '/cities')
+        .done(function (items) {
+          $city.html(optionMarkup(items, selected)).prop('disabled', false).trigger('change');
+          if (selected) {
+            loadBarangays(selected, barangay);
+          } else {
+            finishLocationRestore();
+          }
+        });
+    }
+
+    function loadProvinces(region, selected, city, barangay) {
+      $province.prop('disabled', true).html('<option value="">Loading…</option>');
+      $.get('/api/regions/' + encodeURIComponent(region) + '/provinces')
+        .done(function (items) {
+          $province.html(optionMarkup(items, selected)).prop('disabled', false).trigger('change');
+          if (selected) {
+            loadCities(selected, city, barangay);
+          } else {
+            finishLocationRestore();
+          }
+        });
+    }
+
+    $.get('/api/regions').done(function (items) {
+      $region.html(optionMarkup(items, selectedRegion)).trigger('change');
+      if (selectedRegion) {
+        loadProvinces(selectedRegion, selectedProvince, selectedCity, selectedBarangay);
+      } else {
+        finishLocationRestore();
+      }
+    });
+
+    $region.on('change', function () {
+      if (restoringLocation) return;
+      $province.prop('disabled', true).html('<option value="">Select Region First</option>');
+      $city.prop('disabled', true).html('<option value="">Select Province First</option>');
+      $barangay.prop('disabled', true).html('<option value="">Select City First</option>');
+      if (this.value) loadProvinces(this.value, '', '', '');
+    });
+
+    $province.on('change', function () {
+      if (restoringLocation) return;
+      $city.prop('disabled', true).html('<option value="">Select Province First</option>');
+      $barangay.prop('disabled', true).html('<option value="">Select City First</option>');
+      if (this.value) loadCities(this.value, '', '');
+    });
+
+    $city.on('change', function () {
+      if (restoringLocation) return;
+      $barangay.prop('disabled', true).html('<option value="">Select City First</option>');
+      if (this.value) loadBarangays(this.value, '');
+    });
+  }
+</script>
 <script>
   const canvas = document.getElementById('signatureCanvas');
   const ctx = canvas.getContext('2d');

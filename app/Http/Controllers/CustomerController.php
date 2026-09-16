@@ -19,11 +19,13 @@ class CustomerController extends Controller
         $inactiveCustomers = Client::where('status', 'Inactive')->count();
 
         $stoves = Stove::where('client_id',null)->get();
+        $areas = DB::connection('dms_prei')->table('areas')->whereNull('deleted_at')->orderBy('name')->get();
         $customers = Client::with(['transactions', 'serial'])->get();
         return view('customers',
             array(
                 'stoves' => $stoves,
                 'customers' => $customers,
+                'areas' => $areas,
                 'activeCustomers' => $activeCustomers,
                 'inactiveCustomers' => $inactiveCustomers
             )
@@ -37,12 +39,14 @@ class CustomerController extends Controller
             ->orWhere('id', $customer->serial_number)
             ->orderBy('serial_number')
             ->get();
+        $areas = DB::connection('dms_prei')->table('areas')->whereNull('deleted_at')->orderBy('name')->get();
 
         return view('customer',
             array(
                 'customer' => $customer,
                 'transactions' => $transactions,
                 'stoves' => $stoves,
+                'areas' => $areas,
             )
         );
     }
@@ -53,15 +57,50 @@ class CustomerController extends Controller
     public function newCustomer(Request $request)
     {
         $stoves = Stove::where('client_id',null)->get();
+        $areas = DB::connection('dms_prei')->table('areas')->whereNull('deleted_at')->orderBy('name')->get();
         return view('new-customer',
             array(
-                'stoves' => $stoves
+                'stoves' => $stoves,
+                'areas' => $areas,
             )
         );
     }
 
+    public function matchingSalesTerritories(Request $request)
+    {
+        $location = $request->validate([
+            'region' => 'required|string|max:255',
+            'province' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'barangay' => 'required|string|max:255',
+        ]);
+
+        $areas = DB::connection('dms_prei')
+            ->table('area_geographic_coverages as coverage')
+            ->join('areas', 'areas.id', '=', 'coverage.area_id')
+            ->whereNull('areas.deleted_at')
+            ->where('coverage.region', $location['region'])
+            ->where('coverage.province', $location['province'])
+            ->where('coverage.city_municipality', $location['city'])
+            ->where('coverage.barangay', $location['barangay'])
+            ->select('areas.name')
+            ->distinct()
+            ->orderBy('areas.name')
+            ->pluck('areas.name')
+            ->values();
+
+        return response()->json(['areas' => $areas]);
+    }
+
     public function saveCustomer(Request $request)
     {
+        $request->validate([
+            'area' => 'required|string|max:255|exists:dms_prei.areas,name',
+        ]);
+        $this->ensureSalesTerritoryCoverage($request->area, $request->only([
+            'location_region', 'location_province', 'location_city', 'location_barangay',
+        ]));
+
         $user = new User;
         $user->name = $request->name;
         $user->email = $request->email_address;
@@ -97,6 +136,7 @@ class CustomerController extends Controller
         $customer->street_address = $request->street_address;
         $customer->spo = $request->spo;
         $customer->center = $request->center;
+        $customer->area = $request->area;
         $customer->status = $request->status;
         $customer->save();
 
@@ -132,8 +172,10 @@ class CustomerController extends Controller
             'street_address' => 'nullable|string|max:255',
             'spo' => 'nullable|string|max:255',
             'center' => 'nullable|string|max:255',
+            'area' => 'required|string|max:255|exists:dms_prei.areas,name',
             'status' => 'required|in:Active,Inactive',
         ]);
+        $this->ensureSalesTerritoryCoverage($validated['area'], $validated);
 
         DB::transaction(function () use ($customer, $validated) {
             $newSerialId = $validated['serial_number'] ?? null;
@@ -175,6 +217,34 @@ class CustomerController extends Controller
 
         Alert::success('Success', 'Customer information updated successfully!');
         return redirect()->back();
+    }
+
+    private function ensureSalesTerritoryCoverage($area, array $location)
+    {
+        $keys = ['location_region', 'location_province', 'location_city', 'location_barangay'];
+
+        if (collect($keys)->contains(function ($key) use ($location) {
+            return empty($location[$key]);
+        })) {
+            return;
+        }
+
+        $isCovered = DB::connection('dms_prei')
+            ->table('area_geographic_coverages as coverage')
+            ->join('areas', 'areas.id', '=', 'coverage.area_id')
+            ->whereNull('areas.deleted_at')
+            ->where('areas.name', $area)
+            ->where('coverage.region', $location['location_region'])
+            ->where('coverage.province', $location['location_province'])
+            ->where('coverage.city_municipality', $location['location_city'])
+            ->where('coverage.barangay', $location['location_barangay'])
+            ->exists();
+
+        if (!$isCovered) {
+            throw ValidationException::withMessages([
+                'area' => 'The selected Sales Territory does not cover the selected location.',
+            ]);
+        }
     }
     
     public function changeAvatar(Request $request, $id)

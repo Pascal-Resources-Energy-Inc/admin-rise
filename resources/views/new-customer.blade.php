@@ -9,6 +9,39 @@
 
       border-color:#aebcc3 !important;
     }
+
+    .sales-territory-select + .select2-container {
+      width: 100% !important;
+    }
+
+    .sales-territory-select + .select2-container .select2-selection--single {
+      min-height: 38px;
+      padding: 0.375rem 0.75rem;
+    }
+
+    .sales-territory-select + .select2-container .select2-selection__rendered {
+      line-height: 24px;
+      padding: 0;
+    }
+
+    .sales-territory-select + .select2-container .select2-selection__arrow {
+      height: 36px;
+    }
+
+    @media (max-width: 575.98px) {
+      .sales-territory-select + .select2-container .select2-selection--single {
+        min-height: 44px;
+      }
+
+      .select2-search__field,
+      .select2-results__option {
+        font-size: 16px;
+      }
+
+      .select2-results__options {
+        max-height: 45vh;
+      }
+    }
   </style>
   <link rel="stylesheet" href="{{asset('design/vendors/select2/select2.min.css')}}">
   <link rel="stylesheet" href="{{asset('design/vendors/select2-bootstrap-theme/select2-bootstrap.min.css')}}">
@@ -75,6 +108,17 @@
                                   <option value="{{$stove->id}}">{{$stove->serial_number}}</option>
                                   @endforeach
                             </select>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="mb-3">
+                          <label class="form-label" for="customer_area">Sales Territory <span class="text-danger">*</span></label>
+                          <select class="form-control required sales-territory-select" id="customer_area" name="area" required>
+                            <option value="">Select Sales Territory</option>
+                            @foreach($areas as $area)
+                              <option value="{{ $area->name }}">{{ $area->name }}</option>
+                            @endforeach
+                          </select>
                         </div>
                       </div>
                     </div>
@@ -221,6 +265,15 @@
 <script src="{{asset('design/vendors/typeahead.js/typeahead.bundle.min.js')}}"></script>
   <script src="{{asset('design/vendors/select2/select2.min.js')}}"></script>
     <script src="{{asset('design/js/select2.js')}}"></script>
+<script>
+  $(function () {
+    $('#customer_area').select2({
+      width: '100%',
+      placeholder: 'Search Sales Territory',
+      minimumResultsForSearch: 0
+    });
+  });
+</script>
 <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');

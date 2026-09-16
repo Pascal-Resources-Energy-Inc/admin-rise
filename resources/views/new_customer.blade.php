@@ -96,10 +96,19 @@
                 <input type="text" class="form-control required" name="spo" placeholder="Enter SPO">
               </div>
             </div>
-             <div class="col-md-6">
+            <div class="col-md-6">
               <div class="mb-3">
                 <label class="form-label">Center</label>
                 <input type="text" class="form-control required" name="center" placeholder="Enter Center">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label" for="customer_area">Sales Territory <span class="text-danger">*</span></label>
+                <select class="form-control sales-territory-select" id="customer_area" name="area" data-match-url="{{ route('customer.sales-territories') }}" required disabled>
+                  <option value="">Select Region, Province, City, and Barangay first</option>
+                </select>
+                <small class="form-text text-muted sales-territory-help">The territory is matched from the selected location.</small>
               </div>
             </div>
           </div>
@@ -137,6 +146,53 @@
 <!-- Then your custom script -->
 <script>
 $(document).ready(function() {
+
+    const $territory = $('#customer_area');
+    const $territoryHelp = $('.sales-territory-help');
+
+    function updateSalesTerritory() {
+        const location = {
+            region: $('#location_region').val(),
+            province: $('#location_province').val(),
+            city: $('#location_city').val(),
+            barangay: $('#location_barangay').val()
+        };
+
+        if (!location.region || !location.province || !location.city || !location.barangay) {
+            $territory.prop('disabled', true).html('<option value="">Select Region, Province, City, and Barangay first</option>').trigger('change');
+            $territoryHelp.text('The territory is matched after the complete location is selected.');
+            return;
+        }
+
+        $territory.prop('disabled', true).html('<option value="">Finding matching territory…</option>').trigger('change');
+
+        $.get($territory.data('match-url'), location)
+            .done(function(response) {
+                const areas = response.areas || [];
+                let options = '';
+
+                if (areas.length === 0) {
+                    options = '<option value="">No territory covers this location</option>';
+                    $territoryHelp.text('No Sales Territory matches the selected geographic coverage.');
+                } else if (areas.length === 1) {
+                    options = `<option value="${$('<div>').text(areas[0]).html()}" selected>${$('<div>').text(areas[0]).html()}</option>`;
+                    $territoryHelp.text('Sales Territory was selected automatically from geographic coverage.');
+                } else {
+                    options = '<option value="">Select Sales Territory</option>';
+                    areas.forEach(function(area) {
+                        const safeArea = $('<div>').text(area).html();
+                        options += `<option value="${safeArea}">${safeArea}</option>`;
+                    });
+                    $territoryHelp.text(`${areas.length} Sales Territories cover this location. Select one.`);
+                }
+
+                $territory.html(options).prop('disabled', areas.length === 0).trigger('change');
+            })
+            .fail(function() {
+                $territory.prop('disabled', true).html('<option value="">Unable to match territory</option>').trigger('change');
+                $territoryHelp.text('Sales Territory lookup is currently unavailable.');
+            });
+    }
 
     // LOAD REGIONS
     $.get('/api/regions')
@@ -221,6 +277,8 @@ $(document).ready(function() {
         let postal = $(this).find(':selected').data('postal') || '';
         $('#postal_code').val(postal);
     });
+
+    $('#location_region, #location_province, #location_city, #location_barangay').on('change', updateSalesTerritory);
 
 });
 </script>

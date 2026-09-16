@@ -3,6 +3,7 @@
 @section('css')
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
+<link rel="stylesheet" href="{{asset('design/vendors/select2/select2.min.css')}}">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
 
@@ -43,6 +44,52 @@
   font-size: 1rem;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
+}
+
+.sales-territory-select + .select2-container {
+  width: 100% !important;
+}
+
+.sales-territory-select + .select2-container .select2-selection--single {
+  min-height: 38px;
+  padding: 0.375rem 0.75rem;
+  border-color: #ced4da;
+}
+
+.sales-territory-select + .select2-container .select2-selection__rendered {
+  line-height: 24px;
+  padding: 0;
+}
+
+.sales-territory-select + .select2-container .select2-selection__arrow {
+  height: 36px;
+}
+
+#new_customer .select2-container--open {
+  z-index: 1060;
+}
+
+#new_customer .modal-content {
+  overflow: visible;
+}
+
+@media (max-width: 575.98px) {
+  #new_customer .modal-dialog {
+    margin: 0.5rem;
+  }
+
+  .sales-territory-select + .select2-container .select2-selection--single {
+    min-height: 44px;
+  }
+
+  .select2-search__field,
+  .select2-results__option {
+    font-size: 16px;
+  }
+
+  .select2-results__options {
+    max-height: 45vh;
+  }
 }
 
 .dataTables_length {
@@ -186,6 +233,7 @@
 @section('javascript')
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+<script src="{{asset('design/vendors/select2/select2.min.js')}}"></script>
 <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
 
@@ -238,6 +286,24 @@ $(document).ready(function() {
   $(document).ready(function(){
     $('.chosen-select').chosen({
       width: '100%'
+    });
+
+    $('#new_customer').on('shown.bs.modal', function () {
+      const $territory = $(this).find('.sales-territory-select');
+
+      if (!$territory.hasClass('select2-hidden-accessible')) {
+        $territory.select2({
+          width: '100%',
+          placeholder: 'Search Sales Territory',
+          minimumResultsForSearch: 0,
+          dropdownParent: $(this).find('.modal-content')
+        });
+      }
+    }).on('hidden.bs.modal', function () {
+      const $territory = $(this).find('.sales-territory-select');
+      if ($territory.hasClass('select2-hidden-accessible')) {
+        $territory.select2('close');
+      }
     });
   });
 </script>

@@ -85,6 +85,15 @@ class HomeController extends Controller
         $availableYears = $this->getAvailableYears();
         $availableMonths = $this->getAvailableMonths($selectedYear);
 
+        // Dashboard summary cards use a rolling 12-month reporting period.
+        $reportYear = (int) $request->get('report_year', Carbon::now()->year);
+        $reportEndMonth = min(12, max(1, (int) $request->get('report_end_month', Carbon::now()->month)));
+        $reportEnd = Carbon::create($reportYear, $reportEndMonth, 1)->endOfMonth();
+        $reportStart = $reportEnd->copy()->subMonths(11)->startOfMonth();
+        $dashboardSummary = TransactionDetail::whereBetween('created_at', [$reportStart, $reportEnd])
+            ->selectRaw('COALESCE(SUM(price * qty), 0) as total_sales, COALESCE(SUM(qty), 0) as products_sold, COUNT(DISTINCT dealer_id) as active_dealers, COUNT(DISTINCT client_id) as active_customers')
+            ->first();
+
         $dealers = TransactionDetail::select(
             'dealer_id',
             DB::raw('SUM(points_dealer) as total_points'),
@@ -131,6 +140,9 @@ class HomeController extends Controller
         ->sortByDesc('days_since_transaction');
 
         $mapData = $this->getPhilippineMapData();
+        $refillMonitoringDealers = Dealer::whereNotNull('user_id')
+            ->orderBy('name')
+            ->get(['user_id', 'name', 'store_name']);
 
         return view('home',
             array(
@@ -149,6 +161,11 @@ class HomeController extends Controller
                 'qty_trend' => $qtyTrend,
                 'available_years' => $availableYears,
                 'available_months' => $availableMonths,
+                'dashboard_summary' => $dashboardSummary,
+                'report_year' => $reportYear,
+                'report_end_month' => $reportEndMonth,
+                'report_period_start' => $reportStart,
+                'report_period_end' => $reportEnd,
                 'selected_year' => $selectedYear,
                 'selected_month' => $selectedMonth,
                 'view_type' => $viewType,
@@ -156,14 +173,82 @@ class HomeController extends Controller
                 'customer_available_points' => $customerAvailablePoints ?? 0,
                 'dealers_inactive' => $dealers_inactive,
                 'map_data' => $mapData,
+                'refill_monitoring_dealers' => $refillMonitoringDealers,
             )
         );
     }
 
+    /**
+     * Monthly refill totals used by the dashboard monitoring cards and charts.
+     */
+    public function getRefillMonitoringData(Request $request)
+    {
+        $validated = $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'dealer_id' => 'nullable|integer|exists:dealers,user_id',
+        ]);
+
+        $start = isset($validated['start_date'])
+            ? Carbon::parse($validated['start_date'])->startOfMonth()
+            : Carbon::now()->subMonths(11)->startOfMonth();
+        $end = isset($validated['end_date'])
+            ? Carbon::parse($validated['end_date'])->endOfMonth()
+            : Carbon::now()->endOfMonth();
+
+        $query = TransactionDetail::query()
+            ->whereBetween('created_at', [$start, $end]);
+
+        if (!empty($validated['dealer_id'])) {
+            $query->where('dealer_id', $validated['dealer_id']);
+        }
+
+        $rows = $query->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month_key, SUM(qty) as refills, COUNT(DISTINCT client_id) as beneficiaries")
+            ->groupBy('month_key')
+            ->orderBy('month_key')
+            ->get()
+            ->keyBy('month_key');
+
+        $months = collect();
+        for ($month = $start->copy(); $month->lte($end); $month->addMonth()) {
+            $key = $month->format('Y-m');
+            $row = $rows->get($key);
+            $refills = (int) ($row->refills ?? 0);
+            $beneficiaries = (int) ($row->beneficiaries ?? 0);
+
+            $months->push([
+                'key' => $key,
+                'label' => $month->format('M y'),
+                'refills' => $refills,
+                'beneficiaries' => $beneficiaries,
+                'average' => $beneficiaries > 0 ? round($refills / $beneficiaries, 1) : 0,
+            ]);
+        }
+
+        return response()->json([
+            'months' => $months,
+            'summary' => [
+                'refills' => $months->sum('refills'),
+                'beneficiaries' => $months->sum('beneficiaries'),
+                'average' => $months->sum('beneficiaries') > 0
+                    ? round($months->sum('refills') / $months->sum('beneficiaries'), 1)
+                    : 0,
+            ],
+        ]);
+    }
+
     private function getPhilippineMapData()
     {
-        $transactions = TransactionDetail::whereNotNull('client_address')
-            ->where('client_address', '!=', '')
+        // Customer location is stored on clients, not on transaction_details.
+        $transactions = TransactionDetail::join('clients', 'transaction_details.client_id', '=', 'clients.id')
+            ->whereNotNull('clients.location_province')
+            ->where('clients.location_province', '!=', '')
+            ->select(
+                'transaction_details.client_id',
+                'clients.location_province',
+                'clients.location_city',
+                'clients.location_barangay'
+            )
             ->get();
         
         if ($transactions->isEmpty()) {
@@ -341,17 +426,21 @@ class HomeController extends Controller
         $provinceBarangays = [];
         
         foreach ($transactions as $transaction) {
-            $address = strtoupper(trim($transaction->client_address));
+            $province = strtoupper(trim($transaction->location_province));
             
             foreach ($provinceMapping as $pathId => $provinceNames) {
                 foreach ($provinceNames as $provinceName) {
-                    if (strpos($address, $provinceName) !== false) {
+                    if ($province === $provinceName || strpos($province, $provinceName) !== false) {
                         if (!isset($provinceBarangays[$pathId])) {
                             $provinceBarangays[$pathId] = [];
                         }
                         
-                        $barangay = $this->extractBarangay($address);
-                        $provinceBarangays[$pathId][$barangay] = true;
+                        // Barangay is now a dedicated customer field. Keep the province visible
+                        // even when its customer records still need a barangay value.
+                        $barangay = strtoupper(trim((string) $transaction->location_barangay));
+                        if ($barangay !== '') {
+                            $provinceBarangays[$pathId][$barangay] = true;
+                        }
                         
                         break 2;
                     }
@@ -410,19 +499,33 @@ class HomeController extends Controller
 
     public function getProvinceDetails(Request $request)
     {
-        $provinceName = $request->get('province');
+        $provinceName = trim($request->get('province', ''));
+        if ($provinceName === '') {
+            return response()->json(['error' => 'Province is required.'], 422);
+        }
         
-        $transactions = TransactionDetail::whereNotNull('client_address')
-            ->where('client_address', 'LIKE', "%{$provinceName}%")
+        $transactions = TransactionDetail::join('clients', 'transaction_details.client_id', '=', 'clients.id')
+            ->where('clients.location_province', 'LIKE', "%{$provinceName}%")
+            ->select(
+                'transaction_details.*',
+                'clients.location_province',
+                'clients.location_city',
+                'clients.location_barangay',
+                'clients.street_address'
+            )
             ->with(['customer', 'dealer'])
             ->get();
         
         $locationData = [];
         
         foreach ($transactions as $transaction) {
-            $address = $transaction->client_address;
-            
-            $location = $this->extractLocation($address, $provinceName);
+            $location = trim((string) ($transaction->location_barangay ?: $transaction->location_city ?: 'Unspecified location'));
+            $address = collect([
+                $transaction->street_address,
+                $transaction->location_barangay,
+                $transaction->location_city,
+                $transaction->location_province,
+            ])->filter()->implode(', ');
             
             if (!isset($locationData[$location])) {
                 $locationData[$location] = [

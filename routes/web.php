@@ -28,6 +28,8 @@ Route::group(['middleware' => 'auth'], function () {
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/transactions','TransactionController@index')->name('transactions');
+Route::get('/transactions/data', 'TransactionController@data')->name('transactions.data');
+Route::get('/transactions/export', 'TransactionController@export')->name('transactions.export');
 Route::get('/ad-transactions','TransactionController@adTransactions')->name('ad-transactions');
 Route::delete('/transactions/{id}', 'TransactionController@destroy')->name('transactions.destroy');
 Route::post('/transactions/bulk-delete', 'TransactionController@bulkDelete')->name('transactions.bulkDelete');
@@ -44,6 +46,7 @@ Route::get('/api/locations-map', 'HomeController@getLocationsForMap')->name('loc
 Route::get('/api/location-details/{id}/{type}', 'HomeController@getLocationDetails')->name('location.details');
 Route::get('/home/monthly-data', 'HomeController@getMonthlyDataAjax')->name('home.monthly-data');
 Route::get('/home/chart-data', 'HomeController@getChartDataAjax')->name('home.chart-data');
+Route::get('/home/refill-monitoring-data', 'HomeController@getRefillMonitoringData')->name('home.refill-monitoring-data');
 
 Route::post('/store-transaction','TransactionController@store')->name('new-transaction');
 Route::post('/store-transaction-admin','TransactionController@storeAdmin')->name('new-transaction');
@@ -98,6 +101,7 @@ Route::get('/dashboard-customer','CustomerController@show')->name('customer');
 Route::get('/new-customer','CustomerController@newCustomer')->name('newcustomer');
 Route::get('view-client/{id}', 'CustomerController@view')->name('client.view');
 Route::post('new-customer','CustomerController@saveCustomer')->name('saveCustomer');
+Route::get('/customer-sales-territories', 'CustomerController@matchingSalesTerritories')->name('customer.sales-territories');
 Route::put('/customer/update/{id}', 'CustomerController@update')->name('customer.update');
 Route::post('/change-avatar/{id}','CustomerController@changeAvatar')->name('changeAvatar');
 Route::post('/valid-id/{id}','CustomerController@uploadValidId')->name('uploadValidId');

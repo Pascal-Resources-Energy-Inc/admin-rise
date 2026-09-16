@@ -7,51 +7,21 @@
     .transaction-table th {
         text-align: center;
     }
-    .btn-view {
-        width: 100px;
-        font-size: 14px;
-    }
-    .dashboard-stats {
-        display: flex;
-        justify-content: space-around;
-    }
-    .dashboard-stats div {
-        text-align: center;
-        padding: 20px;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        width: 30%;
-    }
-    .welcome {
+    .transactions-page {
         margin-top: auto !important;
     }
-    .card-header {
-        font-size: 1.25rem;
-        font-weight: bold;
-    }
-    .card-body {
+    .transactions-page .card-body {
         padding: 20px;
     }
-    .filter-container {
-        margin-bottom: 20px;
-    }
-    .card {
-      border-radius: 15px !important;
+    .transactions-page .card {
+        border: 0;
+        border-radius: 14px !important;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, .06);
     }
     @media (max-width: 768px) {
         .modal-dialog {
             margin: 1rem;
             max-width: 100%;
-        }
-
-        .chosen-container {
-            width: 100% !important;
-        }
-
-        .chosen-drop {
-            max-height: 200px;
-            overflow-y: auto;
         }
 
     }
@@ -67,43 +37,6 @@
             height: 43px !important; 
         }
     }
-
-.chosen-container .chosen-single {
-  height: calc(2.25rem + 2px);
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #495057;
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  box-shadow: none;
-}
-
-.chosen-container-active.chosen-with-drop .chosen-single {
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-}
-
-.chosen-container .chosen-drop {
-  border: 1px solid #ced4da;
-  border-top: none;
-  border-radius: 0 0 0.25rem 0.25rem;
-  box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
-}
-
-.chosen-container .chosen-results {
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.chosen-container .chosen-search input {
-  height: calc(1.5em + 0.75rem + 2px);
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-}
 
 .dataTables_length {
   float: left;
@@ -146,6 +79,141 @@ table.dataTable {
     margin-bottom: 0 !important;
 }
 
+.transaction-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.transaction-stat-card {
+    color: #fff;
+    min-height: 132px;
+    overflow: hidden;
+}
+
+.transaction-stat-card .card-body {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+}
+
+.transaction-stat-icon {
+    align-items: center;
+    background: rgba(255, 255, 255, .18);
+    border-radius: 12px;
+    display: flex;
+    font-size: 1.5rem;
+    height: 48px;
+    justify-content: center;
+    width: 48px;
+}
+
+.transaction-stat-label {
+    color: rgba(255, 255, 255, .72);
+    font-size: .75rem;
+    letter-spacing: .06em;
+    margin: .25rem 0 0;
+    text-transform: uppercase;
+}
+
+.transaction-stat-value {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.transaction-stat-sales { background: linear-gradient(135deg, #0d6efd, #3f8cff); }
+.transaction-stat-count { background: linear-gradient(135deg, #6f42c1, #9873e6); }
+.transaction-stat-quantity { background: linear-gradient(135deg, #0f9d77, #38bd91); }
+.transaction-stat-points { background: linear-gradient(135deg, #ef8b16, #f6b73c); }
+
+.transaction-panel-title {
+    margin: 0;
+    color: #24324a;
+    font-weight: 700;
+}
+
+.transaction-panel-subtitle {
+    margin: .25rem 0 0;
+    color: #6c757d;
+    font-size: .875rem;
+}
+
+.transaction-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+}
+
+.transaction-actions .btn {
+    align-items: center;
+    display: inline-flex;
+    gap: .4rem;
+    height: 38px;
+    justify-content: center;
+}
+
+.transaction-filters {
+    align-items: end;
+    background: #f8fafc;
+    border: 1px solid #e7edf4;
+    border-radius: .65rem;
+    display: grid;
+    gap: .75rem;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) auto auto;
+    margin-bottom: 1rem;
+    padding: .85rem;
+}
+
+.transaction-filters label {
+    color: #526176;
+    display: block;
+    font-size: .72rem;
+    font-weight: 700;
+    margin-bottom: .3rem;
+    text-transform: uppercase;
+}
+
+@media (max-width: 1199.98px) { .transaction-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 767.98px) { .transaction-filters { grid-template-columns: 1fr; } }
+
+.transaction-table thead th {
+    background: #f6f8fb;
+    border-bottom-width: 1px;
+    color: #4b5563;
+    font-size: .75rem;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.transaction-table tbody td {
+    vertical-align: middle;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: #0d6efd !important;
+    border-color: #0d6efd !important;
+    border-radius: .375rem;
+    color: #fff !important;
+}
+
+@media (max-width: 767.98px) {
+    .transaction-panel-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .transaction-actions {
+        width: 100%;
+    }
+}
+
 
 </style>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
@@ -158,78 +226,39 @@ table.dataTable {
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 @section('content')
-<div class="welcome @if(auth()->user()->role === 'Dealer') welcome-client @endif">
+<div class="transactions-page welcome @if(auth()->user()->role === 'Dealer') welcome-client @endif">
     <div class="row">
         <!-- Cards Section - All 4 cards in one row -->
         <div class="col-12">
-            <div class="row mb-0 cards">
-                <!-- Total Sales -->
-                  <div class="col-sm-6 col-lg-4 col-xl-2">
-                    <div class="card warning-card overflow-hidden text-bg-primary w-100">
-                        <div class="card-body p-4">
-                          <div class="mb-7">
-                            <i class="ti ti-brand-producthunt fs-8 fw-lighter"></i>
-                          </div>
-                          <h5 class="text-white fw-bold fs-14 text-nowrap">
-                          {{ $transactions->sum(function($transaction) {
-                                return $transaction->price * $transaction->qty;
-                            }) }}
-                          </h5>
-                          <p class="opacity-50 mb-0 ">TOTAL SALES</p>
-                        </div>
-                    </div>
-                </div>
-                  <div class="col-sm-6 col-lg-4 col-xl-2">
-                    <div class="card danger-card overflow-hidden text-bg-primary w-100">
-                        <div class="card-body p-4">
-                          <div class="mb-7">
-                            <i class="ti ti-brand-producthunt fs-8 fw-lighter"></i>
-                          </div>
-                          <h5 class="text-white fw-bold fs-14 text-nowrap">
-                            {{$transactions->count()}}
-                          </h5>
-                          <p class="opacity-50 mb-0 ">TRANSACTIONS</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-lg-4 col-xl-2">
-                    <div class="card info-card overflow-hidden text-bg-primary w-100">
-                        <div class="card-body p-4">
-                          <div class="mb-7">
-                            <i class="ti ti-brand-producthunt fs-8 fw-lighter"></i>
-                          </div>
-                          <h5 class="text-white fw-bold fs-14 text-nowrap">
-                            {{$transactions->sum('qty')}}
-                          </h5>
-                          <p class="opacity-50 mb-0 ">QTY SOLD</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-lg-4 col-xl-2">
-                    <div class="card info-card overflow-hidden text-bg-primary w-100">
-                        <div class="card-body p-4">
-                          <div class="mb-7">
-                            <i class="ti ti-brand-producthunt fs-8 fw-lighter"></i>
-                          </div>
-                          <h5 class="text-white fw-bold fs-14 text-nowrap">
-                            {{$transactions->sum('points_dealer') + $transactions->sum('points_client')}}
-                          </h5>
-                          <p class="opacity-50 mb-0 ">TOTAL POINTS</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="row g-3 mb-3">
+                <div class="col-sm-6 col-xl-3"><div class="card transaction-stat-card transaction-stat-sales w-100"><div class="card-body">
+                    <div class="transaction-stat-icon"><i class="bi bi-cash-stack"></i></div><div><p class="transaction-stat-value">{{ number_format($transactionStats->total_sales, 2) }}</p><p class="transaction-stat-label">Total Sales</p></div>
+                </div></div></div>
+                <div class="col-sm-6 col-xl-3"><div class="card transaction-stat-card transaction-stat-count w-100"><div class="card-body">
+                    <div class="transaction-stat-icon"><i class="bi bi-receipt"></i></div><div><p class="transaction-stat-value">{{ number_format($transactionStats->transaction_count) }}</p><p class="transaction-stat-label">Transactions</p></div>
+                </div></div></div>
+                <div class="col-sm-6 col-xl-3"><div class="card transaction-stat-card transaction-stat-quantity w-100"><div class="card-body">
+                    <div class="transaction-stat-icon"><i class="bi bi-box-seam"></i></div><div><p class="transaction-stat-value">{{ number_format($transactionStats->quantity_sold, 2) }}</p><p class="transaction-stat-label">Quantity Sold</p></div>
+                </div></div></div>
+                <div class="col-sm-6 col-xl-3"><div class="card transaction-stat-card transaction-stat-points w-100"><div class="card-body">
+                    <div class="transaction-stat-icon"><i class="bi bi-star"></i></div><div><p class="transaction-stat-value">{{ number_format($transactionStats->total_points, 2) }}</p><p class="transaction-stat-label">Total Points</p></div>
+                </div></div></div>
             </div>
         </div>
         
         <div class="col-12">
             <div class="card w-100">  
                 <div class="card-body">
-                  <div class="d-flex justify-content-start align-items-center gap-2 mb-3">
+                  <div class="transaction-panel-header">
+                      <div>
+                          <h5 class="transaction-panel-title">Transactions</h5>
+                          <p class="transaction-panel-subtitle">Search, sort, export, and manage transaction records.</p>
+                      </div>
+                      <div class="transaction-actions">
                       @if(auth()->user()->role == "Admin")
                           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModalAdmin">
                               <i class="bi bi-plus-lg"></i> Search Name
                           </button>
-                          <div id="exportExcelContainer"></div>
                           <button type="button" class="btn btn-danger btn-sm" id="deleteSelectedBtn" title="Delete Selected" style="display: none; height: 38px;">
                               <i class="bi bi-trash"></i> Delete All
                           </button>
@@ -241,6 +270,20 @@ table.dataTable {
                               <i class="bi bi-plus-lg"></i> Search Name
                           </button>
                       @endif
+                      <a id="exportExcelButton" class="btn btn-success export-btn-custom" href="{{ route('transactions.export') }}">
+                          <i class="bi bi-file-earmark-excel"></i> Export Excel
+                      </a>
+                      </div>
+                  </div>
+
+                  <div class="transaction-filters" id="transactionFilters">
+                      <div><label for="filterDateFrom">From date</label><input class="form-control form-control-sm" id="filterDateFrom" type="date"></div>
+                      <div><label for="filterDateTo">To date</label><input class="form-control form-control-sm" id="filterDateTo" type="date"></div>
+                      <div><label for="filterDealer">Dealer</label><select class="form-select form-select-sm" id="filterDealer"><option value="">All dealers</option>@foreach($dealers as $dealer)<option value="{{ $dealer->user_id }}">{{ $dealer->store_name ?: $dealer->name }}</option>@endforeach</select></div>
+                      <div><label for="filterCustomer">Customer</label><select class="form-select form-select-sm" id="filterCustomer"><option value="">All customers</option>@foreach($customers as $customer)<option value="{{ $customer->id }}">{{ $customer->name }}</option>@endforeach</select></div>
+                      <div><label for="filterItem">Item</label><select class="form-select form-select-sm" id="filterItem"><option value="">All items</option>@foreach($items as $item)<option value="{{ $item->item }}">{{ $item->item }}</option>@endforeach</select></div>
+                      <button class="btn btn-primary btn-sm" id="applyTransactionFilters" type="button"><i class="bi bi-funnel"></i> Filter</button>
+                      <button class="btn btn-outline-secondary btn-sm" id="resetTransactionFilters" type="button">Reset</button>
                   </div>
 
                   <div class="table-responsive">
@@ -268,36 +311,7 @@ table.dataTable {
                                   @endif
                               </tr>
                           </thead>
-                          <tbody id="transactionBody">
-                              @foreach($transactions as $transaction)
-                                  <tr id="transaction-row-{{$transaction->id}}">
-                                      @if(auth()->user()->role == "Admin" && auth()->user()->can_delete === "on")
-                                          <td style="text-align: center;">
-                                              <input type="checkbox" class="checkbox-item" data-id="{{$transaction->id}}" style="cursor: pointer;">
-                                          </td>
-                                      @endif
-                                      <td>{{$transaction->id}}</td>
-                                      <td>{{ date('M d, Y', strtotime($transaction->date)) }}</td>
-                                      <td>{{ number_format($transaction->qty, 2) }}</td>
-                                      <td>{{ number_format($transaction->qty * $transaction->price, 2) }}</td>
-                                      <td>{{ $transaction->dealer->name ?? '' }}</td>
-                                      <td>{{ $transaction->customer->name ?? '' }}</td>
-                                      <td><span class='text-success'>{{ $transaction->points_dealer }}</span></td>
-                                      <td><span class='text-success'>{{ $transaction->points_client }}</span></td>
-                                      <td>{{ $transaction->item }}</td>
-                                      @if(auth()->user()->role == "Admin" && auth()->user()->can_delete === "on")
-                                          <td style="text-align: center;">
-                                              <button type="button" class="btn btn-danger btn-sm delete-single" 
-                                                      data-id="{{ $transaction->id }}" 
-                                                      title="Delete"
-                                                      style="cursor: pointer;">
-                                                  <i class="bi bi-trash"></i>
-                                              </button>
-                                          </td>
-                                      @endif
-                                  </tr>
-                              @endforeach
-                          </tbody>
+                          <tbody id="transactionBody"></tbody>
                       </table>
                   </div>
                 </div>
@@ -317,13 +331,8 @@ table.dataTable {
 
 @section('javascript')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 {{-- <script>
@@ -341,55 +350,115 @@ table.dataTable {
 </script> --}}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    new TomSelect('#customerSelect', {
-      create: false,
-      allowEmptyOption: true,
-      placeholder: "Search Customer"
-    });
-    new TomSelect('#dealer', {
-      create: false,
-      allowEmptyOption: true,
-      placeholder: "Search Dealer"
-    });
+    const customerSelect = document.querySelector('#customerSelect');
+    const dealerSelect = document.querySelector('#dealer');
+
+    if (customerSelect) {
+      new TomSelect(customerSelect, {
+        create: false,
+        allowEmptyOption: true,
+        placeholder: 'Search Customer'
+      });
+    }
+
+    if (dealerSelect) {
+      new TomSelect(dealerSelect, {
+        create: false,
+        allowEmptyOption: true,
+        placeholder: 'Search Dealer'
+      });
+    }
   });
 </script>
 <script>
-$(document).ready(function() {
+    $(document).ready(function() {
     const csrfToken = $('meta[name="csrf-token"]').attr('content');
-    
+    const headers = $('#example thead th').map(function () {
+        return $(this).text().trim();
+    }).get();
+    const idColumn = headers.indexOf('ID');
+    const nonSortableColumns = headers.reduce(function (columns, header, index) {
+        if (header === '' || header === 'Actions') {
+            columns.push(index);
+        }
+
+        return columns;
+    }, []);
+
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': csrfToken
         }
     });
 
+    function currentFilters() {
+        return {
+            date_from: $('#filterDateFrom').val(),
+            date_to: $('#filterDateTo').val(),
+            dealer_id: $('#filterDealer').val(),
+            customer_id: $('#filterCustomer').val(),
+            item: $('#filterItem').val()
+        };
+    }
+
     const table = $('#example').DataTable({
         dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-             '<"row"<"col-sm-12"tr>>' +
-             '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-        buttons: [
-            {
-                extend: 'excelHtml5',
-                text: 'Export Excel',
-                className: 'btn btn-sm btn-success export-btn-custom',
-                title: 'Transactions'
+                '<"row"<"col-sm-12"tr>>' +
+                '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+        paging: true,
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+        pagingType: 'simple_numbers',
+        autoWidth: false,
+        searchDelay: 250,
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: '{{ route('transactions.data') }}',
+            type: 'GET',
+            data: function (request) {
+                request.filters = currentFilters();
             }
-        ],
-        columnDefs: [
-            { 
-                orderable: false, 
-                targets: [0, -1] // Disable sorting on first column (checkbox) and last column (actions)
-            },
-            {
-                className: 'text-center', // Center align the checkbox column
-                targets: [0]
-            }
-        ],
-        destroy: true,
-        order: [[1, 'desc']] // Default sort by ID column (index 1) in descending order
+        },
+        columnDefs: nonSortableColumns.length ? [{
+            orderable: false,
+            targets: nonSortableColumns
+        }] : [],
+        order: [[idColumn >= 0 ? idColumn : 0, 'desc']],
+        language: {
+            search: '',
+            searchPlaceholder: 'Search transactions...',
+            lengthMenu: 'Show _MENU_ records',
+            info: 'Showing _START_–_END_ of _TOTAL_ transactions',
+            emptyTable: 'No transactions found.'
+        }
     });
 
-    table.buttons().container().appendTo('#exportExcelContainer');
+    table.on('draw', updateUI);
+
+    $('#applyTransactionFilters').on('click', function () {
+        table.ajax.reload(null, true);
+    });
+
+    $('#resetTransactionFilters').on('click', function () {
+        $('#transactionFilters').find('input, select').val('');
+        table.search('');
+        table.ajax.reload(null, true);
+    });
+
+    $('#transactionFilters').on('keydown', 'input', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            table.ajax.reload(null, true);
+        }
+    });
+
+    $('#exportExcelButton').on('click', function () {
+        const search = table.search();
+        const url = '{{ route('transactions.export') }}';
+        const params = $.param({ search: search, filters: currentFilters() });
+        $(this).attr('href', params ? url + '?' + params : url);
+    });
 
     $(document).on('change', '.checkbox-item', function() {
         updateUI();
@@ -397,7 +466,7 @@ $(document).ready(function() {
 
     $(document).on('change', '#selectAll', function() {
         const isChecked = $(this).prop('checked');
-        $('.checkbox-item').prop('checked', isChecked);
+        table.$('.checkbox-item').prop('checked', isChecked);
         updateUI();
     });
 
@@ -415,8 +484,8 @@ $(document).ready(function() {
     });
 
     function updateUI() {
-        const $checkboxes = $('.checkbox-item');
-        const $checked = $('.checkbox-item:checked');
+        const $checkboxes = table.$('.checkbox-item');
+        const $checked = table.$('.checkbox-item:checked');
         const checkedCount = $checked.length;
         const totalCount = $checkboxes.length;
         
@@ -509,7 +578,7 @@ $(document).ready(function() {
     }
 
     function performBulkDelete() {
-        const selectedIds = $('.checkbox-item:checked').map(function() {
+        const selectedIds = table.$('.checkbox-item:checked').map(function() {
             return parseInt($(this).data('id'));
         }).get();
 
@@ -588,10 +657,8 @@ $(document).ready(function() {
         });
     }
 
-    setTimeout(function() {
-        updateUI();
-    }, 100);
-});
+    updateUI();
+    });
 </script>
 
 <script>

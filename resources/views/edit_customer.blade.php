@@ -1,3 +1,27 @@
+<style>
+    #editCustomerModal .modal-dialog {
+        height: calc(100% - 1rem);
+        margin: 0.5rem auto;
+    }
+
+    #editCustomerModal .modal-content {
+        max-height: 100%;
+        overflow: hidden;
+    }
+
+    #editCustomerModal .modal-body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    @media (min-width: 576px) {
+        #editCustomerModal .modal-dialog {
+            height: calc(100% - 3.5rem);
+            margin: 1.75rem auto;
+        }
+    }
+</style>
+
 <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
@@ -39,19 +63,27 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label" for="customer_region">Region</label>
-                            <input id="customer_region" type="text" name="location_region" class="form-control" value="{{ old('location_region', $customer->location_region) }}">
+                            <select id="customer_region" name="location_region" class="form-select" data-selected="{{ old('location_region', $customer->location_region) }}" required>
+                                <option value="">Select Region</option>
+                            </select>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label" for="customer_province">Province</label>
-                            <input id="customer_province" type="text" name="location_province" class="form-control" value="{{ old('location_province', $customer->location_province) }}">
+                            <select id="customer_province" name="location_province" class="form-select" data-selected="{{ old('location_province', $customer->location_province) }}" required disabled>
+                                <option value="">Select Region First</option>
+                            </select>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label" for="customer_city">City/Municipality</label>
-                            <input id="customer_city" type="text" name="location_city" class="form-control" value="{{ old('location_city', $customer->location_city) }}">
+                            <select id="customer_city" name="location_city" class="form-select" data-selected="{{ old('location_city', $customer->location_city) }}" required disabled>
+                                <option value="">Select Province First</option>
+                            </select>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label" for="customer_barangay">Barangay</label>
-                            <input id="customer_barangay" type="text" name="location_barangay" class="form-control" value="{{ old('location_barangay', $customer->location_barangay) }}">
+                            <select id="customer_barangay" name="location_barangay" class="form-select" data-selected="{{ old('location_barangay', $customer->location_barangay) }}" required disabled>
+                                <option value="">Select City First</option>
+                            </select>
                         </div>
                         <div class="col-md-8 mb-3">
                             <label class="form-label" for="customer_street">Street Name, Building, House No.</label>
@@ -68,6 +100,13 @@
                         <div class="col-md-4 mb-3">
                             <label class="form-label" for="customer_center">Center</label>
                             <input id="customer_center" type="text" name="center" class="form-control" value="{{ old('center', $customer->center) }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="customer_area">Sales Territory <span class="text-danger">*</span></label>
+                            <select id="customer_area" name="area" class="form-select sales-territory-select" data-match-url="{{ route('customer.sales-territories') }}" data-current-area="{{ old('area', $customer->area) }}" required disabled>
+                                <option value="">Checking geographic coverage…</option>
+                            </select>
+                            <small class="form-text text-muted sales-territory-help">The territory is matched from the selected location.</small>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label" for="customer_status">Status</label>

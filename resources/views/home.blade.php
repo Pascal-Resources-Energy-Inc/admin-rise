@@ -222,6 +222,42 @@
   .customer-link{
     font-size: 14px !important;
   }
+
+  .monitoring-dashboard { color: #174a7a; margin-bottom: 1.5rem; }
+  .monitoring-filter { align-items: end; background: #fff; border: 1px solid #d5e5ef; border-radius: .75rem; box-shadow: 0 2px 10px rgba(2,67,123,.07); display: flex; flex-wrap: wrap; gap: .7rem; padding: .8rem; }
+  .monitoring-filter label { display: block; font-size: .72rem; font-weight: 700; margin-bottom: .22rem; }
+  .monitoring-filter .form-select { border-color: #aac7d8; min-width: 150px; }
+  .monitoring-filter .btn-primary, .monitoring-title { background: #02437B; border-color: #02437B; }
+  .monitoring-period { color: #0875aa; font-size: .82rem; font-weight: 700; }
+  .monitoring-stat { background: #fff; border: 0; border-left: 4px solid #17a2b8; border-radius: .85rem; box-shadow: 0 3px 12px rgba(2,67,123,.1); min-height: 120px; padding: 1.25rem; }
+  .monitoring-stat-icon { align-items: center; background: #e8f7fa; border-radius: 50%; color: #17a2b8; display: flex; font-size: 1.25rem; height: 46px; justify-content: center; width: 46px; }
+  .monitoring-stat-number { color: #173a62; font-size: clamp(1.5rem, 2.2vw, 2rem); font-weight: 800; line-height: 1; }
+  .monitoring-stat-label { color: #71829a; font-size: .72rem; font-weight: 800; letter-spacing: .07em; margin-top: .8rem; text-transform: uppercase; }
+  .monitoring-panel { background: #fff; border: 1px solid #d8e7ef; border-radius: .7rem; box-shadow: 0 2px 8px rgba(2,67,123,.08); height: 100%; overflow: hidden; }
+  .monitoring-title { color: #fff; font-size: 1rem; font-weight: 700; padding: .65rem .9rem; }
+  .monitoring-chart { min-height: 310px; padding: .8rem; }
+  .monitoring-table { font-size: .8rem; margin-bottom: 0; }
+  .monitoring-table th { background: #e6f4f8; color: #174a7a; text-align: center; white-space: nowrap; }
+  .monitoring-table td { text-align: center; vertical-align: middle; }
+  .monitoring-table th:first-child, .monitoring-table td:first-child { font-weight: 700; min-width: 150px; text-align: left; }
+  .monitoring-takeaway { display: flex; gap: .7rem; padding: .25rem 0; }
+  .monitoring-takeaway:last-child { border-bottom: 0; }
+  .monitoring-takeaway-number { align-items: center; background: #17a2b8; border-radius: 50%; color: #fff; display: flex; flex: 0 0 2rem; font-weight: 800; height: 2rem; justify-content: center; }
+  .latest-transaction-card .transaction-list { overflow-x: hidden; }
+  .latest-transaction-footer { gap: .75rem; }
+  .latest-transaction-footer .pagination { flex-wrap: wrap; justify-content: flex-end; }
+  @media (max-width: 575.98px) {
+    .latest-transaction-card .transaction-column-labels { display: none; }
+    .latest-transaction-card .transaction-row { display: grid; gap: .55rem; grid-template-columns: minmax(0, 1fr) auto; }
+    .latest-transaction-card .transaction-customer { grid-column: 1 / -1; }
+    .latest-transaction-card .transaction-date { text-align: left !important; }
+    .latest-transaction-card .transaction-points { text-align: right !important; }
+    .latest-transaction-footer { align-items: flex-start !important; flex-direction: column; }
+    .latest-transaction-footer nav, .latest-transaction-footer .pagination { width: 100%; }
+    .latest-transaction-footer .pagination { justify-content: flex-start; }
+    .latest-transaction-footer .page-link { padding: .32rem .52rem; }
+  }
+  @media (max-width: 767.98px) { .monitoring-filter .form-select { min-width: 0; width: 100%; } .monitoring-period { margin-top: .4rem; width: 100%; } }
 </style>
 @section('content')
 
@@ -229,81 +265,38 @@
   <!-- Welcome Section Start -->
   @if(auth()->user()->role == "Admin")
     @include('alert')
-  @elseif( auth()->user()->role == "Area Distributor")
-  @endif
-  
-  <section class="welcome">
-    <div class="row">
-    <div class="col-lg-12 col-xl-12">
-        <div class="row custom-width-card">
-            <div class="col-sm-3 d-flex align-items-stretch">
-                <div class="card stats-card w-100 border-0">
-                    <div class="icon-circle">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-currency-peso">
+    <section class="monitoring-dashboard" id="monitoringDashboard" data-start="{{ $report_period_start->toDateString() }}" data-end="{{ $report_period_end->toDateString() }}">
+      <form class="monitoring-filter mb-3" method="GET" action="{{ route('home') }}">
+        <div><label for="reportYear">Report year</label><select class="form-select form-select-sm" id="reportYear" name="report_year">@foreach(collect($available_years)->push($report_year)->unique()->sort()->reverse() as $year)<option value="{{ $year }}" {{ (int)$year === $report_year ? 'selected' : '' }}>{{ $year }}</option>@endforeach</select></div>
+        <div><label for="reportEndMonth">Ending month</label><select class="form-select form-select-sm" id="reportEndMonth" name="report_end_month">@for($month = 1; $month <= 12; $month++)<option value="{{ $month }}" {{ $month === $report_end_month ? 'selected' : '' }}>{{ \Carbon\Carbon::create()->month($month)->format('F') }}</option>@endfor</select></div>
+        <button class="btn btn-primary btn-sm" type="submit"><i class="ti ti-filter me-1"></i>Apply filter</button>
+        <a class="btn btn-outline-secondary btn-sm" href="{{ route('home') }}">Clear</a>
+        <div class="monitoring-period ms-md-auto">12-month period ending {{ $report_period_end->format('F Y') }}</div>
+      </form>
+      <div class="row g-3 mb-3">
+        <div class="col-sm-6 col-xl-3"><div class="monitoring-stat"><div class="d-flex align-items-center gap-3"><div class="monitoring-stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-currency-peso">
                           <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                           <path d="M8 19v-14h3.5a4.5 4.5 0 1 1 0 9h-3.5" />
                           <path d="M18 8h-12" />
                           <path d="M18 11h-12" />
-                        </svg>
-                    </div>
-                    <div class="stats-number">
-                        ₱{{ number_format($total_sales, 2) }}
-                    </div>
-                    <div class="stats-label">Total Sales</div>
-                    {{-- <div class="trend-indicator {{ $sales_trend['trend'] == 'up' ? 'text-success' : ($sales_trend['trend'] == 'down' ? 'text-danger' : 'text-muted') }}">
-                        {{ $sales_trend['percentage'] }}% 
-                        <i class="ti {{ $sales_trend['icon'] }}"></i>
-                    </div> --}}
-                </div>
-            </div>
-
-            <div class="col-sm-3 d-flex align-items-stretch">
-                <div class="card stats-card w-100 border-0">
-                    <div class="icon-circle">
-                        <i class="ti ti-shopping-cart"></i>
-                    </div>
-                    <div class="stats-number">
-                        {{number_format($transactions_details->sum('qty'),0)}} 
-                    </div>
-                    <div class="stats-label">Products Sold</div>
-                    {{-- <div class="trend-indicator {{ $qty_trend['trend'] == 'up' ? 'text-success' : ($qty_trend['trend'] == 'down' ? 'text-danger' : 'text-muted') }}">
-                        {{ $qty_trend['percentage'] }}% 
-                        <i class="ti {{ $qty_trend['icon'] }}"></i>
-                    </div> --}}
-                </div>
-            </div>
-
-            <div class="col-sm-3 d-flex align-items-stretch">
-                <div class="card stats-card w-100 border-0">
-                    <div class="icon-circle">
-                        <i class="ti ti-map-pin"></i>
-                    </div>
-                    <div class="stats-number">
-                        {{count($dealers)}} 
-                    </div>
-                    <div class="stats-label">Dealer</div>
-                </div>
-            </div>
-
-            <div class="col-sm-3 d-flex align-items-stretch">
-                <div class="card stats-card w-100 border-0">
-                    <div class="icon-circle">
-                        <i class="ti ti-users"></i>
-                    </div>
-                    <div class="stats-number">
-                        {{$customers->count()}} 
-                    </div>
-                    <div class="stats-label">Customers</div>
-                </div>
-            </div>
-        </div>
-    </div>
-  </div>
-  </section>
+                        </svg></div><div class="monitoring-stat-number">{{ number_format($dashboard_summary->total_sales, 2) }}</div></div><div class="monitoring-stat-label">Total Sales</div></div></div>
+        <div class="col-sm-6 col-xl-3"><div class="monitoring-stat"><div class="d-flex align-items-center gap-3"><div class="monitoring-stat-icon"><i class="ti ti-shopping-cart"></i></div><div class="monitoring-stat-number">{{ number_format($dashboard_summary->products_sold) }}</div></div><div class="monitoring-stat-label">Products Sold</div></div></div>
+        <div class="col-sm-6 col-xl-3"><div class="monitoring-stat"><div class="d-flex align-items-center gap-3"><div class="monitoring-stat-icon"><i class="ti ti-map-pin"></i></div><div class="monitoring-stat-number">{{ number_format($dashboard_summary->active_dealers) }}</div></div><div class="monitoring-stat-label">Active Dealers</div></div></div>
+        <div class="col-sm-6 col-xl-3"><div class="monitoring-stat"><div class="d-flex align-items-center gap-3"><div class="monitoring-stat-icon"><i class="ti ti-users"></i></div><div class="monitoring-stat-number">{{ number_format($dashboard_summary->active_customers) }}</div></div><div class="monitoring-stat-label">Active Customers</div></div></div>
+      </div>
+      <div class="row g-3">
+        <div class="col-xl-7"><div class="monitoring-panel"><div class="monitoring-title">Monthly Refills and Average Refills per Beneficiary</div><div class="monitoring-chart" id="monitoringCombinedChart"></div></div></div>
+        <div class="col-xl-5"><div class="monitoring-panel"><div class="monitoring-title">Average Refills per Beneficiary</div><div class="monitoring-chart" id="monitoringAverageChart"></div></div></div>
+        <div class="col-xl-8"><div class="monitoring-panel"><div class="monitoring-title">Project RISE – Monthly Refill Monitoring Data</div><div class="table-responsive"><table class="table table-bordered monitoring-table" id="monitoringTable"><thead><tr><th>Monitoring metric</th></tr></thead><tbody><tr><td>No. of Refills</td></tr><tr><td>No. of Beneficiaries</td></tr><tr><td>Average Refills per Beneficiary</td></tr></tbody></table></div></div></div>
+        <div class="col-xl-4"><div class="monitoring-panel"><div class="monitoring-title">Key Takeaways</div><div class="p-3" id="monitoringTakeaways"></div></div></div>
+      </div>
+    </section>
+  @elseif( auth()->user()->role == "Area Distributor")
+  @endif
+  
   <section>
     <div class="row">
-      
-      <div class="col-lg-8 col-xl-8 d-flex align-items-stretch">
+      {{-- <div class="col-lg-8 col-xl-8 d-flex align-items-stretch">
         <div class="card w-100">
             <div class="card-body">
               <div class="d-sm-flex justify-content-between align-items-start mb-3">
@@ -348,8 +341,7 @@
               <div id="chart-bar-stacked"></div>
             </div>
         </div>
-      </div>
-
+      </div> --}}
       <div class="col-lg-4 col-xl-4 d-flex align-items-stretch">
         <div class="card w-100">
           <div class="card-body">
@@ -889,203 +881,188 @@
           </div>
         </div>
       </div>
+      <div class="col-lg-4 col-xl-4 d-flex align-items-stretch">
+        <div class="card w-100">
+          <div class="card-body">
+            <div class="d-flex mb-3 justify-content-center align-items-center position-relative">
+              <div id="dealers-donut-chart"></div>
+              <div class="position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                <small class="text-muted d-block" style="font-size: 11px;">Top 10 Dealers</small>
+                <h4 class="mb-0 fw-bold" style="font-size: 24px;">
+                    {{ $dealers->isNotEmpty() ? number_format($dealers->first()->total_points) : '0' }}
+                </h4>
+              </div>
+            </div>
+            
+            <div style="max-height: 240px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 6px;">
+              <table class="table table-bordered align-middle text-nowrap mb-0">
+                <thead class="bg-white">
+                  <tr style="font-size: 11px; border-bottom: 1px solid #e5e7eb;">
+                    <th scope="col" style="padding: 6px 8px; border-right: 1px solid #e5e7eb;">Dealer</th>
+                    <th scope="col" style="padding: 6px 8px; border-right: 1px solid #e5e7eb;">Total Points</th>
+                    <th scope="col" style="padding: 6px 8px;">Last Transaction</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach($dealers as $index => $dealer)
+                    <tr style="font-size: 10px; border-bottom: 1px solid #e5e7eb;">
+                      <td style="padding: 4px 8px; border-right: 1px solid #e5e7eb;">
+                        <span class="d-inline-block me-1" style="width: 8px; height: 8px; border-radius: 50%; background-color: {{ ['#02437B', '#0E5A8A', '#1A7199', '#2688A8', '#329FB7', '#3EB6C6', '#4ACDD5', '#56E4E4', '#62FBF3', '#6EFFFF'][$index % 10] }};"></span>
+                        {{strtoupper(substr($dealer->dealer->name ?? 'Unknown', 0, 12))}}
+                      </td>
+                      <td style="padding: 4px 8px; border-right: 1px solid #e5e7eb;">{{number_format($dealer->total_points,0)}}</td>
+                      <td style="padding: 4px 8px;">{{date('M j, Y',strtotime($dealer->latest_transaction))}}</td>
+                    </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-xl-4 d-flex align-items-stretch">
+        <div class="card w-100">
+          <div class="card-body">
+            <div class="d-flex mb-3 justify-content-center align-items-center position-relative">
+              <div id="customers-donut-chart"></div>
+              <div class="position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                <small class="text-muted d-block" style="font-size: 11px;">Top 10 Customers</small>
+                <h4 class="mb-0 fw-bold" style="font-size: 24px;">
+                    {{ $top_customers->isNotEmpty() ? number_format($top_customers->first()->total_points) : '0' }}
+                </h4>
+              </div>
+            </div>
+            
+            <div style="max-height: 240px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 6px;">
+              <table class="table table-bordered align-middle text-nowrap mb-0">
+                <thead class="bg-white">
+                  <tr style="font-size: 11px; border-bottom: 1px solid #e5e7eb;">
+                    <th scope="col" style="padding: 6px 8px; border-right: 1px solid #e5e7eb;">Customer</th>
+                    <th scope="col" style="padding: 6px 8px; border-right: 1px solid #e5e7eb;">Total Points</th>
+                    <th scope="col" style="padding: 6px 8px;">Last Transaction</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach($top_customers as $index => $customer)
+                    <tr style="font-size: 10px; border-bottom: 1px solid #e5e7eb;">
+                      <td style="padding: 4px 8px; border-right: 1px solid #e5e7eb;">
+                        <span class="d-inline-block me-1" style="width: 8px; height: 8px; border-radius: 50%; background-color: {{ ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9', '#F8C471', '#82E0AA'][$index % 10] }};"></span>
+                        {{strtoupper(substr($customer->customer->name ?? 'Unknown', 0, 12))}}
+                      </td>
+                      <td style="padding: 4px 8px; border-right: 1px solid #e5e7eb;">{{number_format($customer->total_points,0)}}</td>
+                      <td style="padding: 4px 8px;">{{date('M j, Y',strtotime($customer->latest_transaction))}}</td>
+                    </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
   <section>
     <div class="row">
-      
-        <div class="col-lg-8 col-xl-8 d-flex align-items-stretch">
-          <div class="card w-100">
-            <div class="card-body">
-              <div class="d-flex mb-4 justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold">Latest Transaction</h5>
-              </div>
+      <div class="col-lg-6 col-xl-6 d-flex align-items-stretch">
+        <div class="card w-100 latest-transaction-card">
+          <div class="card-body">
+            <div class="d-flex mb-4 justify-content-between align-items-center">
+              <h5 class="mb-0 fw-bold">Latest Transaction</h5>
+            </div>
 
-              <div class="row mb-3 px-3" style="border-bottom: 2px solid #e2e8f0; padding-bottom: 12px;">
-                <div class="col-4">
-                  <small class="text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
-                    CUSTOMER
-                  </small>
-                </div>
-                <div class="col-4 text-center">
-                  <small class="text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
-                    DATE
-                  </small>
-                </div>
-                <div class="col-4 text-end">
-                  <small class="text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
-                    CUSTOMER POINTS
-                  </small>
-                </div>
+            <div class="row mb-3 px-3 transaction-column-labels" style="border-bottom: 2px solid #e2e8f0; padding-bottom: 12px;">
+              <div class="col-4">
+                <small class="text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
+                  CUSTOMER
+                </small>
               </div>
+              <div class="col-4 text-center">
+                <small class="text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
+                  DATE
+                </small>
+              </div>
+              <div class="col-4 text-end">
+                <small class="text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
+                  CUSTOMER POINTS
+                </small>
+              </div>
+            </div>
 
-              <div class="transaction-list" style="max-height: 500px;">
-                @foreach($transactions_details as $index => $transaction)
-                  <div class="transaction-item {{ $index >= 5 ? 'd-none' : '' }}" data-customer-id="{{$transaction->customer->id ?? 0}}">
-                    <div class="row align-items-center p-3 mb-2 rounded-3 {{ $index % 2 == 0 ? '' : 'bg-light' }}" 
-                        style="border: 1px solid rgba(229, 231, 235, 0.6);">
-                      
-                      <div class="col-4">
-                        <div class="d-flex align-items-center">
-                          <div class="flex-shrink-0 me-3">
-                            <div class="avatar-circle position-relative" style="width: 45px; height: 45px;">
-                              <img src="{{ optional($transaction->customer)->avatar ? asset($transaction->customer->avatar) : asset('/design/assets/images/profile/user-1.png') }}" 
-                                  alt="{{ optional($transaction->customer)->name ?? 'Customer' }}"
-                                  class="rounded-circle w-100 h-100 object-fit-cover">
-                            </div>
+            <div class="transaction-list" style="max-height: 500px;">
+              @foreach($transactions_details as $index => $transaction)
+                <div class="transaction-item {{ $index >= 5 ? 'd-none' : '' }}" data-customer-id="{{$transaction->customer->id ?? 0}}">
+                  <div class="row align-items-center p-3 mb-2 rounded-3 transaction-row {{ $index % 2 == 0 ? '' : 'bg-light' }}" 
+                      style="border: 1px solid rgba(229, 231, 235, 0.6);">
+                    
+                    <div class="col-4 transaction-customer">
+                      <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                          <div class="avatar-circle position-relative" style="width: 45px; height: 45px;">
+                            <img src="{{ optional($transaction->customer)->avatar ? asset($transaction->customer->avatar) : asset('/design/assets/images/profile/user-1.png') }}" 
+                                alt="{{ optional($transaction->customer)->name ?? 'Customer' }}"
+                                class="rounded-circle w-100 h-100 object-fit-cover">
                           </div>
-                          
-                          <div class="flex-grow-1">
-                            <h6 class="mb-0 fw-bold text-dark text-truncate">
-                                <a href="#" 
-                                    class="text-decoration-none text-dark customer-link text-truncate d-inline-block" 
-                                    style="max-width: 100%;"
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#transactionModal" 
-                                    onclick="showTransactionDetails('{{date('M d, Y',strtotime($transaction->created_at))}}', '{{number_format($transaction->qty,2)}}', '{{number_format($transaction->qty*$transaction->price,2)}}', '{{strtoupper($transaction->dealer->name ?? '')}}', '{{strtoupper($transaction->customer->name ?? '')}}', '{{$transaction->points_dealer}}', '{{$transaction->points_client}}', '{{$transaction->item}}')">
-                                    {{ strtoupper($transaction->customer->name ?? 'Unknown') }}
-                                </a>
-                            </h6>
                         </div>
-                        </div>
+                        
+                        <div class="flex-grow-1">
+                          <h6 class="mb-0 fw-bold text-dark text-truncate">
+                              <a href="#" 
+                                  class="text-decoration-none text-dark customer-link text-truncate d-inline-block" 
+                                  style="max-width: 100%;"
+                                  data-bs-toggle="modal" 
+                                  data-bs-target="#transactionModal" 
+                                  onclick="showTransactionDetails('{{date('M d, Y',strtotime($transaction->created_at))}}', '{{number_format($transaction->qty,2)}}', '{{number_format($transaction->qty*$transaction->price,2)}}', '{{strtoupper($transaction->dealer->name ?? '')}}', '{{strtoupper($transaction->customer->name ?? '')}}', '{{$transaction->points_dealer}}', '{{$transaction->points_client}}', '{{$transaction->item}}')">
+                                  {{ strtoupper($transaction->customer->name ?? 'Unknown') }}
+                              </a>
+                          </h6>
                       </div>
-                      
-                      <div class="col-4 text-center">
-                        <span class="text-dark fw-medium">
-                          {{ date('d.m.Y', strtotime($transaction->created_at)) }}
-                        </span>
-                      </div>
-                      
-                      <div class="col-3 text-end">
-                        <span class="fw-bold text-dark">
-                          {{ $transaction->points_client }}
-                        </span>
                       </div>
                     </div>
+                    
+                    <div class="col-4 text-center transaction-date">
+                      <span class="text-dark fw-medium">
+                        {{ date('d.m.Y', strtotime($transaction->created_at)) }}
+                      </span>
+                    </div>
+                    
+                    <div class="col-4 text-end transaction-points">
+                      <span class="fw-bold text-dark">
+                        {{ $transaction->points_client }}
+                      </span>
+                    </div>
                   </div>
-                @endforeach
-              </div>
-
-              <div class="d-flex justify-content-between align-items-center mt-3">
-                <small class="text-muted" id="entriesInfo" style="font-size: 12px;">
-                  Showing <span id="currentStart">1</span> to <span id="currentEnd">5</span> of <span id="totalEntries">{{ $transactions_details->count() }}</span> entries
-                </small>
-                
-                <nav aria-label="Transaction pagination">
-                  <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item" id="prevPage">
-                      <a class="page-link" href="javascript:void(0)" onclick="changePage('prev')" style="font-size: 12px;">
-                        <i class="fas fa-chevron-left"></i> Previous
-                      </a>
-                    </li>
-                    <li class="page-item" id="nextPage">
-                      <a class="page-link" href="javascript:void(0)" onclick="changePage('next')" style="font-size: 12px;">
-                        Next <i class="fas fa-chevron-right"></i>
-                      </a>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="transactionModalLabel">Transaction Details <span id="customerName" style="display:none"></span></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <div class="table-responsive">
-                  <table class="table table-striped align-middle text-nowrap">
-                    <thead>
-                      <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">Quantity</th>
-                        <th scope="col">Amount</th>
-                        <th scope="col">Dealer</th>
-                        <th scope="col">Customer</th>
-                        <th scope="col">Dealer Points</th>
-                        <th scope="col">Customer Points</th>
-                        <th scope="col">Item</th>
-                      </tr>
-                    </thead>
-                    <tbody id="customerTransactions">
-                      <!-- Customer transactions will be here -->
-                    </tbody>
-                  </table>
                 </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              </div>
+              @endforeach
             </div>
-          </div>
-        </div>
 
-        <div class="col-lg-4 col-xl-4 d-flex align-items-stretch">
-          <div class="card w-100">
-            <div class="card-body">
-              <div class="d-flex mb-3 justify-content-center align-items-center position-relative">
-                <div id="dealers-donut-chart"></div>
-                <div class="position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-                  <small class="text-muted d-block" style="font-size: 11px;">Top 10 Dealers</small>
-                  <h4 class="mb-0 fw-bold" style="font-size: 24px;">
-                      {{ $dealers->isNotEmpty() ? number_format($dealers->first()->total_points) : '0' }}
-                  </h4>
-                </div>
+            <div class="d-flex justify-content-between align-items-center mt-3 latest-transaction-footer">
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <label class="small text-muted mb-0" for="latestTransactionPageSize" hidden>Show</label>
+                <select class="form-select form-select-sm" id="latestTransactionPageSize" style="width: auto;" hidden>
+                  <option value="5" selected>5</option><option value="10">10</option><option value="25">25</option>
+                </select>
+                <small class="text-muted" id="latestTransactionEntriesInfo" style="font-size: 12px;">Showing <span id="latestTransactionStart">1</span> to <span id="latestTransactionEnd">5</span> of <span id="latestTransactionTotal">{{ $transactions_details->count() }}</span> entries</small>
               </div>
               
-              <div style="max-height: 240px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 6px;">
-                <table class="table table-bordered align-middle text-nowrap mb-0">
-                  <thead class="bg-white">
-                    <tr style="font-size: 11px; border-bottom: 1px solid #e5e7eb;">
-                      <th scope="col" style="padding: 6px 8px; border-right: 1px solid #e5e7eb;">Dealer</th>
-                      <th scope="col" style="padding: 6px 8px; border-right: 1px solid #e5e7eb;">Total Points</th>
-                      <th scope="col" style="padding: 6px 8px;">Last Transaction</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @foreach($dealers as $index => $dealer)
-                      <tr style="font-size: 10px; border-bottom: 1px solid #e5e7eb;">
-                        <td style="padding: 4px 8px; border-right: 1px solid #e5e7eb;">
-                          <span class="d-inline-block me-1" style="width: 8px; height: 8px; border-radius: 50%; background-color: {{ ['#02437B', '#0E5A8A', '#1A7199', '#2688A8', '#329FB7', '#3EB6C6', '#4ACDD5', '#56E4E4', '#62FBF3', '#6EFFFF'][$index % 10] }};"></span>
-                          {{strtoupper(substr($dealer->dealer->name ?? 'Unknown', 0, 12))}}
-                        </td>
-                        <td style="padding: 4px 8px; border-right: 1px solid #e5e7eb;">{{number_format($dealer->total_points,0)}}</td>
-                        <td style="padding: 4px 8px;">{{date('M j, Y',strtotime($dealer->latest_transaction))}}</td>
-                      </tr>
-                    @endforeach
-                  </tbody>
-                </table>
-              </div>
+              <nav aria-label="Transaction pagination">
+                <ul class="pagination pagination-sm mb-0" id="latestTransactionPagination">
+                  <li class="page-item" id="latestTransactionPrevPage">
+                    <a class="page-link" href="#" id="latestTransactionPrev" style="font-size: 12px;">
+                      <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                  </li>
+                  <li class="page-item" id="latestTransactionNextPage">
+                    <a class="page-link" href="#" id="latestTransactionNext" style="font-size: 12px;">
+                      Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
             </div>
           </div>
         </div>
-    </div>
-  </section>
-    {{-- <div class="col-lg-12 col-xl-6 d-flex align-items-stretch">
-          <div class="card w-100">
-            
-            <div class="card-body">
-              <h5>Stove Distributed(2025)</h5>
-              <div id="chart-bar-stacked-stove"></div>
-              <div class="d-flex align-items-center justify-content-between mb-3">
-                <h5 class="fs-4 mb-0 fw-bold">Stove Goals</h5>
-                <p class="text-primary fw-normal fs-3 mb-0">100</p>
-              </div>
-              <div class="progress bg-light-subtle" style="height: 10px">
-                <div class="progress-bar bg-primary  rounded" style="width: 35%;height: 10px;" role="progressbar" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100">35%</div>
-              </div>
-              
-            </div>
-          </div>
-        </div> --}}
-  <section>
-    <div class="row">
-      <div class="col-lg-7 col-xl-8 d-flex align-items-stretch">
+      </div>
+      <div class="col-lg-6 col-xl-6 d-flex align-items-stretch">
         <div class="card w-100">
           <div class="card-body">
             <div class="d-flex mb-3 justify-content-between align-items-center">
@@ -1185,1266 +1162,1326 @@
           </div>
         </div>
       </div>
-
-      <div class="col-lg-4 col-xl-4 d-flex align-items-stretch">
-        <div class="card w-100">
-          <div class="card-body">
-            <div class="d-flex mb-3 justify-content-center align-items-center position-relative">
-              <div id="customers-donut-chart"></div>
-              <div class="position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-                <small class="text-muted d-block" style="font-size: 11px;">Top 10 Customers</small>
-                <h4 class="mb-0 fw-bold" style="font-size: 24px;">
-                    {{ $top_customers->isNotEmpty() ? number_format($top_customers->first()->total_points) : '0' }}
-                </h4>
+      <div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="transactionModalLabel">Transaction Details <span id="customerName" style="display:none"></span></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="table-responsive">
+                <table class="table table-striped align-middle text-nowrap">
+                  <thead>
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col">Amount</th>
+                      <th scope="col">Dealer</th>
+                      <th scope="col">Customer</th>
+                      <th scope="col">Dealer Points</th>
+                      <th scope="col">Customer Points</th>
+                      <th scope="col">Item</th>
+                    </tr>
+                  </thead>
+                  <tbody id="customerTransactions">
+                    <!-- Customer transactions will be here -->
+                  </tbody>
+                </table>
               </div>
             </div>
-            
-            <div style="max-height: 240px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 6px;">
-              <table class="table table-bordered align-middle text-nowrap mb-0">
-                <thead class="bg-white">
-                  <tr style="font-size: 11px; border-bottom: 1px solid #e5e7eb;">
-                    <th scope="col" style="padding: 6px 8px; border-right: 1px solid #e5e7eb;">Customer</th>
-                    <th scope="col" style="padding: 6px 8px; border-right: 1px solid #e5e7eb;">Total Points</th>
-                    <th scope="col" style="padding: 6px 8px;">Last Transaction</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @foreach($top_customers as $index => $customer)
-                    <tr style="font-size: 10px; border-bottom: 1px solid #e5e7eb;">
-                      <td style="padding: 4px 8px; border-right: 1px solid #e5e7eb;">
-                        <span class="d-inline-block me-1" style="width: 8px; height: 8px; border-radius: 50%; background-color: {{ ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9', '#F8C471', '#82E0AA'][$index % 10] }};"></span>
-                        {{strtoupper(substr($customer->customer->name ?? 'Unknown', 0, 12))}}
-                      </td>
-                      <td style="padding: 4px 8px; border-right: 1px solid #e5e7eb;">{{number_format($customer->total_points,0)}}</td>
-                      <td style="padding: 4px 8px;">{{date('M j, Y',strtotime($customer->latest_transaction))}}</td>
-                    </tr>
-                  @endforeach
-                </tbody>
-              </table>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
       </div>
-
     </div>
-  </section>        
+  </section>
+    {{-- <div class="col-lg-12 col-xl-6 d-flex align-items-stretch">
+          <div class="card w-100">
+            
+            <div class="card-body">
+              <h5>Stove Distributed(2025)</h5>
+              <div id="chart-bar-stacked-stove"></div>
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fs-4 mb-0 fw-bold">Stove Goals</h5>
+                <p class="text-primary fw-normal fs-3 mb-0">100</p>
+              </div>
+              <div class="progress bg-light-subtle" style="height: 10px">
+                <div class="progress-bar bg-primary  rounded" style="width: 35%;height: 10px;" role="progressbar" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100">35%</div>
+              </div>
+              
+            </div>
+          </div>
+        </div> --}}  
 @endsection
 @section('javascript')
-<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
  @if(auth()->user()->role == "Client")
-      <script>
-          const qrcode = new QRCode(document.getElementById('qrcode'), {
-              text: "{{ $customer->serial->serial_number }}",
-              width: 128,
-              height: 128,
-              colorDark : '#000',
-              colorLight : '#fff',
-              correctLevel : QRCode.CorrectLevel.H
-          });
-      </script>
+    <script>
+        const qrcode = new QRCode(document.getElementById('qrcode'), {
+            text: "{{ $customer->serial->serial_number }}",
+            width: 128,
+            height: 128,
+            colorDark : '#000',
+            colorLight : '#fff',
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    </script>
   @endif
-
-
-<script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
   {{-- <script src="../assets/js/dashboards/dashboard.js"></script> --}}
+  <script src="{{asset('design/assets/l ibs/jvectormap/jquery-jvectormap.min.js')}}"></script>
+  <script src="{{asset('design/assets/libs/apexcharts/dist/apexcharts.min.js')}}"></script>
+  <script src="{{asset('design/assets/js/extra-libs/jvectormap/jquery-jvectormap-us-aea-en.js')}}"></script>
+  <script src="{{asset('design/assets/js/dashboards/dashboard.js')}}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+  {{-- <script src="{{asset('design/assets/js/dashboards/dashboard2.js')}}"></script> --}}
 
-
-<script src="{{asset('design/assets/l ibs/jvectormap/jquery-jvectormap.min.js')}}"></script>
-<script src="{{asset('design/assets/libs/apexcharts/dist/apexcharts.min.js')}}"></script>
-<script src="{{asset('design/assets/js/extra-libs/jvectormap/jquery-jvectormap-us-aea-en.js')}}"></script>
-<script src="{{asset('design/assets/js/dashboards/dashboard.js')}}"></script>
-<script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
-{{-- <script src="{{asset('design/assets/js/dashboards/dashboard2.js')}}"></script> --}}
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== MAP DEBUG START ===');
-    
-    const mapData = @json($map_data);
-    console.log('Map Data received:', mapData);
-    console.log('Number of provinces with data:', Object.keys(mapData).length);
-    
-    const colors = {
-        high: '#5BC2E7',
-        average: '#02437B',
-        low: '#DA291C',
-        none: '#f8f8f8'
-    };
-    
-    const allPaths = document.querySelectorAll('#philippineMap svg path');
-    console.log('Total SVG paths found:', allPaths.length);
-    
-    let coloredCount = 0;
-    
-    let tooltip = document.getElementById('mapTooltip');
-    if (!tooltip) {
-        tooltip = document.createElement('div');
-        tooltip.id = 'mapTooltip';
-        tooltip.className = 'map-tooltip';
-        tooltip.style.display = 'none';
-        document.body.appendChild(tooltip);
-    }
-    
-    allPaths.forEach(path => {
-        const pathId = path.getAttribute('id');
-        const title = path.getAttribute('title');
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('=== MAP DEBUG START ===');
         
-        if (!title) {
-            return;
+        const mapData = @json($map_data);
+        console.log('Map Data received:', mapData);
+        console.log('Number of provinces with data:', Object.keys(mapData).length);
+        
+        const colors = {
+            high: '#5BC2E7',
+            average: '#02437B',
+            low: '#DA291C',
+            none: '#f8f8f8'
+        };
+        
+        const allPaths = document.querySelectorAll('#philippineMap svg path');
+        console.log('Total SVG paths found:', allPaths.length);
+        
+        let coloredCount = 0;
+        
+        let tooltip = document.getElementById('mapTooltip');
+        if (!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.id = 'mapTooltip';
+            tooltip.className = 'map-tooltip';
+            tooltip.style.display = 'none';
+            document.body.appendChild(tooltip);
         }
         
-        if (pathId && mapData[pathId]) {
-            const data = mapData[pathId];
-            const color = colors[data.level];
+        allPaths.forEach(path => {
+            const pathId = path.getAttribute('id');
+            const title = path.getAttribute('title');
             
-            path.style.fill = color;
-            path.style.cursor = 'pointer';
-            path.style.transition = 'all 0.3s ease';
+            if (!title) {
+                return;
+            }
             
-            coloredCount++;
-            console.log(`Colored ${pathId} (${title}): ${data.level} - ${data.count}/${data.total} barangays (${data.percentage}%)`);
-            
-            path.addEventListener('mouseenter', function(e) {
-                this.style.opacity = '0.8';
-                this.style.strokeWidth = '1.5';
-                this.style.stroke = '#ffcc00';
-                showTooltip(e, title, data.count, data.total, data.level, data.percentage);
-            });
-            
-            path.addEventListener('mousemove', function(e) {
-                updateTooltipPosition(e);
-            });
-            
-            path.addEventListener('mouseleave', function() {
-                this.style.opacity = '1';
-                this.style.strokeWidth = '0.5';
-                this.style.stroke = '#000000';
-                hideTooltip();
-            });
-            
-            path.addEventListener('click', function() {
-                showProvinceDetails(title, pathId);
-            });
-        } else {
-            path.style.fill = colors.none;
-            path.style.cursor = 'pointer';
-            path.style.transition = 'all 0.3s ease';
-            
-            path.addEventListener('mouseenter', function(e) {
-                this.style.opacity = '0.8';
-                this.style.strokeWidth = '1.5';
-                this.style.stroke = '#cccccc';
-                showEmptyTooltip(e, title);
-            });
-            
-            path.addEventListener('mousemove', function(e) {
-                updateTooltipPosition(e);
-            });
-            
-            path.addEventListener('mouseleave', function() {
-                this.style.opacity = '1';
-                this.style.strokeWidth = '0.5';
-                this.style.stroke = '#000000';
-                hideTooltip();
-            });
-        }
-    });
-    
-    console.log(`Successfully colored ${coloredCount} provinces`);
-    console.log('=== MAP DEBUG END ===');
-    
-    function showTooltip(event, province, reachedBarangays, totalBarangays, level, percentage) {
-        const tooltip = document.getElementById('mapTooltip');
-        const levelText = level.charAt(0).toUpperCase() + level.slice(1);
-        const levelColor = colors[level];
-        
-        tooltip.innerHTML = `
-            <div style="font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #1f2937;">
-                ${province}
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <span style="display: inline-block; width: 14px; height: 14px; background-color: ${levelColor}; border-radius: 3px;"></span>
-                <span style="color: #4b5563; font-size: 13px; font-weight: 600;">${levelText} Activity</span>
-            </div>
-            <div style="color: #6b7280; font-size: 12px; padding-left: 22px; margin-bottom: 4px;">
-                ${percentage}% of barangays reached
-            </div>
-            <div style="color: #9ca3af; font-size: 11px; padding-left: 22px; font-style: italic;">
-                ${reachedBarangays} out of ${totalBarangays} barangays
-            </div>
-            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; text-align: center;">
-                Click to view details
-            </div>
-        `;
-        tooltip.style.display = 'block';
-        updateTooltipPosition(event);
-    }
-    
-    function showEmptyTooltip(event, province) {
-        const tooltip = document.getElementById('mapTooltip');
-        
-        tooltip.innerHTML = `
-            <div style="font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #1f2937;">
-                ${province}
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <i class="ti ti-info-circle" style="font-size: 14px; color: #9ca3af;"></i>
-                <span style="color: #6b7280; font-size: 12px;">No barangays reached yet</span>
-            </div>
-        `;
-        tooltip.style.display = 'block';
-        updateTooltipPosition(event);
-    }
-    
-    function updateTooltipPosition(event) {
-        const tooltip = document.getElementById('mapTooltip');
-        const offsetX = 15;
-        const offsetY = 15;
-        
-        // Get viewport dimensions
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        
-        const tooltipRect = tooltip.getBoundingClientRect();
-        const tooltipWidth = tooltipRect.width;
-        const tooltipHeight = tooltipRect.height;
-        
-        let left = event.pageX + offsetX;
-        let top = event.pageY + offsetY;
-        
-        if (event.clientX + tooltipWidth + offsetX > viewportWidth) {
-            left = event.pageX - tooltipWidth - offsetX;
-        }
-        
-        if (event.clientY + tooltipHeight + offsetY > viewportHeight) {
-            top = event.pageY - tooltipHeight - offsetY;
-        }
-        
-        tooltip.style.left = left + 'px';
-        tooltip.style.top = top + 'px';
-    }
-    
-    function hideTooltip() {
-        const tooltip = document.getElementById('mapTooltip');
-        tooltip.style.display = 'none';
-    }
-
-    let provinceData = [];
-    let filteredProvinceData = [];
-    let currentPage = 1;
-    let entriesPerPage = 10;
-
-    function showProvinceDetails(provinceName, provinceId) {
-        const modal = new bootstrap.Modal(document.getElementById('provinceModal'));
-        document.getElementById('provinceName').textContent = provinceName;
-        
-        document.getElementById('provinceTableBody').innerHTML = `
-            <tr>
-                <td colspan="6" class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-2 text-muted">Loading ${provinceName} data...</p>
-                </td>
-            </tr>
-        `;
-        
-        modal.show();
-        
-        fetch(`/get-province-details?province=${encodeURIComponent(provinceName)}`)
-            .then(response => response.json())
-            .then(data => {
-                provinceData = data.locations;
-                filteredProvinceData = [...provinceData];
+            if (pathId && mapData[pathId]) {
+                const data = mapData[pathId];
+                const color = colors[data.level];
                 
-                document.getElementById('provinceTotalTransactions').textContent = data.summary.total_transactions;
-                document.getElementById('provinceTotalAmount').textContent = '₱' + parseFloat(data.summary.total_amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                document.getElementById('provinceTotalQty').textContent = data.summary.total_qty.toLocaleString();
-                document.getElementById('provinceUniqueCustomers').textContent = data.summary.unique_customers;
-                document.getElementById('provinceLocations').textContent = data.summary.total_locations;
-                document.getElementById('provinceActiveDealers').textContent = data.summary.active_dealers;
+                path.style.fill = color;
+                path.style.cursor = 'pointer';
+                path.style.transition = 'all 0.3s ease';
                 
-                currentPage = 1;
-                renderProvinceTable();
-            })
-            .catch(error => {
-                console.error('Error fetching province data:', error);
-                document.getElementById('provinceTableBody').innerHTML = `
-                    <tr>
-                        <td colspan="6" class="text-center py-5 text-danger">
-                            <i class="ti ti-alert-circle" style="font-size: 48px;"></i>
-                            <p class="mt-2">Error loading data. Please try again.</p>
-                        </td>
-                    </tr>
-                `;
-            });
-    }
-
-    function renderProvinceTable() {
-        const tbody = document.getElementById('provinceTableBody');
-        const start = (currentPage - 1) * entriesPerPage;
-        const end = start + entriesPerPage;
-        const pageData = filteredProvinceData.slice(start, end);
+                coloredCount++;
+                console.log(`Colored ${pathId} (${title}): ${data.level} - ${data.count}/${data.total} barangays (${data.percentage}%)`);
+                
+                path.addEventListener('mouseenter', function(e) {
+                    this.style.opacity = '0.8';
+                    this.style.strokeWidth = '1.5';
+                    this.style.stroke = '#ffcc00';
+                    showTooltip(e, title, data.count, data.total, data.level, data.percentage);
+                });
+                
+                path.addEventListener('mousemove', function(e) {
+                    updateTooltipPosition(e);
+                });
+                
+                path.addEventListener('mouseleave', function() {
+                    this.style.opacity = '1';
+                    this.style.strokeWidth = '0.5';
+                    this.style.stroke = '#000000';
+                    hideTooltip();
+                });
+                
+                path.addEventListener('click', function() {
+                    showProvinceDetails(title, pathId);
+                });
+            } else {
+                path.style.fill = colors.none;
+                path.style.cursor = 'pointer';
+                path.style.transition = 'all 0.3s ease';
+                
+                path.addEventListener('mouseenter', function(e) {
+                    this.style.opacity = '0.8';
+                    this.style.strokeWidth = '1.5';
+                    this.style.stroke = '#cccccc';
+                    showEmptyTooltip(e, title);
+                });
+                
+                path.addEventListener('mousemove', function(e) {
+                    updateTooltipPosition(e);
+                });
+                
+                path.addEventListener('mouseleave', function() {
+                    this.style.opacity = '1';
+                    this.style.strokeWidth = '0.5';
+                    this.style.stroke = '#000000';
+                    hideTooltip();
+                });
+            }
+        });
         
-        if (pageData.length === 0) {
-            tbody.innerHTML = `
+        console.log(`Successfully colored ${coloredCount} provinces`);
+        console.log('=== MAP DEBUG END ===');
+        
+        function showTooltip(event, province, reachedBarangays, totalBarangays, level, percentage) {
+            const tooltip = document.getElementById('mapTooltip');
+            const levelText = level.charAt(0).toUpperCase() + level.slice(1);
+            const levelColor = colors[level];
+            
+            tooltip.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #1f2937;">
+                    ${province}
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                    <span style="display: inline-block; width: 14px; height: 14px; background-color: ${levelColor}; border-radius: 3px;"></span>
+                    <span style="color: #4b5563; font-size: 13px; font-weight: 600;">${levelText} Activity</span>
+                </div>
+                <div style="color: #6b7280; font-size: 12px; padding-left: 22px; margin-bottom: 4px;">
+                    ${percentage}% of barangays reached
+                </div>
+                <div style="color: #9ca3af; font-size: 11px; padding-left: 22px; font-style: italic;">
+                    ${reachedBarangays} out of ${totalBarangays} barangays
+                </div>
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; text-align: center;">
+                    Click to view details
+                </div>
+            `;
+            tooltip.style.display = 'block';
+            updateTooltipPosition(event);
+        }
+        
+        function showEmptyTooltip(event, province) {
+            const tooltip = document.getElementById('mapTooltip');
+            
+            tooltip.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #1f2937;">
+                    ${province}
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ti ti-info-circle" style="font-size: 14px; color: #9ca3af;"></i>
+                    <span style="color: #6b7280; font-size: 12px;">No barangays reached yet</span>
+                </div>
+            `;
+            tooltip.style.display = 'block';
+            updateTooltipPosition(event);
+        }
+        
+        function updateTooltipPosition(event) {
+            const tooltip = document.getElementById('mapTooltip');
+            const offsetX = 15;
+            const offsetY = 15;
+            
+            // Get viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const tooltipWidth = tooltipRect.width;
+            const tooltipHeight = tooltipRect.height;
+            
+            let left = event.pageX + offsetX;
+            let top = event.pageY + offsetY;
+            
+            if (event.clientX + tooltipWidth + offsetX > viewportWidth) {
+                left = event.pageX - tooltipWidth - offsetX;
+            }
+            
+            if (event.clientY + tooltipHeight + offsetY > viewportHeight) {
+                top = event.pageY - tooltipHeight - offsetY;
+            }
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+        
+        function hideTooltip() {
+            const tooltip = document.getElementById('mapTooltip');
+            tooltip.style.display = 'none';
+        }
+
+        let provinceData = [];
+        let filteredProvinceData = [];
+        let currentPage = 1;
+        let entriesPerPage = 10;
+
+        function showProvinceDetails(provinceName, provinceId) {
+            const modal = new bootstrap.Modal(document.getElementById('provinceModal'));
+            document.getElementById('provinceName').textContent = provinceName;
+            
+            document.getElementById('provinceTableBody').innerHTML = `
                 <tr>
                     <td colspan="6" class="text-center py-5">
-                        <i class="ti ti-folder-open" style="font-size: 48px; color: #ccc;"></i>
-                        <p class="mt-2 text-muted">No results found</p>
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading ${provinceName} data...</p>
                     </td>
                 </tr>
             `;
-            return;
+            
+            modal.show();
+            
+            fetch(`/get-province-details?province=${encodeURIComponent(provinceName)}`)
+                .then(response => response.json())
+                .then(data => {
+                    provinceData = data.locations;
+                    filteredProvinceData = [...provinceData];
+                    
+                    document.getElementById('provinceTotalTransactions').textContent = data.summary.total_transactions;
+                    document.getElementById('provinceTotalAmount').textContent = '₱' + parseFloat(data.summary.total_amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    document.getElementById('provinceTotalQty').textContent = data.summary.total_qty.toLocaleString();
+                    document.getElementById('provinceUniqueCustomers').textContent = data.summary.unique_customers;
+                    document.getElementById('provinceLocations').textContent = data.summary.total_locations;
+                    document.getElementById('provinceActiveDealers').textContent = data.summary.active_dealers;
+                    
+                    currentPage = 1;
+                    renderProvinceTable();
+                })
+                .catch(error => {
+                    console.error('Error fetching province data:', error);
+                    document.getElementById('provinceTableBody').innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-danger">
+                                <i class="ti ti-alert-circle" style="font-size: 48px;"></i>
+                                <p class="mt-2">Error loading data. Please try again.</p>
+                            </td>
+                        </tr>
+                    `;
+                });
         }
+
+        function renderProvinceTable() {
+            const tbody = document.getElementById('provinceTableBody');
+            const start = (currentPage - 1) * entriesPerPage;
+            const end = start + entriesPerPage;
+            const pageData = filteredProvinceData.slice(start, end);
+            
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <i class="ti ti-folder-open" style="font-size: 48px; color: #ccc;"></i>
+                            <p class="mt-2 text-muted">No results found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = pageData.map((item, index) => `
+                <tr>
+                    <td class="text-muted">${start + index + 1}</td>
+                    <td>
+                        <div>
+                            <strong class="d-block">${item.location}</strong>
+                            <small class="text-muted">${item.full_address}</small>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <span class="stat-badge bg-primary bg-opacity-10 text-primary">
+                            ${item.transaction_count}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <span class="stat-badge bg-success bg-opacity-10 text-success">
+                            ${item.total_qty}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <span class="stat-badge bg-info bg-opacity-10 text-info">
+                            ${item.customer_count}
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <strong class="text-primary">₱${parseFloat(item.total_amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
+                    </td>
+                </tr>
+            `).join('');
+            
+            document.getElementById('provinceShowingStart').textContent = start + 1;
+            document.getElementById('provinceShowingEnd').textContent = Math.min(end, filteredProvinceData.length);
+            document.getElementById('provinceShowingTotal').textContent = filteredProvinceData.length;
+            
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredProvinceData.length / entriesPerPage);
+            const pagination = document.getElementById('provincePagination');
+            
+            let html = '';
+            
+            html += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">
+                        <i class="ti ti-chevron-left"></i>
+                    </a>
+                </li>
+            `;
+            
+            const maxVisible = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+            
+            if (endPage - startPage < maxVisible - 1) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+            
+            if (startPage > 1) {
+                html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(1); return false;">1</a></li>`;
+                if (startPage > 2) {
+                    html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                html += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
+                    </li>
+                `;
+            }
+            
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+                html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${totalPages}); return false;">${totalPages}</a></li>`;
+            }
+            
+            html += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">
+                        <i class="ti ti-chevron-right"></i>
+                    </a>
+                </li>
+            `;
+            
+            pagination.innerHTML = html;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredProvinceData.length / entriesPerPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderProvinceTable();
+        }
+
+        function exportProvinceData() {
+            const provinceName = document.getElementById('provinceName').textContent;
+            let csv = 'Location,Full Address,Transactions,Quantity,Customers,Total Sales\n';
+            
+            filteredProvinceData.forEach(item => {
+                csv += `"${item.location}","${item.full_address}",${item.transaction_count},${item.total_qty},${item.customer_count},${item.total_amount}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${provinceName}_transactions.csv`;
+            a.click();
+        }
+
+        document.getElementById('provinceSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            filteredProvinceData = provinceData.filter(item => 
+                item.location.toLowerCase().includes(searchTerm) ||
+                item.full_address.toLowerCase().includes(searchTerm)
+            );
+            currentPage = 1;
+            renderProvinceTable();
+        });
+
+        document.getElementById('provinceEntriesPerPage').addEventListener('change', function(e) {
+            entriesPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderProvinceTable();
+        });
+
+        document.getElementById('provinceSortBy').addEventListener('change', function(e) {
+            const sortValue = e.target.value;
+            
+            filteredProvinceData.sort((a, b) => {
+                switch(sortValue) {
+                    case 'transactions_desc':
+                        return b.transaction_count - a.transaction_count;
+                    case 'transactions_asc':
+                        return a.transaction_count - b.transaction_count;
+                    case 'amount_desc':
+                        return parseFloat(b.total_amount) - parseFloat(a.total_amount);
+                    case 'amount_asc':
+                        return parseFloat(a.total_amount) - parseFloat(b.total_amount);
+                    case 'qty_desc':
+                        return b.total_qty - a.total_qty;
+                    case 'qty_asc':
+                        return a.total_qty - b.total_qty;
+                    case 'location_asc':
+                        return a.location.localeCompare(b.location);
+                    case 'location_desc':
+                        return b.location.localeCompare(a.location);
+                }
+            });
+            
+            currentPage = 1;
+            renderProvinceTable();
+        });
+
+        window.showProvinceDetails = showProvinceDetails;
+        window.changePage = changePage;
+        window.exportProvinceData = exportProvinceData;
+    });
+  </script>
+
+  <script>
+    let currentDealersPage = 1;
+    let dealersPerPage = 5;
+    let totalDealersEntries = {{ $dealers_inactive->count() ?? 0 }};
+    let totalDealersPages = Math.ceil(totalDealersEntries / dealersPerPage);
+
+    function showDealersPage(page) {
+        const items = document.querySelectorAll('.inactive-dealer-item');
+        const startIndex = (page - 1) * dealersPerPage;
+        const endIndex = startIndex + dealersPerPage;
         
-        tbody.innerHTML = pageData.map((item, index) => `
-            <tr>
-                <td class="text-muted">${start + index + 1}</td>
-                <td>
-                    <div>
-                        <strong class="d-block">${item.location}</strong>
-                        <small class="text-muted">${item.full_address}</small>
-                    </div>
-                </td>
-                <td class="text-center">
-                    <span class="stat-badge bg-primary bg-opacity-10 text-primary">
-                        ${item.transaction_count}
-                    </span>
-                </td>
-                <td class="text-center">
-                    <span class="stat-badge bg-success bg-opacity-10 text-success">
-                        ${item.total_qty}
-                    </span>
-                </td>
-                <td class="text-center">
-                    <span class="stat-badge bg-info bg-opacity-10 text-info">
-                        ${item.customer_count}
-                    </span>
-                </td>
-                <td class="text-end">
-                    <strong class="text-primary">₱${parseFloat(item.total_amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
-                </td>
-            </tr>
-        `).join('');
-        
-        document.getElementById('provinceShowingStart').textContent = start + 1;
-        document.getElementById('provinceShowingEnd').textContent = Math.min(end, filteredProvinceData.length);
-        document.getElementById('provinceShowingTotal').textContent = filteredProvinceData.length;
-        
-        renderPagination();
+        items.forEach((item, index) => {
+            if (index >= startIndex && index < endIndex) {
+                item.classList.remove('d-none');
+            } else {
+                item.classList.add('d-none');
+            }
+        });
     }
 
-    function renderPagination() {
-        const totalPages = Math.ceil(filteredProvinceData.length / entriesPerPage);
-        const pagination = document.getElementById('provincePagination');
-        
-        let html = '';
-        
-        html += `
-            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">
-                    <i class="ti ti-chevron-left"></i>
-                </a>
-            </li>
-        `;
-        
-        const maxVisible = 5;
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisible - 1);
-        
-        if (endPage - startPage < maxVisible - 1) {
-            startPage = Math.max(1, endPage - maxVisible + 1);
+    function changeDealersPage(direction) {
+        if (direction === 'next' && currentDealersPage < totalDealersPages) {
+            currentDealersPage++;
+        } else if (direction === 'prev' && currentDealersPage > 1) {
+            currentDealersPage--;
         }
+        showDealersPage(currentDealersPage);
+        updateDealersPagination();
+        updateDealersEntriesInfo();
+        return false;
+    }
+
+    function goToDealersPage(page) {
+        currentDealersPage = page;
+        showDealersPage(currentDealersPage);
+        updateDealersPagination();
+        updateDealersEntriesInfo();
+        return false;
+    }
+
+    function updateDealersPagination() {
+        const pageNumbers = document.querySelector('.inactive-dealers-list').nextElementSibling.querySelector('.pagination');
+        if (!pageNumbers) return;
         
-        if (startPage > 1) {
-            html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(1); return false;">1</a></li>`;
-            if (startPage > 2) {
-                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        const pageItems = pageNumbers.querySelectorAll('.page-item:not(#dealersPrevPage):not(#dealersNextPage)');
+        pageItems.forEach(item => item.remove());
+        
+        const prevPage = document.getElementById('dealersPrevPage');
+        const nextPage = document.getElementById('dealersNextPage');
+        
+        if (!prevPage || !nextPage) return;
+        
+        let startPage, endPage;
+        
+        if (totalDealersPages <= 3) {
+            startPage = 1;
+            endPage = totalDealersPages;
+        } else {
+            if (currentDealersPage <= 2) {
+                startPage = 1;
+                endPage = 3;
+            } else if (currentDealersPage >= totalDealersPages - 1) {
+                startPage = totalDealersPages - 2;
+                endPage = totalDealersPages;
+            } else {
+                startPage = currentDealersPage - 1;
+                endPage = currentDealersPage + 1;
             }
         }
         
         for (let i = startPage; i <= endPage; i++) {
-            html += `
-                <li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
-                </li>
-            `;
+            const li = document.createElement('li');
+            li.className = `page-item ${i === currentDealersPage ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="javascript:void(0)" onclick="goToDealersPage(${i}); return false;" style="font-size: 12px;">${i}</a>`;
+            nextPage.parentNode.insertBefore(li, nextPage);
         }
         
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
-            }
-            html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${totalPages}); return false;">${totalPages}</a></li>`;
+        if (startPage > 1) {
+            const dotsLi = document.createElement('li');
+            dotsLi.className = 'page-item disabled';
+            dotsLi.innerHTML = '<span class="page-link" style="font-size: 12px;">...</span>';
+            prevPage.nextSibling.after(dotsLi);
         }
         
-        html += `
-            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">
-                    <i class="ti ti-chevron-right"></i>
-                </a>
-            </li>
-        `;
+        if (endPage < totalDealersPages) {
+            const dotsLi = document.createElement('li');
+            dotsLi.className = 'page-item disabled';
+            dotsLi.innerHTML = '<span class="page-link" style="font-size: 12px;">...</span>';
+            nextPage.parentNode.insertBefore(dotsLi, nextPage);
+        }
         
-        pagination.innerHTML = html;
+        prevPage.classList.toggle('disabled', currentDealersPage === 1);
+        nextPage.classList.toggle('disabled', currentDealersPage === totalDealersPages);
     }
 
-    function changePage(page) {
-        const totalPages = Math.ceil(filteredProvinceData.length / entriesPerPage);
-        if (page < 1 || page > totalPages) return;
-        currentPage = page;
-        renderProvinceTable();
+    function updateDealersEntriesInfo() {
+        const startEntry = (currentDealersPage - 1) * dealersPerPage + 1;
+        const endEntry = Math.min(currentDealersPage * dealersPerPage, totalDealersEntries);
+        
+        const startEl = document.getElementById('dealersCurrentStart');
+        const endEl = document.getElementById('dealersCurrentEnd');
+        const totalEl = document.getElementById('dealersTotalEntries');
+        
+        if (startEl) startEl.textContent = startEntry;
+        if (endEl) endEl.textContent = endEntry;
+        if (totalEl) totalEl.textContent = totalDealersEntries;
     }
 
-    function exportProvinceData() {
-        const provinceName = document.getElementById('provinceName').textContent;
-        let csv = 'Location,Full Address,Transactions,Quantity,Customers,Total Sales\n';
-        
-        filteredProvinceData.forEach(item => {
-            csv += `"${item.location}","${item.full_address}",${item.transaction_count},${item.total_qty},${item.customer_count},${item.total_amount}\n`;
-        });
-        
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${provinceName}_transactions.csv`;
-        a.click();
-    }
-
-    document.getElementById('provinceSearch').addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        filteredProvinceData = provinceData.filter(item => 
-            item.location.toLowerCase().includes(searchTerm) ||
-            item.full_address.toLowerCase().includes(searchTerm)
-        );
-        currentPage = 1;
-        renderProvinceTable();
-    });
-
-    document.getElementById('provinceEntriesPerPage').addEventListener('change', function(e) {
-        entriesPerPage = parseInt(e.target.value);
-        currentPage = 1;
-        renderProvinceTable();
-    });
-
-    document.getElementById('provinceSortBy').addEventListener('change', function(e) {
-        const sortValue = e.target.value;
-        
-        filteredProvinceData.sort((a, b) => {
-            switch(sortValue) {
-                case 'transactions_desc':
-                    return b.transaction_count - a.transaction_count;
-                case 'transactions_asc':
-                    return a.transaction_count - b.transaction_count;
-                case 'amount_desc':
-                    return parseFloat(b.total_amount) - parseFloat(a.total_amount);
-                case 'amount_asc':
-                    return parseFloat(a.total_amount) - parseFloat(b.total_amount);
-                case 'qty_desc':
-                    return b.total_qty - a.total_qty;
-                case 'qty_asc':
-                    return a.total_qty - b.total_qty;
-                case 'location_asc':
-                    return a.location.localeCompare(b.location);
-                case 'location_desc':
-                    return b.location.localeCompare(a.location);
-            }
-        });
-        
-        currentPage = 1;
-        renderProvinceTable();
-    });
-
-    window.showProvinceDetails = showProvinceDetails;
-    window.changePage = changePage;
-    window.exportProvinceData = exportProvinceData;
-});
-</script>
-
-<script>
-let currentDealersPage = 1;
-let dealersPerPage = 5;
-let totalDealersEntries = {{ $dealers_inactive->count() ?? 0 }};
-let totalDealersPages = Math.ceil(totalDealersEntries / dealersPerPage);
-
-function showDealersPage(page) {
-    const items = document.querySelectorAll('.inactive-dealer-item');
-    const startIndex = (page - 1) * dealersPerPage;
-    const endIndex = startIndex + dealersPerPage;
-    
-    items.forEach((item, index) => {
-        if (index >= startIndex && index < endIndex) {
-            item.classList.remove('d-none');
-        } else {
-            item.classList.add('d-none');
+    document.addEventListener('DOMContentLoaded', function() {
+        if (totalDealersEntries > 0) {
+            showDealersPage(1);
+            updateDealersPagination();
+            updateDealersEntriesInfo();
         }
     });
-}
+  </script>
 
-function changeDealersPage(direction) {
-    if (direction === 'next' && currentDealersPage < totalDealersPages) {
-        currentDealersPage++;
-    } else if (direction === 'prev' && currentDealersPage > 1) {
-        currentDealersPage--;
-    }
-    showDealersPage(currentDealersPage);
-    updateDealersPagination();
-    updateDealersEntriesInfo();
-    return false;
-}
+  <script>
+    const allTransactions = {!! json_encode(
+        $transactions_details->map(function($transaction) {
+            return [
+                'date' => date('M d, Y', strtotime($transaction->created_at)),
+                'quantity' => number_format($transaction->qty, 2),
+                'amount' => number_format($transaction->qty * $transaction->price, 2),
+                'dealer' => strtoupper($transaction->dealer->name ?? ''),
+                'customer' => strtoupper($transaction->customer->name ?? ''),
+                'dealer_points' => $transaction->points_dealer,
+                'customer_points' => $transaction->points_client,
+                'item' => $transaction->item,
+                'customer_id' => optional($transaction->customer)->id ?? 0
+            ];
+        })
+    ) !!};
 
-function goToDealersPage(page) {
-    currentDealersPage = page;
-    showDealersPage(currentDealersPage);
-    updateDealersPagination();
-    updateDealersEntriesInfo();
-    return false;
-}
-
-function updateDealersPagination() {
-    const pageNumbers = document.querySelector('.inactive-dealers-list').nextElementSibling.querySelector('.pagination');
-    if (!pageNumbers) return;
-    
-    const pageItems = pageNumbers.querySelectorAll('.page-item:not(#dealersPrevPage):not(#dealersNextPage)');
-    pageItems.forEach(item => item.remove());
-    
-    const prevPage = document.getElementById('dealersPrevPage');
-    const nextPage = document.getElementById('dealersNextPage');
-    
-    if (!prevPage || !nextPage) return;
-    
-    let startPage, endPage;
-    
-    if (totalDealersPages <= 3) {
-        startPage = 1;
-        endPage = totalDealersPages;
-    } else {
-        if (currentDealersPage <= 2) {
-            startPage = 1;
-            endPage = 3;
-        } else if (currentDealersPage >= totalDealersPages - 1) {
-            startPage = totalDealersPages - 2;
-            endPage = totalDealersPages;
-        } else {
-            startPage = currentDealersPage - 1;
-            endPage = currentDealersPage + 1;
-        }
-    }
-    
-    for (let i = startPage; i <= endPage; i++) {
-        const li = document.createElement('li');
-        li.className = `page-item ${i === currentDealersPage ? 'active' : ''}`;
-        li.innerHTML = `<a class="page-link" href="javascript:void(0)" onclick="goToDealersPage(${i}); return false;" style="font-size: 12px;">${i}</a>`;
-        nextPage.parentNode.insertBefore(li, nextPage);
-    }
-    
-    if (startPage > 1) {
-        const dotsLi = document.createElement('li');
-        dotsLi.className = 'page-item disabled';
-        dotsLi.innerHTML = '<span class="page-link" style="font-size: 12px;">...</span>';
-        prevPage.nextSibling.after(dotsLi);
-    }
-    
-    if (endPage < totalDealersPages) {
-        const dotsLi = document.createElement('li');
-        dotsLi.className = 'page-item disabled';
-        dotsLi.innerHTML = '<span class="page-link" style="font-size: 12px;">...</span>';
-        nextPage.parentNode.insertBefore(dotsLi, nextPage);
-    }
-    
-    prevPage.classList.toggle('disabled', currentDealersPage === 1);
-    nextPage.classList.toggle('disabled', currentDealersPage === totalDealersPages);
-}
-
-function updateDealersEntriesInfo() {
-    const startEntry = (currentDealersPage - 1) * dealersPerPage + 1;
-    const endEntry = Math.min(currentDealersPage * dealersPerPage, totalDealersEntries);
-    
-    const startEl = document.getElementById('dealersCurrentStart');
-    const endEl = document.getElementById('dealersCurrentEnd');
-    const totalEl = document.getElementById('dealersTotalEntries');
-    
-    if (startEl) startEl.textContent = startEntry;
-    if (endEl) endEl.textContent = endEntry;
-    if (totalEl) totalEl.textContent = totalDealersEntries;
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    if (totalDealersEntries > 0) {
-        showDealersPage(1);
-        updateDealersPagination();
-        updateDealersEntriesInfo();
-    }
-});
-</script>
-
-<script>
-const allTransactions = {!! json_encode(
-    $transactions_details->map(function($transaction) {
-        return [
-            'date' => date('M d, Y', strtotime($transaction->created_at)),
-            'quantity' => number_format($transaction->qty, 2),
-            'amount' => number_format($transaction->qty * $transaction->price, 2),
-            'dealer' => strtoupper($transaction->dealer->name ?? ''),
-            'customer' => strtoupper($transaction->customer->name ?? ''),
-            'dealer_points' => $transaction->points_dealer,
-            'customer_points' => $transaction->points_client,
-            'item' => $transaction->item,
-            'customer_id' => optional($transaction->customer)->id ?? 0
-        ];
-    })
-) !!};
-
-function showTransactionDetails(date, quantity, amount, dealer, customer, dealerPoints, customerPoints, item) {
-    document.getElementById('customerName').textContent = customer;
-    
-    const tbody = document.getElementById('customerTransactions');
-    tbody.innerHTML = '';
-    
-    const row = `
-        <tr>
-            <td>${date}</td>
-            <td>${quantity}</td>
-            <td>${amount}</td>
-            <td>${dealer}</td>
-            <td>${customer}</td>
-            <td><span class='text-success'>${dealerPoints}</span></td>
-            <td><span class='text-success'>${customerPoints}</span></td>
-            <td>${item}</td>
-        </tr>
-    `;
-    tbody.innerHTML = row;
-}
-
-function loadCustomerTransactions(customerId, customerName) {
-    document.getElementById('customerName').textContent = customerName;
-    
-    const customerTransactions = allTransactions.filter(transaction => 
-        transaction.customer_id == customerId
-    );
-    
-    const tbody = document.getElementById('customerTransactions');
-    tbody.innerHTML = '';
-    
-    customerTransactions.forEach(transaction => {
+    function showTransactionDetails(date, quantity, amount, dealer, customer, dealerPoints, customerPoints, item) {
+        document.getElementById('customerName').textContent = customer;
+        
+        const tbody = document.getElementById('customerTransactions');
+        tbody.innerHTML = '';
+        
         const row = `
             <tr>
-                <td>${transaction.date}</td>
-                <td>${transaction.quantity}</td>
-                <td>${transaction.amount}</td>
-                <td>${transaction.dealer}</td>
-                <td>${transaction.customer}</td>
-                <td><span class='text-success'>${transaction.dealer_points}</span></td>
-                <td><span class='text-success'>${transaction.customer_points}</span></td>
-                <td>${transaction.item}</td>
+                <td>${date}</td>
+                <td>${quantity}</td>
+                <td>${amount}</td>
+                <td>${dealer}</td>
+                <td>${customer}</td>
+                <td><span class='text-success'>${dealerPoints}</span></td>
+                <td><span class='text-success'>${customerPoints}</span></td>
+                <td>${item}</td>
             </tr>
         `;
-        tbody.innerHTML += row;
-    });
-    
-    if (customerTransactions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No transactions found for this customer.</td></tr>';
+        tbody.innerHTML = row;
     }
-}
 
-function updateTableEntries() {
-    const entriesPerPage = parseInt(document.getElementById('entriesPerPage').value);
-    const allRows = document.querySelectorAll('.transaction-row');
-    const totalEntries = allRows.length;
-    
-    allRows.forEach((row, index) => {
-        if (index < entriesPerPage) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
+    function loadCustomerTransactions(customerId, customerName) {
+        document.getElementById('customerName').textContent = customerName;
+        
+        const customerTransactions = allTransactions.filter(transaction => 
+            transaction.customer_id == customerId
+        );
+        
+        const tbody = document.getElementById('customerTransactions');
+        tbody.innerHTML = '';
+        
+        customerTransactions.forEach(transaction => {
+            const row = `
+                <tr>
+                    <td>${transaction.date}</td>
+                    <td>${transaction.quantity}</td>
+                    <td>${transaction.amount}</td>
+                    <td>${transaction.dealer}</td>
+                    <td>${transaction.customer}</td>
+                    <td><span class='text-success'>${transaction.dealer_points}</span></td>
+                    <td><span class='text-success'>${transaction.customer_points}</span></td>
+                    <td>${transaction.item}</td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+        
+        if (customerTransactions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">No transactions found for this customer.</td></tr>';
         }
-    });
-    
-    const showing = Math.min(entriesPerPage, totalEntries);
-    document.getElementById('entriesInfo').textContent = 
-        `Showing 1 to ${showing} of ${totalEntries} entries`;
-}
-</script>
+    }
 
-<script>
-// Donut Chart for Top 10 Dealers
-$(document).ready(function() {
-  const dealersData = @json($dealers);
-  const dealerNames = dealersData.slice(0, 10).map(dealer => dealer.dealer?.name || 'Unknown');
-  const dealerPoints = dealersData.slice(0, 10).map(dealer => parseFloat(dealer.total_points));
-  
-  var donutOptions = {
-    series: dealerPoints,
-    chart: {
-      type: 'donut',
-      height: 220,
-      width: 220,
-      fontFamily: 'inherit',
-    },
-    colors: [
-      '#ff0000', '#ff6b59', '#ffa191', '#ffd1c8', '	#ec705c',
-      '#cea294', '#9ecbc9', '#0ff0fe', '#ec705c', '	#ff0000'
-    ],
-    plotOptions: {
-      pie: {
-        donut: {
-          size: '65%',
-          labels: {
-            show: false,
-          }
-        }
-      }
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    legend: {
-      show: false,
-    },
-    stroke: {
-      width: 0,
-    },
-    tooltip: {
-      enabled: true,
-      y: {
-        formatter: function (val) {
-          return val + ' points';
+    function updateTableEntries() {
+        const entriesPerPage = parseInt(document.getElementById('entriesPerPage').value);
+        const allRows = document.querySelectorAll('.transaction-row');
+        const totalEntries = allRows.length;
+        
+        allRows.forEach((row, index) => {
+            if (index < entriesPerPage) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        const showing = Math.min(entriesPerPage, totalEntries);
+        document.getElementById('entriesInfo').textContent = 
+            `Showing 1 to ${showing} of ${totalEntries} entries`;
+    }
+  </script>
+
+  <script>
+    // Donut Chart for Top 10 Dealers
+    $(document).ready(function() {
+      const dealersData = @json($dealers);
+      const dealerNames = dealersData.slice(0, 10).map(dealer => dealer.dealer?.name || 'Unknown');
+      const dealerPoints = dealersData.slice(0, 10).map(dealer => parseFloat(dealer.total_points));
+      
+      var donutOptions = {
+        series: dealerPoints,
+        chart: {
+          type: 'donut',
+          height: 220,
+          width: 220,
+          fontFamily: 'inherit',
         },
-      },
-    },
-    labels: dealerNames,
-  };
-
-  var donutChart = new ApexCharts(document.querySelector("#dealers-donut-chart"), donutOptions);
-  donutChart.render();
-});
-</script>
-
-<script>
-// Donut Chart for Top 10 Customers
-$(document).ready(function() {
-  const customersData = @json($top_customers ?? []);
-  const customerNames = customersData.slice(0, 10).map(customer => customer.customer?.name || 'Unknown');
-  const customerPoints = customersData.slice(0, 10).map(customer => parseFloat(customer.total_points));
-  
-  var customersDonutOptions = {
-    series: customerPoints,
-    chart: {
-      type: 'donut',
-      height: 220,
-      width: 220,
-      fontFamily: 'inherit',
-    },
-    colors: [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
-      '#F7DC6F', '#BB8FCE', '#85C1E9', '#F8C471', '#82E0AA'
-    ],
-    
-    plotOptions: {
-      pie: {
-        donut: {
-          size: '65%',
-          labels: {
-            show: false,
-          }
-        }
-      }
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    legend: {
-      show: false,
-    },
-    stroke: {
-      width: 0,
-    },
-    tooltip: {
-      enabled: true,
-      y: {
-        formatter: function (val) {
-          return val + ' points';
-        },
-      },
-    },
-    labels: customerNames,
-  };
-
-  var customersDonutChart = new ApexCharts(document.querySelector("#customers-donut-chart"), customersDonutOptions);
-  customersDonutChart.render();
-});
-</script>
-
-<script>
-let chartInstance = null;
-const initialCategories = @json($categories);
-const initialQty = @json($qty);
-const initialViewType = @json($view_type);
-
-// Initialize chart on page load
-$(function () {
-  renderChart(initialCategories, initialQty, {{ $selected_year }}, {{ $selected_month ?? 'null' }}, initialViewType);
-  
-  // Handle year selection change
-  $('#yearSelect').on('change', function() {
-    const selectedYear = $(this).val();
-    const selectedMonth = $('#monthSelect').val();
-    loadChartData(selectedYear, selectedMonth, true);
-  });
-  
-  // Handle month selection change
-  $('#monthSelect').on('change', function() {
-    const selectedYear = $('#yearSelect').val();
-    const selectedMonth = $(this).val();
-    loadChartData(selectedYear, selectedMonth);
-  });
-});
-
-function loadChartData(year, month = null, refreshMonths = false) {
-  // Disable dropdowns to prevent multiple requests
-  $('#yearSelect, #monthSelect').prop('disabled', true);
-  
-  // Show loading indicator
-  $('#chartLoading').show();
-  $('#chart-bar-stacked').hide();
-  
-  $.ajax({
-      url: '{{ route("home.chart-data") }}',
-      method: 'GET',
-      data: { 
-        year: year, 
-        month: month || null,
-        include_months: refreshMonths ? '1' : '0'
-      },
-      cache: false,
-      success: function(response) {
-        console.log('Data loaded for year:', year, 'month:', month, response);
-        
-        // Update available months dropdown
-        if (response.available_months) {
-          updateMonthsDropdown(response.available_months, month);
-        }
-        
-        // Update view mode indicator
-        updateViewModeIndicator(response.view_type);
-        
-        // Hide loading and show chart
-        $('#chartLoading').hide();
-        $('#chart-bar-stacked').show();
-        
-        // Re-enable dropdowns
-        $('#yearSelect, #monthSelect').prop('disabled', false);
-        
-        // Render chart with new data
-        renderChart(response.categories, response.qty, response.year, response.month, response.view_type);
-      },
-      error: function(xhr, status, error) {
-        $('#chartLoading').hide();
-        $('#chart-bar-stacked').show();
-        $('#yearSelect, #monthSelect').prop('disabled', false);
-        console.error('Error loading chart data:', error);
-        alert('Error loading data. Please try again.');
-      }
-    });
-}
-
-function updateMonthsDropdown(availableMonths, selectedMonth) {
-  const monthSelect = $('#monthSelect');
-  
-  // Clear existing options except "All Months"
-  monthSelect.find('option:not([value=""])').remove();
-  
-  // Add available months
-  availableMonths.forEach(function(month) {
-    const isSelected = month.number == selectedMonth ? 'selected' : '';
-    monthSelect.append(`<option value="${month.number}" ${isSelected}>${month.name}</option>`);
-  });
-}
-
-function updateViewModeIndicator(viewType) {
-  const indicator = $('#viewModeIndicator');
-  if (viewType === 'monthly') {
-    indicator.text('Daily View').removeClass('bg-primary').addClass('bg-success');
-  } else {
-    indicator.text('Monthly View').removeClass('bg-success').addClass('bg-primary');
-  }
-}
-
-function renderChart(categories, qty, year, month = null, viewType = 'yearly') {
-  // Determine chart title and axis labels based on view type
-  const chartTitle = viewType === 'monthly' 
-    ? `Daily LPG Refills - ${getMonthName(month)} ${year}`
-    : `Monthly LPG Refills - ${year}`;
-    
-  const xAxisTitle = viewType === 'monthly' ? 'Days' : 'Months';
-  
-  var options_area = {
-    series: [
-      {
-        name: "LPG Cylinder Refills",
-        data: qty,
-      }
-    ],
-    chart: {
-      fontFamily: "inherit",
-      type: "bar",
-      height: 500,
-      toolbar: {
-        show: false,
-      },
-      background: 'transparent',
-      animations: {
-        enabled: true,
-        easing: 'easeinout',
-        speed: 800,
-        animateGradually: {
-          enabled: true,
-          delay: 150
-        },
-        dynamicAnimation: {
-          enabled: true,
-          speed: 350
-        }
-      }
-    },
-    title: {
-      text: chartTitle,
-      align: 'center',
-      style: {
-        fontSize: '0px',
-        fontWeight: 0,
-        color: '#ffffffff'
-      }
-    },
-    grid: {
-      show: true,
-      borderColor: "#E5E7EB",
-      strokeDashArray: 0,
-      position: 'back',
-      xaxis: {
-        lines: {
-          show: false
-        }
-      },
-      yaxis: {
-        lines: {
-          show: true
-        }
-      },
-      padding: {
-        top: 20,
-        right: 20,
-        bottom: 10,
-        left: 10
-      },
-    },
-    colors: ["#5BC2E7"],
-    fill: {
-      type: "gradient",
-      gradient: {
-        shade: "light",
-        type: "vertical",
-        shadeIntensity: 0.3,
-        gradientToColors: ["#5BC2E7"],
-        inverseColors: false,
-        opacityFrom: 1,
-        opacityTo: 0.8,
-        stops: [0, 100],
-      },
-    },
-    stroke: {
-      curve: "straight",
-      width: 0,
-    },
-    plotOptions: {
-      bar: {
-        borderRadius: 5,
-        columnWidth: viewType === 'monthly' ? '60%' : '45%',
-      },
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    xaxis: {
-      categories: categories,
-      title: {
-        text: xAxisTitle,
-        offsetY: 15,
-        style: {
-          fontSize: '12px',
-          fontWeight: 600,
-          color: '#666'
-        }
-      },
-      labels: {
-        style: {
-          colors: "#9CA3AF",
-          fontSize: "11px",
-          fontWeight: 400,
-        },
-        offsetY: 0,
-        rotate: viewType === 'monthly' && categories.length > 15 ? -45 : 0,
-        hideOverlappingLabels: true,
-        maxHeight: 30,
-        formatter: function (val) {
-          if (viewType === 'monthly') {
-            return val; // Show day numbers as is
-          } else {
-            // For yearly view, show abbreviated month names
-            if (val && typeof val === 'string') {
-              const date = new Date(val);
-              if (!isNaN(date.getTime())) {
-                return date.toLocaleDateString('en-US', { month: 'short' });
+        colors: [
+          '#ff0000', '#ff6b59', '#ffa191', '#ffd1c8', '	#ec705c',
+          '#cea294', '#9ecbc9', '#0ff0fe', '#ec705c', '	#ff0000'
+        ],
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '65%',
+              labels: {
+                show: false,
               }
-              return val.length > 3 ? val.substring(0, 3) : val;
             }
-            return val;
           }
         },
-      },
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
-      tickPlacement: 'on',
-    },
-    yaxis: {
-      show: true,
-      title: {
-        text: 'Quantity',
-        style: {
-          fontSize: '12px',
-          fontWeight: 600,
-          color: '#666'
-        }
-      },
-      labels: {
-        show: true,
-        style: {
-          colors: "#9CA3AF",
-          fontSize: "11px",
-          fontWeight: 400,
+        dataLabels: {
+          enabled: false,
         },
-        formatter: function (val) {
-          return Math.round(val);
+        legend: {
+          show: false,
         },
-      },
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
-    },
-    tooltip: {
-      theme: "light",
-      x: {
-        formatter: function(val, opts) {
-          if (viewType === 'monthly') {
-            return `Day ${val}`;
-          } else {
-            return val;
-          }
-        }
-      },
-      y: {
-        formatter: function (val) {
-          return val + " units";
+        stroke: {
+          width: 0,
         },
-      },
-    },
-    legend: {
-      show: false,
-    },
-    markers: {
-      size: 0,
-    },
-    responsive: [
-      {
-        breakpoint: 768,
-        options: {
-          chart: {
-            height: 300,
-          },
-          title: {
-            style: {
-              fontSize: '14px'
-            }
-          },
-          xaxis: {
-            labels: {
-              fontSize: "10px",
-              rotate: -45,
+        tooltip: {
+          enabled: true,
+          y: {
+            formatter: function (val) {
+              return val + ' points';
             },
-            title: {
-              style: {
-                fontSize: '10px'
+          },
+        },
+        labels: dealerNames,
+      };
+
+      var donutChart = new ApexCharts(document.querySelector("#dealers-donut-chart"), donutOptions);
+      donutChart.render();
+    });
+  </script>
+
+  <script>
+    // Donut Chart for Top 10 Customers
+    $(document).ready(function() {
+      const customersData = @json($top_customers ?? []);
+      const customerNames = customersData.slice(0, 10).map(customer => customer.customer?.name || 'Unknown');
+      const customerPoints = customersData.slice(0, 10).map(customer => parseFloat(customer.total_points));
+      
+      var customersDonutOptions = {
+        series: customerPoints,
+        chart: {
+          type: 'donut',
+          height: 220,
+          width: 220,
+          fontFamily: 'inherit',
+        },
+        colors: [
+          '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+          '#F7DC6F', '#BB8FCE', '#85C1E9', '#F8C471', '#82E0AA'
+        ],
+        
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '65%',
+              labels: {
+                show: false,
               }
+            }
+          }
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        legend: {
+          show: false,
+        },
+        stroke: {
+          width: 0,
+        },
+        tooltip: {
+          enabled: true,
+          y: {
+            formatter: function (val) {
+              return val + ' points';
+            },
+          },
+        },
+        labels: customerNames,
+      };
+
+      var customersDonutChart = new ApexCharts(document.querySelector("#customers-donut-chart"), customersDonutOptions);
+      customersDonutChart.render();
+    });
+  </script>
+
+  <script>
+    let chartInstance = null;
+    const initialCategories = @json($categories);
+    const initialQty = @json($qty);
+    const initialViewType = @json($view_type);
+
+    // Initialize chart on page load
+    $(function () {
+      renderChart(initialCategories, initialQty, {{ $selected_year }}, {{ $selected_month ?? 'null' }}, initialViewType);
+      
+      // Handle year selection change
+      $('#yearSelect').on('change', function() {
+        const selectedYear = $(this).val();
+        const selectedMonth = $('#monthSelect').val();
+        loadChartData(selectedYear, selectedMonth, true);
+      });
+      
+      // Handle month selection change
+      $('#monthSelect').on('change', function() {
+        const selectedYear = $('#yearSelect').val();
+        const selectedMonth = $(this).val();
+        loadChartData(selectedYear, selectedMonth);
+      });
+    });
+
+    function loadChartData(year, month = null, refreshMonths = false) {
+      // Disable dropdowns to prevent multiple requests
+      $('#yearSelect, #monthSelect').prop('disabled', true);
+      
+      // Show loading indicator
+      $('#chartLoading').show();
+      $('#chart-bar-stacked').hide();
+      
+      $.ajax({
+          url: '{{ route("home.chart-data") }}',
+          method: 'GET',
+          data: { 
+            year: year, 
+            month: month || null,
+            include_months: refreshMonths ? '1' : '0'
+          },
+          cache: false,
+          success: function(response) {
+            console.log('Data loaded for year:', year, 'month:', month, response);
+            
+            // Update available months dropdown
+            if (response.available_months) {
+              updateMonthsDropdown(response.available_months, month);
+            }
+            
+            // Update view mode indicator
+            updateViewModeIndicator(response.view_type);
+            
+            // Hide loading and show chart
+            $('#chartLoading').hide();
+            $('#chart-bar-stacked').show();
+            
+            // Re-enable dropdowns
+            $('#yearSelect, #monthSelect').prop('disabled', false);
+            
+            // Render chart with new data
+            renderChart(response.categories, response.qty, response.year, response.month, response.view_type);
+          },
+          error: function(xhr, status, error) {
+            $('#chartLoading').hide();
+            $('#chart-bar-stacked').show();
+            $('#yearSelect, #monthSelect').prop('disabled', false);
+            console.error('Error loading chart data:', error);
+            alert('Error loading data. Please try again.');
+          }
+        });
+    }
+
+    function updateMonthsDropdown(availableMonths, selectedMonth) {
+      const monthSelect = $('#monthSelect');
+      
+      // Clear existing options except "All Months"
+      monthSelect.find('option:not([value=""])').remove();
+      
+      // Add available months
+      availableMonths.forEach(function(month) {
+        const isSelected = month.number == selectedMonth ? 'selected' : '';
+        monthSelect.append(`<option value="${month.number}" ${isSelected}>${month.name}</option>`);
+      });
+    }
+
+    function updateViewModeIndicator(viewType) {
+      const indicator = $('#viewModeIndicator');
+      if (viewType === 'monthly') {
+        indicator.text('Daily View').removeClass('bg-primary').addClass('bg-success');
+      } else {
+        indicator.text('Monthly View').removeClass('bg-success').addClass('bg-primary');
+      }
+    }
+
+    function renderChart(categories, qty, year, month = null, viewType = 'yearly') {
+      // Determine chart title and axis labels based on view type
+      const chartTitle = viewType === 'monthly' 
+        ? `Daily LPG Refills - ${getMonthName(month)} ${year}`
+        : `Monthly LPG Refills - ${year}`;
+        
+      const xAxisTitle = viewType === 'monthly' ? 'Days' : 'Months';
+      
+      var options_area = {
+        series: [
+          {
+            name: "LPG Cylinder Refills",
+            data: qty,
+          }
+        ],
+        chart: {
+          fontFamily: "inherit",
+          type: "bar",
+          height: 500,
+          toolbar: {
+            show: false,
+          },
+          background: 'transparent',
+          animations: {
+            enabled: true,
+            easing: 'easeinout',
+            speed: 800,
+            animateGradually: {
+              enabled: true,
+              delay: 150
+            },
+            dynamicAnimation: {
+              enabled: true,
+              speed: 350
+            }
+          }
+        },
+        title: {
+          text: chartTitle,
+          align: 'center',
+          style: {
+            fontSize: '0px',
+            fontWeight: 0,
+            color: '#ffffffff'
+          }
+        },
+        grid: {
+          show: true,
+          borderColor: "#E5E7EB",
+          strokeDashArray: 0,
+          position: 'back',
+          xaxis: {
+            lines: {
+              show: false
             }
           },
           yaxis: {
-            labels: {
-              fontSize: "10px",
+            lines: {
+              show: true
+            }
+          },
+          padding: {
+            top: 20,
+            right: 20,
+            bottom: 10,
+            left: 10
+          },
+        },
+        colors: ["#5BC2E7"],
+        fill: {
+          type: "gradient",
+          gradient: {
+            shade: "light",
+            type: "vertical",
+            shadeIntensity: 0.3,
+            gradientToColors: ["#5BC2E7"],
+            inverseColors: false,
+            opacityFrom: 1,
+            opacityTo: 0.8,
+            stops: [0, 100],
+          },
+        },
+        stroke: {
+          curve: "straight",
+          width: 0,
+        },
+        plotOptions: {
+          bar: {
+            borderRadius: 5,
+            columnWidth: viewType === 'monthly' ? '60%' : '45%',
+          },
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        xaxis: {
+          categories: categories,
+          title: {
+            text: xAxisTitle,
+            offsetY: 15,
+            style: {
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#666'
+            }
+          },
+          labels: {
+            style: {
+              colors: "#9CA3AF",
+              fontSize: "11px",
+              fontWeight: 400,
             },
-            title: {
-              style: {
-                fontSize: '10px'
+            offsetY: 0,
+            rotate: viewType === 'monthly' && categories.length > 15 ? -45 : 0,
+            hideOverlappingLabels: true,
+            maxHeight: 30,
+            formatter: function (val) {
+              if (viewType === 'monthly') {
+                return val; // Show day numbers as is
+              } else {
+                // For yearly view, show abbreviated month names
+                if (val && typeof val === 'string') {
+                  const date = new Date(val);
+                  if (!isNaN(date.getTime())) {
+                    return date.toLocaleDateString('en-US', { month: 'short' });
+                  }
+                  return val.length > 3 ? val.substring(0, 3) : val;
+                }
+                return val;
+              }
+            },
+          },
+          axisBorder: {
+            show: false,
+          },
+          axisTicks: {
+            show: false,
+          },
+          tickPlacement: 'on',
+        },
+        yaxis: {
+          show: true,
+          title: {
+            text: 'Quantity',
+            style: {
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#666'
+            }
+          },
+          labels: {
+            show: true,
+            style: {
+              colors: "#9CA3AF",
+              fontSize: "11px",
+              fontWeight: 400,
+            },
+            formatter: function (val) {
+              return Math.round(val);
+            },
+          },
+          axisBorder: {
+            show: false,
+          },
+          axisTicks: {
+            show: false,
+          },
+        },
+        tooltip: {
+          theme: "light",
+          x: {
+            formatter: function(val, opts) {
+              if (viewType === 'monthly') {
+                return `Day ${val}`;
+              } else {
+                return val;
               }
             }
           },
+          y: {
+            formatter: function (val) {
+              return val + " units";
+            },
+          },
         },
-      },
-    ],
-  };
+        legend: {
+          show: false,
+        },
+        markers: {
+          size: 0,
+        },
+        responsive: [
+          {
+            breakpoint: 768,
+            options: {
+              chart: {
+                height: 300,
+              },
+              title: {
+                style: {
+                  fontSize: '14px'
+                }
+              },
+              xaxis: {
+                labels: {
+                  fontSize: "10px",
+                  rotate: -45,
+                },
+                title: {
+                  style: {
+                    fontSize: '10px'
+                  }
+                }
+              },
+              yaxis: {
+                labels: {
+                  fontSize: "10px",
+                },
+                title: {
+                  style: {
+                    fontSize: '10px'
+                  }
+                }
+              },
+            },
+          },
+        ],
+      };
 
-  if (chartInstance) {
-    chartInstance.updateOptions(options_area, true, false);
-    return;
-  }
+      if (chartInstance) {
+        chartInstance.updateOptions(options_area, true, false);
+        return;
+      }
 
-  chartInstance = new ApexCharts(
-    document.querySelector("#chart-bar-stacked"),
-    options_area
-  );
-  chartInstance.render();
-}
-
-function getMonthName(monthNumber) {
-  if (!monthNumber) return '';
-  const months = [
-    '', 'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-  return months[monthNumber] || '';
-}
-</script>
-<script>
-let currentPage = 1;
-let entriesPerPage = 5;
-let totalEntries = {{ $transactions_details->count() }};
-let totalPages = Math.ceil(totalEntries / entriesPerPage);
-
-function updateTableEntries() {
-    entriesPerPage = parseInt(document.getElementById('entriesPerPage').value);
-    totalPages = Math.ceil(totalEntries / entriesPerPage);
-    currentPage = 1;
-    showPage(currentPage);
-    updatePagination();
-    updateEntriesInfo();
-}
-
-function showPage(page) {
-    const items = document.querySelectorAll('.transaction-item');
-    const startIndex = (page - 1) * entriesPerPage;
-    const endIndex = startIndex + entriesPerPage;
-    
-    items.forEach((item, index) => {
-        if (index >= startIndex && index < endIndex) {
-            item.classList.remove('d-none');
-        } else {
-            item.classList.add('d-none');
-        }
-    });
-}
-
-function changePage(direction) {
-    if (direction === 'next' && currentPage < totalPages) {
-        currentPage++;
-    } else if (direction === 'prev' && currentPage > 1) {
-        currentPage--;
+      chartInstance = new ApexCharts(
+        document.querySelector("#chart-bar-stacked"),
+        options_area
+      );
+      chartInstance.render();
     }
-    showPage(currentPage);
-    updatePagination();
-    updateEntriesInfo();
-    return false;
-}
 
-function goToPage(page) {
-    currentPage = page;
-    showPage(currentPage);
-    updatePagination();
-    updateEntriesInfo();
-    return false;
-}
+    function getMonthName(monthNumber) {
+      if (!monthNumber) return '';
+      const months = [
+        '', 'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+      return months[monthNumber] || '';
+    }
+  </script>
+  <script>
+    // Replaced by the isolated latest-transaction pager below.
+    if (false) {
+    let currentPage = 1;
+    let entriesPerPage = 5;
+    let totalEntries = {{ $transactions_details->count() }};
+    let totalPages = Math.ceil(totalEntries / entriesPerPage);
 
-function updatePagination() {
-    const pageNumbers = document.querySelector('.pagination');
-    const pageItems = pageNumbers.querySelectorAll('.page-item:not(#prevPage):not(#nextPage)');
-    pageItems.forEach(item => item.remove());
-    
-    const prevPage = document.getElementById('prevPage');
-    const nextPage = document.getElementById('nextPage');
-    
-    let startPage, endPage;
-    
-    if (totalPages <= 3) {
-        startPage = 1;
-        endPage = totalPages;
-    } else {
-        if (currentPage <= 2) {
+    function updateTableEntries() {
+        entriesPerPage = parseInt(document.getElementById('entriesPerPage').value);
+        totalPages = Math.ceil(totalEntries / entriesPerPage);
+        currentPage = 1;
+        showPage(currentPage);
+        updatePagination();
+        updateEntriesInfo();
+    }
+
+    function showPage(page) {
+        const items = document.querySelectorAll('.transaction-item');
+        const startIndex = (page - 1) * entriesPerPage;
+        const endIndex = startIndex + entriesPerPage;
+        
+        items.forEach((item, index) => {
+            if (index >= startIndex && index < endIndex) {
+                item.classList.remove('d-none');
+            } else {
+                item.classList.add('d-none');
+            }
+        });
+    }
+
+    function changePage(direction) {
+        if (direction === 'next' && currentPage < totalPages) {
+            currentPage++;
+        } else if (direction === 'prev' && currentPage > 1) {
+            currentPage--;
+        }
+        showPage(currentPage);
+        updatePagination();
+        updateEntriesInfo();
+        return false;
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        showPage(currentPage);
+        updatePagination();
+        updateEntriesInfo();
+        return false;
+    }
+
+    function updatePagination() {
+        const pageNumbers = document.querySelector('.pagination');
+        const pageItems = pageNumbers.querySelectorAll('.page-item:not(#prevPage):not(#nextPage)');
+        pageItems.forEach(item => item.remove());
+        
+        const prevPage = document.getElementById('prevPage');
+        const nextPage = document.getElementById('nextPage');
+        
+        let startPage, endPage;
+        
+        if (totalPages <= 3) {
             startPage = 1;
-            endPage = 3;
-        } else if (currentPage >= totalPages - 1) {
-            startPage = totalPages - 2;
             endPage = totalPages;
         } else {
-            startPage = currentPage - 1;
-            endPage = currentPage + 1;
+            if (currentPage <= 2) {
+                startPage = 1;
+                endPage = 3;
+            } else if (currentPage >= totalPages - 1) {
+                startPage = totalPages - 2;
+                endPage = totalPages;
+            } else {
+                startPage = currentPage - 1;
+                endPage = currentPage + 1;
+            }
         }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="javascript:void(0)" onclick="goToPage(${i}); return false;" style="font-size: 12px;">${i}</a>`;
+            nextPage.parentNode.insertBefore(li, nextPage);
+        }
+        
+        if (startPage > 1) {
+            const dotsLi = document.createElement('li');
+            dotsLi.className = 'page-item disabled';
+            dotsLi.innerHTML = '<span class="page-link" style="font-size: 12px;">...</span>';
+            prevPage.nextSibling.after(dotsLi);
+        }
+        
+        if (endPage < totalPages) {
+            const dotsLi = document.createElement('li');
+            dotsLi.className = 'page-item disabled';
+            dotsLi.innerHTML = '<span class="page-link" style="font-size: 12px;">...</span>';
+            nextPage.parentNode.insertBefore(dotsLi, nextPage);
+        }
+        
+        document.getElementById('prevPage').classList.toggle('disabled', currentPage === 1);
+        document.getElementById('nextPage').classList.toggle('disabled', currentPage === totalPages);
     }
-    
-    for (let i = startPage; i <= endPage; i++) {
-        const li = document.createElement('li');
-        li.className = `page-item ${i === currentPage ? 'active' : ''}`;
-        li.innerHTML = `<a class="page-link" href="javascript:void(0)" onclick="goToPage(${i}); return false;" style="font-size: 12px;">${i}</a>`;
-        nextPage.parentNode.insertBefore(li, nextPage);
-    }
-    
-    if (startPage > 1) {
-        const dotsLi = document.createElement('li');
-        dotsLi.className = 'page-item disabled';
-        dotsLi.innerHTML = '<span class="page-link" style="font-size: 12px;">...</span>';
-        prevPage.nextSibling.after(dotsLi);
-    }
-    
-    if (endPage < totalPages) {
-        const dotsLi = document.createElement('li');
-        dotsLi.className = 'page-item disabled';
-        dotsLi.innerHTML = '<span class="page-link" style="font-size: 12px;">...</span>';
-        nextPage.parentNode.insertBefore(dotsLi, nextPage);
-    }
-    
-    document.getElementById('prevPage').classList.toggle('disabled', currentPage === 1);
-    document.getElementById('nextPage').classList.toggle('disabled', currentPage === totalPages);
-}
 
-function updateEntriesInfo() {
-    const startEntry = (currentPage - 1) * entriesPerPage + 1;
-    const endEntry = Math.min(currentPage * entriesPerPage, totalEntries);
-    
-    document.getElementById('currentStart').textContent = startEntry;
-    document.getElementById('currentEnd').textContent = endEntry;
-    document.getElementById('totalEntries').textContent = totalEntries;
-}
+    function updateEntriesInfo() {
+        const startEntry = (currentPage - 1) * entriesPerPage + 1;
+        const endEntry = Math.min(currentPage * entriesPerPage, totalEntries);
+        
+        document.getElementById('currentStart').textContent = startEntry;
+        document.getElementById('currentEnd').textContent = endEntry;
+        document.getElementById('totalEntries').textContent = totalEntries;
+    }
 
-document.addEventListener('DOMContentLoaded', function() {
-    showPage(1);
-    updatePagination();
-    updateEntriesInfo();
-});
-</script>
-{{-- <script src="{{asset('design/assets/js/apex-chart/apex.bar.init.js')}}"></script> --}}
-<script src="{{asset('design/assets/js/dashboards/dashboard.js')}}"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    var myModal = new bootstrap.Modal(document.getElementById('homeModal'));
-    myModal.show();
-  });
-</script>
+    document.addEventListener('DOMContentLoaded', function() {
+        showPage(1);
+        updatePagination();
+        updateEntriesInfo();
+    });
+    }
+  </script>
+  {{-- <script src="{{asset('design/assets/js/apex-chart/apex.bar.init.js')}}"></script> --}}
+  <script>
+    document.addEventListener('DOMContentLoaded', async function () {
+      const dashboard = document.getElementById('monitoringDashboard');
+      if (!dashboard || typeof ApexCharts === 'undefined') return;
+      const params = new URLSearchParams({ start_date: dashboard.dataset.start, end_date: dashboard.dataset.end });
+      const takeaways = document.getElementById('monitoringTakeaways');
+      try {
+        const response = await fetch('{{ route("home.refill-monitoring-data") }}?' + params.toString());
+        if (!response.ok) throw new Error('Unable to load refill monitoring data.');
+        const data = await response.json();
+        const months = data.months || [], labels = months.map(m => m.label), averages = months.map(m => m.average);
+        new ApexCharts(document.querySelector('#monitoringCombinedChart'), { series: [{ name: 'No. of Refills', type: 'column', data: months.map(m => m.refills) }, { name: 'Average per Beneficiary', type: 'line', data: averages }], chart: { height: 290, toolbar: { show: false } }, colors: ['#17a2b8', '#02437B'], stroke: { width: [0, 3] }, plotOptions: { bar: { columnWidth: '54%', borderRadius: 3 } }, dataLabels: { enabled: true, style: { fontSize: '10px' }, formatter: (v, options) => options.seriesIndex === 0 ? Number(v).toLocaleString() : Number(v).toFixed(1).replace(/\.0$/, '') }, xaxis: { categories: labels }, yaxis: [{ title: { text: 'Number of Refills' }, labels: { formatter: v => Number(v).toLocaleString() } }, { opposite: true, title: { text: 'Average Refills per Beneficiary' } }], grid: { borderColor: '#e2edf2' }, legend: { position: 'top' }, tooltip: { y: { formatter: (v, options) => options.seriesIndex === 0 ? Number(v).toLocaleString() : Number(v).toFixed(1) } } }).render();
+        new ApexCharts(document.querySelector('#monitoringAverageChart'), { series: [{ name: 'Average per Beneficiary', data: averages }], chart: { type: 'line', height: 290, toolbar: { show: false } }, colors: ['#17a2b8'], stroke: { width: 3 }, markers: { size: 5 }, dataLabels: { enabled: true, offsetY: -9, formatter: v => Number(v).toFixed(1).replace(/\.0$/, '') }, xaxis: { categories: labels }, yaxis: { min: 0, title: { text: 'Average Refills per Beneficiary' } }, grid: { borderColor: '#e2edf2' } }).render();
+        const table = document.getElementById('monitoringTable'), head = table.tHead.rows[0];
+        months.forEach(m => { const th = document.createElement('th'); th.textContent = m.label; head.appendChild(th); });
+        ['refills', 'beneficiaries', 'average'].forEach((key, index) => months.forEach(m => { const td = document.createElement('td'); td.textContent = key === 'average' ? Number(m[key]).toFixed(1).replace(/\.0$/, '') : Number(m[key]).toLocaleString(); table.tBodies[0].rows[index].appendChild(td); }));
+        if (!months.length) { takeaways.textContent = 'No refill data is available for this reporting period.'; return; }
+        const latest = months[months.length - 1], peak = months.reduce((a, b) => a.refills > b.refills ? a : b);
+        [['Latest Activity', `${latest.label} recorded ${Number(latest.refills).toLocaleString()} refills among ${Number(latest.beneficiaries).toLocaleString()} beneficiaries.`], ['Highest Refill Activity', `${peak.label} had the highest activity with ${Number(peak.refills).toLocaleString()} refills.`], ['Live Monitoring', 'The report reflects the selected rolling 12-month period.']].forEach((item, i) => { const row = document.createElement('div'); row.className = 'monitoring-takeaway'; row.innerHTML = `<span class="monitoring-takeaway-number">${i + 1}</span><div><strong></strong><div class="small text-muted"></div></div>`; row.querySelector('strong').textContent = item[0]; row.querySelector('.text-muted').textContent = item[1]; takeaways.appendChild(row); });
+      } catch (error) { takeaways.textContent = error.message; }
+    });
+  </script>
+  <script>
+    // Isolated latest-transaction pager: it does not share state with the province table pager.
+    document.addEventListener('DOMContentLoaded', function () {
+      const rows = Array.from(document.querySelectorAll('.transaction-item'));
+      const pagination = document.getElementById('latestTransactionPagination');
+      if (!pagination) return;
+      const previous = document.getElementById('latestTransactionPrevPage'), next = document.getElementById('latestTransactionNextPage');
+      const pageSizeSelect = document.getElementById('latestTransactionPageSize');
+      let pageSize = Number(pageSizeSelect.value), page = 1;
+      const totalPages = () => Math.max(1, Math.ceil(rows.length / pageSize));
+      function render() {
+        page = Math.min(page, totalPages());
+        rows.forEach((row, index) => row.classList.toggle('d-none', index < (page - 1) * pageSize || index >= page * pageSize));
+        document.getElementById('latestTransactionStart').textContent = rows.length ? (page - 1) * pageSize + 1 : 0;
+        document.getElementById('latestTransactionEnd').textContent = rows.length ? Math.min(page * pageSize, rows.length) : 0;
+        document.getElementById('latestTransactionTotal').textContent = rows.length;
+        pagination.querySelectorAll('.latest-transaction-page').forEach(node => node.remove());
+        const addPage = number => { const li = document.createElement('li'), link = document.createElement('a'); li.className = `page-item latest-transaction-page ${number === page ? 'active' : ''}`; link.className = 'page-link'; link.href = '#'; link.textContent = number; link.onclick = e => { e.preventDefault(); page = number; render(); }; li.appendChild(link); pagination.insertBefore(li, next); };
+        const addDots = () => { const li = document.createElement('li'); li.className = 'page-item disabled latest-transaction-page'; li.innerHTML = '<span class="page-link">…</span>'; pagination.insertBefore(li, next); };
+        const count = totalPages(), first = Math.max(1, page - 2), last = Math.min(count, page + 2);
+        if (first > 1) { addPage(1); if (first > 2) addDots(); }
+        for (let number = first; number <= last; number++) addPage(number);
+        if (last < count) { if (last < count - 1) addDots(); addPage(count); }
+        previous.classList.toggle('disabled', page === 1 || !rows.length); next.classList.toggle('disabled', page === totalPages() || !rows.length);
+      }
+      previous.onclick = e => { e.preventDefault(); if (page > 1) { page--; render(); } };
+      next.onclick = e => { e.preventDefault(); if (page < totalPages()) { page++; render(); } };
+      pageSizeSelect.onchange = () => { pageSize = Number(pageSizeSelect.value); page = 1; render(); };
+      render();
+    });
+  </script>
+  <script src="{{asset('design/assets/js/dashboards/dashboard.js')}}"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var myModal = new bootstrap.Modal(document.getElementById('homeModal'));
+      myModal.show();
+    });
+  </script>
 @endsection
