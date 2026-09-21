@@ -968,6 +968,7 @@
           <div class="card-body">
             <div class="d-flex mb-4 justify-content-between align-items-center">
               <h5 class="mb-0 fw-bold">Latest Transaction</h5>
+              <span class="badge bg-success text-white">Activity (7 Days from Date Today)</span>
             </div>
 
             <div class="row mb-3 px-3 transaction-column-labels" style="border-bottom: 2px solid #e2e8f0; padding-bottom: 12px;">
