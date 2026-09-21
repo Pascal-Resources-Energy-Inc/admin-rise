@@ -34,6 +34,7 @@ class HomeController extends Controller
         $dealer = "";
         $customer = "";
         $threeDaysAgo = Carbon::now()->subDays(7)->toDateString();
+        $latestTransactionsStartDate = Carbon::today()->subDays(6)->toDateString();
         
         $selectedYear = $request->get('year', Carbon::now()->year);
         $selectedMonth = $request->get('month', null);
@@ -44,12 +45,19 @@ class HomeController extends Controller
         $customers = Client::whereHas('transactions')->get();
         $transactions = Transaction::orderBy('id','desc')->get();
         $dealers = Dealer::get();
-        $transactions_details = TransactionDetail::orderBy('id','desc')->get();
+        $transactions_details = TransactionDetail::whereDate('date', '>=', $latestTransactionsStartDate)
+            ->orderByDesc('date')
+            ->orderByDesc('id')
+            ->get();
 
         if(auth()->user()->role == "Dealer")
         {
             $dealer = Dealer::with('sales')->where('user_id',auth()->user()->id)->first();
-            $transactions_details = TransactionDetail::where('dealer_id',auth()->user()->id)->orderBy('id','desc')->get();
+            $transactions_details = TransactionDetail::where('dealer_id', auth()->user()->id)
+                ->whereDate('date', '>=', $latestTransactionsStartDate)
+                ->orderByDesc('date')
+                ->orderByDesc('id')
+                ->get();
             $total_sales = TransactionDetail::where('dealer_id',auth()->user()->id)->sum('price');
 
             $totalEarnedPointsDealer = $dealer->sales->sum('points_dealer');
@@ -59,7 +67,11 @@ class HomeController extends Controller
         if(auth()->user()->role == "Client")
         {
             $customer = Client::where('user_id',auth()->user()->id)->first();
-            $transactions_details = TransactionDetail::where('client_id',$customer->id)->orderBy('id','desc')->get();
+            $transactions_details = TransactionDetail::where('client_id', $customer->id)
+                ->whereDate('date', '>=', $latestTransactionsStartDate)
+                ->orderByDesc('date')
+                ->orderByDesc('id')
+                ->get();
             $total_sales = TransactionDetail::where('client_id',$customer->id)->sum('price');
 
             $totalEarnedPointsCustomer = $customer->transactions->sum('points_client');
@@ -119,21 +131,23 @@ class HomeController extends Controller
         $salesTrend = $this->calculateSalesTrend();
         $qtyTrend = $this->calculateQtyTrend();
 
-        $threeDaysAgo = Carbon::now()->subDays(3)->toDateString();
+        $inactiveDealersCutoff = Carbon::today()->subDays(3)->toDateString();
 
-        $dealers_inactive = Dealer::whereDoesntHave('sales', function ($q) use ($threeDaysAgo) {
-            $q->where('created_at', '>=', $threeDaysAgo);
+        $dealers_inactive = Dealer::whereDoesntHave('sales', function ($q) use ($inactiveDealersCutoff) {
+            // A dealer is inactive at 3+ days when no transaction is newer than the cutoff date.
+            $q->whereDate('date', '>', $inactiveDealersCutoff);
         })
         ->whereHas('sales')
         ->get()
         ->map(function($dealer) {
             $lastTransaction = TransactionDetail::where('dealer_id', $dealer->user_id)
-                ->orderBy('created_at', 'desc')
+                ->orderByDesc('date')
+                ->orderByDesc('id')
                 ->first();
             
-            $dealer->last_transaction_date = $lastTransaction ? $lastTransaction->created_at : null;
+            $dealer->last_transaction_date = $lastTransaction ? $lastTransaction->date : null;
             $dealer->days_since_transaction = $lastTransaction 
-                ? \Carbon\Carbon::parse($lastTransaction->created_at)->diffInDays(\Carbon\Carbon::now()) 
+                ? Carbon::parse($lastTransaction->date)->startOfDay()->diffInDays(Carbon::today())
                 : null;
             return $dealer;
         })
@@ -905,6 +919,7 @@ class HomeController extends Controller
         $dealer = "";
         $customer = "";
         $threeDaysAgo = Carbon::now()->subDays(7)->toDateString();
+        $latestTransactionsStartDate = Carbon::today()->subDays(6)->toDateString();
         $user = auth()->user();
         $centers = $user->ad->areas->pluck('area_name')->toArray();
         
@@ -918,12 +933,19 @@ class HomeController extends Controller
         $transactions = Transaction::orderBy('id','desc')->get();
         
         $adDealers = Dealer::whereIn('center', $centers)->get();
-        $transactions_details = TransactionDetail::orderBy('id','desc')->get();
+        $transactions_details = TransactionDetail::whereDate('date', '>=', $latestTransactionsStartDate)
+            ->orderByDesc('date')
+            ->orderByDesc('id')
+            ->get();
 
         if(auth()->user()->role == "Dealer")
         {
             $dealer = Dealer::with('sales')->where('user_id',auth()->user()->id)->first();
-            $transactions_details = TransactionDetail::where('dealer_id',auth()->user()->id)->orderBy('id','desc')->get();
+            $transactions_details = TransactionDetail::where('dealer_id', auth()->user()->id)
+                ->whereDate('date', '>=', $latestTransactionsStartDate)
+                ->orderByDesc('date')
+                ->orderByDesc('id')
+                ->get();
             $total_sales = TransactionDetail::where('dealer_id',auth()->user()->id)->sum('price');
 
             $totalEarnedPointsDealer = $dealer->sales->sum('points_dealer');
@@ -933,7 +955,11 @@ class HomeController extends Controller
         if(auth()->user()->role == "Client")
         {
             $customer = Client::where('user_id',auth()->user()->id)->first();
-            $transactions_details = TransactionDetail::where('client_id',$customer->id)->orderBy('id','desc')->get();
+            $transactions_details = TransactionDetail::where('client_id', $customer->id)
+                ->whereDate('date', '>=', $latestTransactionsStartDate)
+                ->orderByDesc('date')
+                ->orderByDesc('id')
+                ->get();
             $total_sales = TransactionDetail::where('client_id',$customer->id)->sum('price');
 
             $totalEarnedPointsCustomer = $customer->transactions->sum('points_client');
@@ -984,21 +1010,23 @@ class HomeController extends Controller
         $salesTrend = $this->calculateSalesTrend();
         $qtyTrend = $this->calculateQtyTrend();
 
-        $threeDaysAgo = Carbon::now()->subDays(3)->toDateString();
+        $inactiveDealersCutoff = Carbon::today()->subDays(3)->toDateString();
 
-        $dealers_inactive = Dealer::whereDoesntHave('sales', function ($q) use ($threeDaysAgo) {
-            $q->where('created_at', '>=', $threeDaysAgo);
+        $dealers_inactive = Dealer::whereDoesntHave('sales', function ($q) use ($inactiveDealersCutoff) {
+            // A dealer is inactive at 3+ days when no transaction is newer than the cutoff date.
+            $q->whereDate('date', '>', $inactiveDealersCutoff);
         })
         ->whereHas('sales')
         ->get()
         ->map(function($dealer) {
             $lastTransaction = TransactionDetail::where('dealer_id', $dealer->user_id)
-                ->orderBy('created_at', 'desc')
+                ->orderByDesc('date')
+                ->orderByDesc('id')
                 ->first();
             
-            $dealer->last_transaction_date = $lastTransaction ? $lastTransaction->created_at : null;
+            $dealer->last_transaction_date = $lastTransaction ? $lastTransaction->date : null;
             $dealer->days_since_transaction = $lastTransaction 
-                ? \Carbon\Carbon::parse($lastTransaction->created_at)->diffInDays(\Carbon\Carbon::now()) 
+                ? Carbon::parse($lastTransaction->date)->startOfDay()->diffInDays(Carbon::today())
                 : null;
             return $dealer;
         })

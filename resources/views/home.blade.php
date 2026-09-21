@@ -989,7 +989,7 @@
             </div>
 
             <div class="transaction-list" style="max-height: 500px;">
-              @foreach($transactions_details as $index => $transaction)
+              @forelse($transactions_details as $index => $transaction)
                 <div class="transaction-item {{ $index >= 5 ? 'd-none' : '' }}" data-customer-id="{{$transaction->customer->id ?? 0}}">
                   <div class="row align-items-center p-3 mb-2 rounded-3 transaction-row {{ $index % 2 == 0 ? '' : 'bg-light' }}" 
                       style="border: 1px solid rgba(229, 231, 235, 0.6);">
@@ -1011,7 +1011,7 @@
                                   style="max-width: 100%;"
                                   data-bs-toggle="modal" 
                                   data-bs-target="#transactionModal" 
-                                  onclick="showTransactionDetails('{{date('M d, Y',strtotime($transaction->created_at))}}', '{{number_format($transaction->qty,2)}}', '{{number_format($transaction->qty*$transaction->price,2)}}', '{{strtoupper($transaction->dealer->name ?? '')}}', '{{strtoupper($transaction->customer->name ?? '')}}', '{{$transaction->points_dealer}}', '{{$transaction->points_client}}', '{{$transaction->item}}')">
+                                  onclick="showTransactionDetails('{{date('M d, Y',strtotime($transaction->date))}}', '{{number_format($transaction->qty,2)}}', '{{number_format($transaction->qty*$transaction->price,2)}}', '{{strtoupper($transaction->dealer->name ?? '')}}', '{{strtoupper($transaction->customer->name ?? '')}}', '{{$transaction->points_dealer}}', '{{$transaction->points_client}}', '{{$transaction->item}}')">
                                   {{ strtoupper($transaction->customer->name ?? 'Unknown') }}
                               </a>
                           </h6>
@@ -1021,7 +1021,7 @@
                     
                     <div class="col-4 text-center transaction-date">
                       <span class="text-dark fw-medium">
-                        {{ date('d.m.Y', strtotime($transaction->created_at)) }}
+                        {{ date('d.m.Y', strtotime($transaction->date)) }}
                       </span>
                     </div>
                     
@@ -1032,7 +1032,12 @@
                     </div>
                   </div>
                 </div>
-              @endforeach
+              @empty
+                <div class="py-5 text-center text-muted">
+                  <i class="bi bi-calendar-x fs-4 d-block mb-2"></i>
+                  No transactions in the last 7 days.
+                </div>
+              @endforelse
             </div>
 
             <div class="d-flex justify-content-between align-items-center mt-3 latest-transaction-footer">
@@ -1767,7 +1772,7 @@
     const allTransactions = {!! json_encode(
         $transactions_details->map(function($transaction) {
             return [
-                'date' => date('M d, Y', strtotime($transaction->created_at)),
+            'date' => date('M d, Y', strtotime($transaction->date)),
                 'quantity' => number_format($transaction->qty, 2),
                 'amount' => number_format($transaction->qty * $transaction->price, 2),
                 'dealer' => strtoupper($transaction->dealer->name ?? ''),
