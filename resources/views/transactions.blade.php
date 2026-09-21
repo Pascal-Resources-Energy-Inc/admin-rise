@@ -106,6 +106,7 @@ table.dataTable {
     display: flex;
     font-size: 1.5rem;
     height: 48px;
+    color: #fff;
     justify-content: center;
     width: 48px;
 }
@@ -121,6 +122,7 @@ table.dataTable {
 .transaction-stat-value {
     font-size: 1.35rem;
     font-weight: 700;
+    color: #FFF;
     margin: 0;
 }
 
