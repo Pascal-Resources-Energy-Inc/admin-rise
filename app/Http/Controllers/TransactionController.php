@@ -110,7 +110,7 @@ class TransactionController extends Controller
         $this->applyTransactionSearch($query, trim($request->input('search', '')));
 
         return Excel::download(
-            new TransactionsExport($query->orderByDesc('id')),
+            new TransactionsExport($query->orderByDesc('transaction_details.id')),
             'transactions-' . now()->format('Y-m-d') . '.xlsx'
         );
     }

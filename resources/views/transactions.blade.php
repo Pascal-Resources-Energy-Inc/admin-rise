@@ -413,6 +413,7 @@ table.dataTable {
         pagingType: 'simple_numbers',
         autoWidth: false,
         searchDelay: 250,
+        deferRender: true,
         processing: true,
         serverSide: true,
         ajax: {
@@ -420,6 +421,9 @@ table.dataTable {
             type: 'GET',
             data: function (request) {
                 request.filters = currentFilters();
+            },
+            error: function (xhr) {
+                console.error('Unable to load transactions.', xhr.responseText);
             }
         },
         columnDefs: nonSortableColumns.length ? [{

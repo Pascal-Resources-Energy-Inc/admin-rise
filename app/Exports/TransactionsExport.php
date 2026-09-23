@@ -9,8 +9,11 @@ use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Carbon\Carbon;
 
-class TransactionsExport extends DefaultValueBinder implements FromQuery, WithHeadings, WithMapping, WithCustomValueBinder
+class TransactionsExport extends DefaultValueBinder implements FromQuery, WithHeadings, WithMapping, WithCustomValueBinder, WithColumnFormatting
 {
     private $query;
 
@@ -41,9 +44,15 @@ class TransactionsExport extends DefaultValueBinder implements FromQuery, WithHe
 
     public function map($transaction): array
     {
+        // Export a genuine Excel date, then lock its display format below.
+        // This prevents Excel from applying the computer's regional date format.
+        $date = $transaction->date
+            ? ExcelDate::dateTimeToExcel(Carbon::createFromFormat('Y-m-d', substr((string) $transaction->date, 0, 10))->startOfDay())
+            : null;
+
         return [
             $transaction->id,
-            date('M d, Y', strtotime($transaction->date)),
+            $date,
             number_format($transaction->qty, 2),
             number_format($transaction->qty * $transaction->price, 2),
             optional($transaction->dealer)->name ?? '',
@@ -54,11 +63,23 @@ class TransactionsExport extends DefaultValueBinder implements FromQuery, WithHe
         ];
     }
 
+    /**
+     * Use a fixed Excel date format rather than General, so every downloaded
+     * file displays the Date column as YYYY-MM-DD on any computer.
+     */
+    public function columnFormats(): array
+    {
+        return [
+            'B' => 'yyyy-mm-dd',
+        ];
+    }
+
     public function bindValue(Cell $cell, $value)
     {
-        // Excel must receive the Date column as text so it cannot change its format or value.
-        if ($cell->getColumn() === 'B') {
-            $cell->setValueExplicit((string) $value, DataType::TYPE_STRING);
+        // The Date heading is also in column B, so only bind actual Excel
+        // serial date values as numeric cells.
+        if ($cell->getColumn() === 'B' && is_numeric($value)) {
+            $cell->setValueExplicit($value, DataType::TYPE_NUMERIC);
 
             return true;
         }
