@@ -971,18 +971,23 @@
               <span class="badge bg-success text-white">Activity (7 Days from Date Today)</span>
             </div>
 
-            <div class="row mb-3 px-3 transaction-column-labels" style="border-bottom: 2px solid #e2e8f0; padding-bottom: 12px;">
-              <div class="col-4">
+            <div class="row px-3 transaction-column-labels" style="border-bottom: 2px solid #e2e8f0; padding-bottom: 5px;">
+              <div class="col-5">
                 <small class="text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
                   CUSTOMER
                 </small>
               </div>
-              <div class="col-4 text-center">
+              <div class="col-3 text-center">
                 <small class="text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
                   DATE
                 </small>
               </div>
-              <div class="col-4 text-end">
+              <div class="col-2 text-center">
+                <small class="text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
+                  MFI
+                </small>
+              </div>
+              <div class="col-2 text-end">
                 <small class="text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
                   CUSTOMER POINTS
                 </small>
@@ -995,7 +1000,7 @@
                   <div class="row align-items-center p-3 mb-2 rounded-3 transaction-row {{ $index % 2 == 0 ? '' : 'bg-light' }}" 
                       style="border: 1px solid rgba(229, 231, 235, 0.6);">
                     
-                    <div class="col-4 transaction-customer">
+                    <div class="col-5 transaction-customer">
                       <div class="d-flex align-items-center">
                         <div class="flex-shrink-0 me-3">
                           <div class="avatar-circle position-relative" style="width: 45px; height: 45px;">
@@ -1018,15 +1023,19 @@
                           </h6>
                       </div>
                       </div>
-                    </div>
-                    
-                    <div class="col-4 text-center transaction-date">
+                    </div>        
+                    <div class="col-3 text-center transaction-date">
                       <span class="text-dark fw-medium">
                         {{ date('d.m.Y', strtotime($transaction->date)) }}
                       </span>
                     </div>
-                    
-                    <div class="col-4 text-end transaction-points">
+                    <div class="col-2 text-center transaction-date">
+                      <span class="text-dark fw-medium">
+                        {{ $transaction->customer->mfi ?? 'N/A' }}
+                        
+                      </span>
+                    </div>
+                    <div class="col-2 text-end transaction-points">
                       <span class="fw-bold text-dark">
                         {{ $transaction->points_client }}
                       </span>
