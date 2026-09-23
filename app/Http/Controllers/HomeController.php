@@ -211,13 +211,13 @@ class HomeController extends Controller
             : Carbon::now()->endOfMonth();
 
         $query = TransactionDetail::query()
-            ->whereBetween('created_at', [$start, $end]);
+            ->whereBetween('date', [$start, $end]);
 
         if (!empty($validated['dealer_id'])) {
             $query->where('dealer_id', $validated['dealer_id']);
         }
 
-        $rows = $query->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month_key, SUM(qty) as refills, COUNT(DISTINCT client_id) as beneficiaries")
+        $rows = $query->selectRaw("DATE_FORMAT(date, '%Y-%m') as month_key, SUM(qty) as refills, COUNT(DISTINCT client_id) as beneficiaries")
             ->groupBy('month_key')
             ->orderBy('month_key')
             ->get()
